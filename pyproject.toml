@@ -7,7 +7,7 @@ name = "frag"
 version = "0.1.0"
 description = "Local preservation and inspection of SEC source evidence"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["flask>=3.1,<4"]
 
 [project.scripts]
 frag = "frag.cli:main"

@@ -14,6 +14,18 @@ class SourceError(ValueError):
     """The requested source cannot be preserved or inspected safely."""
 
 
+class StoreMissing(SourceError):
+    """No source catalogue exists yet."""
+
+
+class SourceNotFound(SourceError):
+    """The catalogue does not contain the requested source."""
+
+
+class SourceConflict(SourceError):
+    """Preserved bytes already have different claims."""
+
+
 @dataclass(frozen=True)
 class SourceMetadata:
     """Caller-supplied identity claims, never inferred from the filename or HTML."""
@@ -50,10 +62,24 @@ class SourceStore:
         provenance: Literal["local_original", "synthetic"],
         metadata: SourceMetadata | None = None,
     ) -> dict[str, Any]:
+        return self.ingest_bytes(
+            path.read_bytes(), provenance=provenance, metadata=metadata,
+            input_path=str(path.resolve()),
+        )
+
+    def ingest_bytes(
+        self,
+        original: bytes,
+        *,
+        provenance: Literal["local_original", "synthetic"],
+        metadata: SourceMetadata | None = None,
+        input_path: str | None = None,
+        upload_name: str | None = None,
+    ) -> dict[str, Any]:
+        """Preserve bytes from either a local path or a browser upload."""
         if provenance not in ("local_original", "synthetic"):
             raise SourceError("Explicit local_original or synthetic provenance is required.")
         metadata = metadata or SourceMetadata()
-        original = path.read_bytes()
         if not original:
             raise SourceError("Input is empty; supply original HTML or a labeled synthetic fixture.")
         digest = hashlib.sha256(original).hexdigest()
@@ -69,7 +95,8 @@ class SourceStore:
             "metadata_status": "supplied_unverified",
             "provenance": {
                 "kind": provenance,
-                "input_path": str(path.resolve()),
+                "input_path": input_path,
+                **({"upload_name": upload_name} if upload_name is not None else {}),
                 "preserved_at": datetime.now(timezone.utc).isoformat(),
             },
             "original_path": str(raw_path),
@@ -97,7 +124,7 @@ class SourceStore:
                 if saved["provenance"]["kind"] != provenance or any(
                     saved[key] != value for key, value in asdict(metadata).items()
                 ):
-                    raise SourceError(
+                    raise SourceConflict(
                         "Identical bytes already have different metadata or provenance; "
                         "existing evidence is unchanged. Replay with the original metadata."
                     )
@@ -118,7 +145,7 @@ class SourceStore:
     def inspect(self, source_id: str | None = None) -> dict[str, Any]:
         database = self.root / "sources.sqlite3"
         if not database.is_file():
-            raise SourceError("Store does not exist; ingest a local HTML file first.")
+            raise StoreMissing("Store does not exist; ingest a local HTML file first.")
         with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True)) as connection:
             if source_id is None:
                 rows = connection.execute("SELECT record FROM sources ORDER BY source_id")
@@ -130,7 +157,7 @@ class SourceStore:
                 "SELECT record FROM sources WHERE source_id = ?", (source_id,)
             ).fetchone()
         if row is None:
-            raise SourceError(f"Source not found: {source_id}")
+            raise SourceNotFound(f"Source not found: {source_id}")
         result: dict[str, Any] = json.loads(row[0])
         self._check_original(result)
         return result

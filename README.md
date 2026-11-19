@@ -1,8 +1,8 @@
 # FRAG
 
-Local, evidence-first SEC financial QA work in progress. Issue #2 provides an
-importable Python package and a JSON CLI for **preservation and inspection only**.
-It does not extract revenue, verify filing identity, or produce verified facts.
+Local, evidence-first SEC financial QA work in progress. The CLI and local
+browser workspace preserve and inspect sources. Revenue extraction and
+verification are later Phase 1 slices.
 
 From the repository root in Windows PowerShell, with uv installed:
 
@@ -14,7 +14,36 @@ uv run --offline pytest
 
 Python 3.12 is selected by `.python-version`; uv can install it if needed. Setup
 may require downloads. Subsequent `uv run --offline` commands use the installed
-environment and lockfile. Production code uses only the Python standard library.
+environment and lockfile. The source store uses the Python standard library,
+and the browser API uses Flask.
+
+For the browser workspace, install Node.js 24 and run these commands from the
+repository root after `uv sync --locked`:
+
+```powershell
+npm.cmd --prefix web ci
+npm.cmd --prefix web run build
+uv run --offline frag serve --store artifacts/phase01/local-store/browser
+```
+
+Open [the local source inspector](http://127.0.0.1:5000). Upload an HTML file,
+choose its provenance, and preserve the source. Try `tests/fixtures/synthetic.html`
+with the **Synthetic fixture** option. To inspect browser uploads through the CLI,
+run `uv run --offline frag inspect --store artifacts/phase01/local-store/browser`.
+Click **Refresh** to see sources ingested through the CLI while the page was open.
+Use `--port` to choose another available port. Setup may fetch dependencies.
+Once built and installed, the app uses only localhost during review.
+
+To repeat the automated browser check with an installed Google Chrome, stop
+at the build step above and run:
+
+```powershell
+uv run --locked --with playwright python artifacts/phase01/browser-replay.py
+```
+
+The check starts its own localhost server, uses a temporary store and synthetic
+inputs, and blocks page requests to other origins. uv may fetch Playwright on
+the first run.
 
 The following runnable example uses an explicitly labeled **synthetic document**:
 

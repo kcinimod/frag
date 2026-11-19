@@ -22,6 +22,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     inspect = commands.add_parser("inspect", help="Inspect one source or list all sources")
     inspect.add_argument("source_id", nargs="?")
     inspect.add_argument("--store", type=Path, required=True)
+    serve = commands.add_parser("serve", help="Run the browser workspace on localhost")
+    serve.add_argument("--store", type=Path, required=True)
+    serve.add_argument("--assets", type=Path, default=Path("web/dist"))
+    serve.add_argument("--port", type=int, default=5000)
     args = parser.parse_args(argv)
     try:
         store = SourceStore(args.store)
@@ -34,8 +38,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                     filing_date=args.filing_date, source_url=args.source_url,
                 ),
             )
-        else:
+        elif args.command == "inspect":
             result = store.inspect(args.source_id)
+        else:
+            from frag.web import create_app
+
+            if not (args.assets / "index.html").is_file():
+                raise SourceError("Browser build is missing. Run npm.cmd --prefix web run build.")
+            if not 1 <= args.port <= 65535:
+                raise SourceError("Port must be between 1 and 65535.")
+            create_app(store, args.assets).run(host="127.0.0.1", port=args.port)
+            return 0
     except (SourceError, OSError, sqlite3.Error, json.JSONDecodeError) as exc:
         print(json.dumps({"error": str(exc)}), file=sys.stderr)
         return 1
