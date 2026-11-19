@@ -47,8 +47,9 @@ The SEC index corroborates the CIK, accession, filing and report dates, and
 the exact 9,963,591-byte primary document size. The retained bytes came from an
 EDGAR mirror and have SHA-256
 `6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea`.
-A fresh direct SEC request returned HTTP 403. Verification and replay apply to
-this preserved copy. Direct SEC byte comparison remains outstanding.
+Verification and replay apply to this preserved copy. A later SEC download
+added a 105-byte script element and otherwise matched this copy byte for byte.
+[Direct SEC acquisition](SEC_ACQUISITION.md)
 [SEC filing index](https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/0000950170-23-035122-index.htm)
 [Preserved copy](originals/msft-20230630.htm.gz)
 

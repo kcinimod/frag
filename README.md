@@ -108,9 +108,9 @@ $local = uv run --locked --offline frag ingest $filingPath --store $localStore -
 uv run --locked --offline frag inspect $local.source_id --store $localStore
 ```
 
-The live SEC request returned HTTP 403 on this workstation. The controlled
-download and cached inspection passed, and the retained Microsoft HTML passed
-local replay. [Acquisition run record](artifacts/phase01/SEC_ACQUISITION.md)
+The live download succeeded with a monitored contact email in the user agent.
+The response includes an extra script element and has its own source hash.
+Offline inspection passed. [Acquisition run record](artifacts/phase01/SEC_ACQUISITION.md)
 
 ## Offline replay and source records
 

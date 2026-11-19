@@ -14,7 +14,9 @@ parser. The retained HTML and source manifest support offline replay. See the
   evidence, retains applicable notes and scope caveats, and reports comparison
   compatibility separately. The retained copy came from an EDGAR mirror.
 - Issue #5 adds direct SEC acquisition and offline cache reuse to the CLI.
-  Controlled responses and local replay passed. A live request returned HTTP
-  403, so the direct byte comparison remains outstanding.
+  A live request with a monitored contact succeeded, and cache reuse and
+  inspection passed offline. The SEC response adds one 105-byte script
+  element to the verified mirror copy. The direct response's observations
+  are provisional under its own source hash.
   [Acquisition run record](../artifacts/phase01/SEC_ACQUISITION.md)
 - The wider Phase 1 handoff remains open.
