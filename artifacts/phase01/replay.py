@@ -104,8 +104,11 @@ def replay_microsoft() -> None:
         (fact["reporting_period"]["fiscal_year"], fact["raw_amount"], fact["normalized_amount"])
         for fact in facts
     ] == [(2022, "198,270", "198270000000"), (2023, "211,915", "211915000000")]
-    assert not inspected["real_source_acceptance"] and not inspected["diagnostics"]
-    assert all(fact["status"] == "provisional" for fact in facts)
+    assert inspected["real_source_acceptance"] and not inspected["diagnostics"]
+    assert not inspected["unresolved_requirements"]
+    assert inspected["comparison"]["status"] == "compatible"
+    assert all(fact["status"] == "verified" for fact in facts)
+    assert all([note["number"] for note in fact["applicable_notes"]] == [1, 8, 13, 19] for fact in facts)
     lines = original.decode("utf-8-sig").split("\n")
     for fact in facts:
         for key, expected in (

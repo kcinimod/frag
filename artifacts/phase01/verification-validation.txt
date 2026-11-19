@@ -1,0 +1,30 @@
+Issue #4 validation on Windows PowerShell
+
+uv run --locked --offline mypy
+Success: no issues found in 12 source files
+
+uv run --locked --offline pytest tests/test_verification_workflow.py tests/test_revenue_workflow.py -q
+24 passed in 14.12s
+
+uv run --locked --offline pytest -q
+43 passed in 18.84s
+
+uv run --locked --offline python artifacts/phase01/replay.py --microsoft
+Exit 0. Saved output in microsoft-revenue.json. Both periods verified, comparison
+compatible, identical reingest and one source. The input was the retained EDGAR
+mirror copy. Socket operations were rejected in every CLI subprocess.
+
+npm.cmd --prefix web run build
+tsc --noEmit passed. Vite v7.3.8 transformed 28 modules and built in 523ms.
+
+uv run --locked --offline --with playwright python artifacts/phase01/browser-replay.py
+Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, provisional and verified facts, notes, and comparison. External page requests blocked.
+
+uv build --offline --wheel --out-dir artifacts/phase01/local-store/package
+Built frag-0.1.0-py3-none-any.whl. A ZIP member check confirmed that it contains
+frag/microsoft-revenue-reference.json at evidence version microsoft-fy2023-revenue-v2.
+
+Direct SEC primary document request with an identifying user agent
+curl: (22) The requested URL returned error: 403
+The SEC index corroborated the filing identifiers and primary document size.
+Direct SEC byte comparison was unavailable.

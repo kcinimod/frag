@@ -102,5 +102,7 @@ def test_inline_context_cannot_override_the_displayed_year(tmp_path: Path) -> No
         'name="us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax">817</ix:nonfraction><',
     )
     record = inspect_perturbation(tmp_path, html)
-    assert record["facts"] == []
+    assert [fact["reporting_period"]["fiscal_year"] for fact in record["facts"]] == [2023]
+    assert record["facts"][0]["status"] == "provisional"
+    assert record["diagnostics"][0]["fiscal_year"] == 2022
     assert "context" in record["diagnostics"][0]["message"].lower()

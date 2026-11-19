@@ -102,10 +102,15 @@ def main() -> None:
                     page.get_by_label("Local original", exact=True).check()
                     page.get_by_label("HTML file").set_input_files(filing)
                     save.click()
-                    expect(page.get_by_text("FY2023 · USD 211,915,000,000 · Provisional")).to_be_visible()
+                    page.get_by_text("FY2023 · USD 211,915,000,000 · Verified").click()
+                    expect(page.get_by_text("FY2022 · USD 198,270,000,000 · Verified")).to_be_visible()
+                    expanded = page.locator("details[open]").filter(has_text="FY2023")
+                    expect(expanded.get_by_text("Note 8 · Business Combinations")).to_be_visible()
+                    expect(expanded.get_by_text("HTML lines 13913–14338")).to_be_visible()
+                    expect(page.get_by_text("Nuance was consolidated from March 4, 2022.", exact=False)).to_be_visible()
                 finally:
                     browser.close()
-            print("Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, provisional facts and evidence. External page requests blocked.")
+            print("Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, provisional and verified facts, notes, and comparison. External page requests blocked.")
         finally:
             server.terminate()
             server.wait(timeout=10)

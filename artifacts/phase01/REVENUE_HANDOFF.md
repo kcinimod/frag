@@ -1,5 +1,8 @@
 # Issue #3 provisional revenue handoff
 
+This records the extraction checkpoint. The current fact statuses and replay
+are described in the [issue #4 verification handoff](VERIFICATION_HANDOFF.md).
+
 The SEC filing index identifies Microsoft Corporation (CIK 789019), accession
 `0000950170-23-035122`, filed July 27, 2023, for the year ended June 30, 2023.
 Direct requests from the run environment returned HTTP 403. A GET from the

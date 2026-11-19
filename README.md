@@ -1,7 +1,7 @@
 # FRAG
 
 Local, evidence-first SEC financial QA work in progress. The CLI and browser
-workspace preserve original source bytes and expose provisional consolidated
+workspace preserve original source bytes and expose verified and provisional consolidated
 revenue for FY2022 and FY2023 from the selected Microsoft FY2023 10-K.
 
 From the repository root in Windows PowerShell, with uv installed:
@@ -91,18 +91,21 @@ Treat the store as trusted local state, and keep backups of original evidence.
 
 Successful commands print JSON to stdout. Operational errors print JSON to stderr
 and exit 1; invalid command syntax exits 2. `inspect` without an ID lists all
-sources and their count. Each source exposes the parser version, any provisional
-facts, extraction diagnostics, and open verification requirements. Amounts are
+sources and their count. Each source exposes parser and evidence versions, fact
+statuses, extraction diagnostics, and open verification requirements. Amounts are
 decimal strings, with JSON `null` for unknown normalized amounts. The parser reads
 HTML as data. The locators point to the original HTML using one-based line and
 character offsets and physical table, row, and cell ordinals. Column ordinals use
-the logical grid after spans are applied. Expand a provisional observation in
-the browser to see these coordinates.
+the logical grid after spans are applied. Expand an observation in the browser
+to see its bounded applicable notes and source coordinates. Comparison status
+and scope caveats appear below the observations. Verification currently covers
+the retained Microsoft filing and uses an independently inspected reference
+with a recorded source hash.
 
 Importable entry points are `frag.store.SourceStore`, `SourceMetadata`, and
 `SourceError`. Use `SourceStore(Path(...)).ingest(...)` and `.inspect(...)` with
 the same metadata and provenance semantics as the CLI.
 
 See [project status](docs/PROJECT_STATUS.md) and the
-[revenue extraction handoff](artifacts/phase01/REVENUE_HANDOFF.md) for evidence
+[revenue verification handoff](artifacts/phase01/VERIFICATION_HANDOFF.md) for evidence
 and remaining work.

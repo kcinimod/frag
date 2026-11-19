@@ -5,14 +5,148 @@
     "accession": "0000950170-23-035122",
     "byte_count": 9963591,
     "company": "Microsoft Corporation",
+    "comparison": {
+      "basis": "The adjoining annual periods use the same June 30 year-end and reported consolidated US GAAP revenue definition in the FY2023 filing. The FY2022 observation is the comparative reported in that filing. Note 1 says the disclosed recasts did not affect consolidated income statements.",
+      "evidence": [
+        {
+          "id": "segment_recast",
+          "interpretation": "MD&A describes recast prior-period segment amounts on the internal management reporting basis.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 1912
+            },
+            "start": {
+              "character": 1,
+              "line": 1909
+            }
+          },
+          "sha256": "c2067d33778a19e836fc95725da769ca985c6310d0b1120ba6e11615ea00c5f5"
+        },
+        {
+          "id": "acquisition_and_exchange_rates",
+          "interpretation": "The FY2023 versus FY2022 discussion identifies a foreign currency impact on reported revenue and separately discusses Nuance and Xandr in operating expenses.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 2324
+            },
+            "start": {
+              "character": 1,
+              "line": 2315
+            }
+          },
+          "scope_caveat": "Microsoft disclosed an unfavorable foreign currency impact on revenue in its FY2023 comparison.",
+          "sha256": "626d2c5b77a7b26ce07edf2a88c3f4f6eabd9df6a1d46925fe7b2a519f7b0467"
+        },
+        {
+          "id": "xandr_acquisition",
+          "interpretation": "The More Personal Computing discussion identifies Xandr as a contributor to search and news advertising revenue excluding traffic acquisition costs.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 2672
+            },
+            "start": {
+              "character": 1,
+              "line": 2671
+            }
+          },
+          "scope_caveat": "The filing identifies Xandr in a component revenue discussion. This evidence supplies no adjustment to total consolidated revenue.",
+          "sha256": "9a4bcc08c1d6cb9c8547840de05246ebac3d207a3cde9c0ae37432b0b7e9040c"
+        }
+      ],
+      "reference_status": "compatible",
+      "scope_caveats": [
+        "Reported revenue reflects foreign currency translation at average rates for each year.",
+        "Nuance was consolidated from March 4, 2022. FY2022 includes a partial year of Nuance and FY2023 includes a full year.",
+        "Microsoft disclosed an unfavorable foreign currency impact on revenue in its FY2023 comparison.",
+        "The filing identifies Xandr in a component revenue discussion. This evidence supplies no adjustment to total consolidated revenue."
+      ],
+      "status": "compatible",
+      "unresolved_requirements": []
+    },
     "diagnostics": [],
+    "evidence_version": "microsoft-fy2023-revenue-v2",
     "facts": [
       {
-        "applicable_notes": [],
+        "applicable_notes": [
+          {
+            "interpretation": "US GAAP and consolidated Microsoft plus subsidiaries, with intercompany eliminations. Revenue is recognized on transfer of control. Disclosed prior-period recasts had no effect on the consolidated income statements. Foreign currency revenue is translated at average rates.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 7608
+              },
+              "start": {
+                "character": 1,
+                "line": 7233
+              }
+            },
+            "next_heading": 2,
+            "number": 1,
+            "scope_caveat": "Reported revenue reflects foreign currency translation at average rates for each year.",
+            "sha256": "fc7eaa52f7ab11bc87c6fceaf94224ee88eeead8532bd8d228290ba76b889a46",
+            "title": "Accounting Policies"
+          },
+          {
+            "interpretation": "Nuance entered consolidated results on March 4, 2022, partway through FY2022. ZeniMax entered in March 2021 before both periods. Activision Blizzard was pending as of the filing.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 14339
+              },
+              "start": {
+                "character": 1,
+                "line": 13913
+              }
+            },
+            "next_heading": 9,
+            "number": 8,
+            "scope_caveat": "Nuance was consolidated from March 4, 2022. FY2022 includes a partial year of Nuance and FY2023 includes a full year.",
+            "sha256": "b34e1d7aee77aa571a3e36eaa4070787e2bddfa2e3f0c7a75dae6f02835d72b3",
+            "title": "Business Combinations"
+          },
+          {
+            "interpretation": "Contract liability rollforward and remaining performance obligations provide timing context for recognition. Unearned revenue balances are distinct from recognized total revenue.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 17827
+              },
+              "start": {
+                "character": 1,
+                "line": 17612
+              }
+            },
+            "next_heading": 14,
+            "number": 13,
+            "sha256": "b8c6684408f0b606d270ea21852dced19de3625e22a724fcb0ead80727d0f9f7",
+            "title": "Unearned Revenue"
+          },
+          {
+            "interpretation": "Prior segment amounts were recast for internal management reporting. The segment revenue table reconciles to consolidated total revenue for both years.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 21846
+              },
+              "start": {
+                "character": 1,
+                "line": 20936
+              }
+            },
+            "next_heading": null,
+            "number": 19,
+            "sha256": "27479fda2c3a86d8e8ac319c28983dd5b2a8a74a4bb30816739cc3ab717e7880",
+            "title": "Segment Information and Geographic Data"
+          }
+        ],
         "basis": "as_reported_in_filing",
         "company": "Microsoft Corporation",
         "comparative": true,
         "currency": "USD",
+        "evidence_version": "microsoft-fy2023-revenue-v2",
         "fact_id": "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
         "filing_date": "2023-07-27",
         "inline_xbrl": {
@@ -84,8 +218,9 @@
         "metric_label": "Total revenue",
         "normalized_amount": "198270000000",
         "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
-        "parser_version": "annual-revenue-v2",
+        "parser_version": "annual-revenue-v4",
         "raw_amount": "198,270",
+        "reference_status": "matched",
         "reporting_period": {
           "end": "2022-06-30",
           "fiscal_year": 2022,
@@ -95,18 +230,87 @@
         "scale": 1000000,
         "scope": "consolidated",
         "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
-        "status": "provisional",
-        "unresolved_requirements": [
-          "applicable_notes",
-          "independent_evidence_verification"
-        ]
+        "status": "verified",
+        "unresolved_requirements": []
       },
       {
-        "applicable_notes": [],
+        "applicable_notes": [
+          {
+            "interpretation": "US GAAP and consolidated Microsoft plus subsidiaries, with intercompany eliminations. Revenue is recognized on transfer of control. Disclosed prior-period recasts had no effect on the consolidated income statements. Foreign currency revenue is translated at average rates.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 7608
+              },
+              "start": {
+                "character": 1,
+                "line": 7233
+              }
+            },
+            "next_heading": 2,
+            "number": 1,
+            "scope_caveat": "Reported revenue reflects foreign currency translation at average rates for each year.",
+            "sha256": "fc7eaa52f7ab11bc87c6fceaf94224ee88eeead8532bd8d228290ba76b889a46",
+            "title": "Accounting Policies"
+          },
+          {
+            "interpretation": "Nuance entered consolidated results on March 4, 2022, partway through FY2022. ZeniMax entered in March 2021 before both periods. Activision Blizzard was pending as of the filing.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 14339
+              },
+              "start": {
+                "character": 1,
+                "line": 13913
+              }
+            },
+            "next_heading": 9,
+            "number": 8,
+            "scope_caveat": "Nuance was consolidated from March 4, 2022. FY2022 includes a partial year of Nuance and FY2023 includes a full year.",
+            "sha256": "b34e1d7aee77aa571a3e36eaa4070787e2bddfa2e3f0c7a75dae6f02835d72b3",
+            "title": "Business Combinations"
+          },
+          {
+            "interpretation": "Contract liability rollforward and remaining performance obligations provide timing context for recognition. Unearned revenue balances are distinct from recognized total revenue.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 17827
+              },
+              "start": {
+                "character": 1,
+                "line": 17612
+              }
+            },
+            "next_heading": 14,
+            "number": 13,
+            "sha256": "b8c6684408f0b606d270ea21852dced19de3625e22a724fcb0ead80727d0f9f7",
+            "title": "Unearned Revenue"
+          },
+          {
+            "interpretation": "Prior segment amounts were recast for internal management reporting. The segment revenue table reconciles to consolidated total revenue for both years.",
+            "locator": {
+              "end_exclusive": {
+                "character": 1,
+                "line": 21846
+              },
+              "start": {
+                "character": 1,
+                "line": 20936
+              }
+            },
+            "next_heading": null,
+            "number": 19,
+            "sha256": "27479fda2c3a86d8e8ac319c28983dd5b2a8a74a4bb30816739cc3ab717e7880",
+            "title": "Segment Information and Geographic Data"
+          }
+        ],
         "basis": "as_reported_in_filing",
         "company": "Microsoft Corporation",
         "comparative": false,
         "currency": "USD",
+        "evidence_version": "microsoft-fy2023-revenue-v2",
         "fact_id": "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37",
         "filing_date": "2023-07-27",
         "inline_xbrl": {
@@ -178,8 +382,9 @@
         "metric_label": "Total revenue",
         "normalized_amount": "211915000000",
         "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
-        "parser_version": "annual-revenue-v2",
+        "parser_version": "annual-revenue-v4",
         "raw_amount": "211,915",
+        "reference_status": "matched",
         "reporting_period": {
           "end": "2023-06-30",
           "fiscal_year": 2023,
@@ -189,32 +394,43 @@
         "scale": 1000000,
         "scope": "consolidated",
         "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
-        "status": "provisional",
-        "unresolved_requirements": [
-          "applicable_notes",
-          "independent_evidence_verification"
-        ]
+        "status": "verified",
+        "unresolved_requirements": []
       }
     ],
     "filing_date": "2023-07-27",
     "form": "10-K",
     "hash_algorithm": "sha256",
     "metadata_status": "supplied_unverified",
-    "parser_version": "annual-revenue-v2",
+    "parser_version": "annual-revenue-v4",
     "provenance": {
       "archive": "artifacts/phase01/originals/msft-20230630.htm.gz",
       "kind": "local_original",
       "retrieved_from": "https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm"
     },
-    "real_source_acceptance": false,
+    "real_source_acceptance": true,
     "schema_version": "source-v1",
     "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
     "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
     "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm",
     "status": "source_preserved",
-    "unresolved_requirements": [
-      "source_identity_verification",
-      "evidence_verification"
-    ]
+    "unresolved_requirements": [],
+    "verification_reference": {
+      "input_kind": "local_original",
+      "inspection_method": "Manual inspection of visible statement and disclosure text, raw HTML tags and merged cells, and referenced inline XBRL contexts and unit. SEC filing index corroborates identity and document size. SHA-256 fingerprints were computed from the manually selected source coordinates, independently of the extractor.",
+      "reviewed_filing": {
+        "accession": "0000950170-23-035122",
+        "byte_count": 9963591,
+        "cik": "0000789019",
+        "company": "Microsoft Corporation",
+        "filing_date": "2023-07-27",
+        "filing_index_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/0000950170-23-035122-index.htm",
+        "form": "10-K",
+        "report_end": "2023-06-30",
+        "reviewed_copy_url": "https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm",
+        "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm"
+      }
+    }
   }
 }

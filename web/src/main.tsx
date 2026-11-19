@@ -11,6 +11,11 @@ type Locator = {
   column?: number;
 };
 
+type Disclosure = {
+  interpretation: string;
+  locator: { start: Locator; end_exclusive: Locator };
+};
+
 type RevenueFact = {
   fact_id: string;
   metric_label: string;
@@ -18,6 +23,8 @@ type RevenueFact = {
   normalized_amount: string | null;
   currency: string | null;
   scale: number | null;
+  status: 'verified' | 'provisional';
+  applicable_notes: (Disclosure & { number: number; title: string })[];
   comparative: boolean;
   reporting_period: { fiscal_year: number; start: string; end: string };
   parent_table_id: string;
@@ -36,6 +43,13 @@ type Source = {
   byte_count: number;
   parser_version: string;
   facts: RevenueFact[];
+  comparison?: {
+    status: 'compatible' | 'unresolved';
+    basis: string | null;
+    evidence: (Disclosure & { id: string })[];
+    scope_caveats: string[];
+    unresolved_requirements: string[];
+  };
   diagnostics: { code: string; message: string; fiscal_year?: number }[];
   unresolved_requirements: string[];
   provenance: {
@@ -78,7 +92,7 @@ function SourceDetail({ source }: { source: Source }) {
         <dt>Preserved at</dt><dd>{new Date(source.provenance.preserved_at).toLocaleString()}</dd>
       </dl>
       <h3>Filing metadata</h3>
-      <p className="muted">Supplied metadata is unverified. Real-source acceptance is pending.</p>
+      <p className="muted">These fields show metadata supplied at ingest.</p>
       <dl>
         {fields.map(([key, label]) => (
           <div className="pair" key={key}><dt>{label}</dt><dd>{source[key] ?? 'Unknown'}</dd></div>
@@ -88,7 +102,7 @@ function SourceDetail({ source }: { source: Source }) {
       <dl>
         <dt>Parser version</dt><dd className="mono">{source.parser_version}</dd>
         <dt>Open requirements</dt>
-        <dd>{source.unresolved_requirements.map(requirement => requirement.replaceAll('_', ' ')).join(', ')}</dd>
+        <dd>{formatRequirements(source.unresolved_requirements)}</dd>
       </dl>
       {source.diagnostics.length > 0 && (
         <ul>{source.diagnostics.map(diagnostic => (
@@ -96,7 +110,36 @@ function SourceDetail({ source }: { source: Source }) {
         ))}</ul>
       )}
       {source.facts.map(fact => <RevenueDetail fact={fact} key={fact.fact_id} />)}
+      {source.comparison && source.facts.length > 0 && (
+        <section aria-labelledby="comparison-title">
+          <h3 id="comparison-title">FY2022 and FY2023 comparison</h3>
+          <p>{source.comparison.basis ?? 'Comparison is unresolved.'}</p>
+          {source.comparison.unresolved_requirements.length > 0 && (
+            <p>Open requirements · {formatRequirements(source.comparison.unresolved_requirements)}</p>
+          )}
+          {source.comparison.scope_caveats.map(caveat => <p key={caveat}>{caveat}</p>)}
+          {source.comparison.evidence.map(evidence => (
+            <DisclosureDetail key={evidence.id} disclosure={evidence} />
+          ))}
+        </section>
+      )}
     </section>
+  );
+}
+
+function formatRequirements(requirements: string[]) {
+  return requirements.map(requirement => requirement.replaceAll('_', ' ')).join(', ') || 'None';
+}
+
+function DisclosureDetail({ disclosure, title }: { disclosure: Disclosure; title?: string }) {
+  const { start, end_exclusive } = disclosure.locator;
+  const lastLine = end_exclusive.line - 1;
+  return (
+    <p>
+      {title && <strong>{title} · </strong>}
+      {disclosure.interpretation}{' '}
+      <span className="muted">HTML {lastLine === start.line ? `line ${start.line}` : `lines ${start.line}–${lastLine}`}</span>
+    </p>
   );
 }
 
@@ -114,7 +157,7 @@ function RevenueDetail({ fact }: { fact: RevenueFact }) {
     : 'Unknown amount';
   return (
     <details className="fact">
-      <summary>FY{year} · {amount} · Provisional</summary>
+      <summary>FY{year} · {amount} · {fact.status === 'verified' ? 'Verified' : 'Provisional'}</summary>
       <dl>
         <dt>Original label and amount</dt><dd>{fact.metric_label} · {fact.raw_amount || 'Unknown'}</dd>
         <dt>Currency</dt><dd>{fact.currency ?? 'Unknown'}</dd>
@@ -124,7 +167,7 @@ function RevenueDetail({ fact }: { fact: RevenueFact }) {
         <dt>Fact ID</dt><dd className="mono">{fact.fact_id}</dd>
         <dt>Table ID</dt><dd className="mono">{fact.parent_table_id}</dd>
         <dt>Open requirements</dt>
-        <dd>{fact.unresolved_requirements.map(requirement => requirement.replaceAll('_', ' ')).join(', ')}</dd>
+        <dd>{formatRequirements(fact.unresolved_requirements)}</dd>
         {Object.entries(fact.locators).map(([key, location]) => (
           <div className="pair" key={key}>
             <dt>{locatorLabels[key] ?? key}</dt>
@@ -138,6 +181,9 @@ function RevenueDetail({ fact }: { fact: RevenueFact }) {
           </div>
         ))}
       </dl>
+      {fact.applicable_notes?.map(note => (
+        <DisclosureDetail key={note.number} disclosure={note} title={`Note ${note.number} · ${note.title}`} />
+      ))}
     </details>
   );
 }

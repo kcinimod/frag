@@ -12,7 +12,7 @@ from frag.income_html import (
     is_statement_heading, table_grid,
 )
 
-PARSER_VERSION = "annual-revenue-v2"
+PARSER_VERSION = "annual-revenue-v4"
 ACCESSION = "0000950170-23-035122"
 MICROSOFT_CIK = "0000789019"
 TARGET_YEARS = (2022, 2023)
@@ -69,13 +69,16 @@ def _check_document(document: StatementHTML, source: dict[str, Any]) -> None:
     actual = {key: [item.text for item in items] for key, items in document.cover_facts.items()}
     if actual != expected:
         raise UnsupportedLayout("Expected inline cover fields for Microsoft's FY2023 Form 10-K.")
-    company = source["company"]
-    if company and " ".join(company.casefold().replace(".", "").split()) not in {
-        "microsoft corp", "microsoft corporation",
-    }:
+    if not matches_microsoft_company(source["company"]):
         raise UnsupportedLayout("The supplied company conflicts with the Microsoft inline cover fields.")
     if source["accession"] not in (None, ACCESSION) or source["form"] not in (None, "10-K"):
         raise UnsupportedLayout(f"Supplied metadata conflicts with Form 10-K accession {ACCESSION}.")
+
+
+def matches_microsoft_company(company: str | None) -> bool:
+    return company is None or " ".join(company.casefold().replace(".", "").split()) in {
+        "microsoft corp", "microsoft corporation",
+    }
 
 
 def _extract_table(
@@ -110,8 +113,14 @@ def _extract_table(
         header = year_cells[year]
         if value_row.width != rows[header.row - 1].width:
             raise UnsupportedLayout("The Total revenue row width differs from the year header row.")
-        value = _value_cell(value_row.cells, label, header)
-        fact = _revenue_fact(document, source, evidence, header, value, year)
+        try:
+            value = _value_cell(value_row.cells, label, header)
+            fact = _revenue_fact(document, source, evidence, header, value, year)
+        except UnsupportedLayout as exc:
+            diagnostics.append({
+                "code": "unsupported_observation", "fiscal_year": year, "message": str(exc),
+            })
+            continue
         facts.append(fact)
         for field in ("normalized_amount", "currency", "scale"):
             if fact[field] is None:
@@ -119,6 +128,8 @@ def _extract_table(
                     "code": f"unknown_{field}", "fiscal_year": year,
                     "message": f"FY{year} revenue has unknown {field.replace('_', ' ')}.",
                 })
+    if not facts and diagnostics:
+        raise UnsupportedLayout(diagnostics[0]["message"])
     return facts, diagnostics
 
 

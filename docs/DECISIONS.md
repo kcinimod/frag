@@ -62,3 +62,19 @@ source ID, metric, and fiscal year. The SQLite catalogue stores extraction
 results by source ID and parser version separately from the original source
 record. Reingestion fills the current parser version while preserving earlier
 results. Inspect can derive the current view in memory for older stores.
+
+## Issue #4 independent verification
+
+The independent reference is packaged separately from the extractor. For the
+one reviewed filing, it pins the preserved source identity and fingerprints of
+manually selected statement elements, contexts, note headings, and disclosure
+ranges. A verified fact requires matching fields and geometry, resolvable original
+markup, and bounded applicable notes. Comparison additionally requires both
+observations and the reviewed comparative disclosures. The original input hash
+is required for real-source acceptance. Explicitly synthetic derivatives report
+per-observation reference matches while retaining provisional fact status.
+
+The catalogue cache key combines parser and evidence versions. Observation IDs
+remain byte-, metric-, and period-based. A failed per-observation annual context
+leaves the other period available. Ambiguous shared statement geometry still
+produces a source-level diagnostic.

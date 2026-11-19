@@ -9,7 +9,10 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
-from frag.revenue import PARSER_VERSION, extract_revenue
+from frag.revenue import PARSER_VERSION
+from frag.verification import EVIDENCE_VERSION, inspect_revenue
+
+RESULT_VERSION = f"{PARSER_VERSION}:{EVIDENCE_VERSION}"
 
 
 class SourceError(ValueError):
@@ -145,10 +148,10 @@ class SourceStore:
             )
             result = self._read_extraction(connection, source_id)
             if result is None:
-                result = extract_revenue(original, record)
+                result = inspect_revenue(original, record)
                 connection.execute(
                     "INSERT INTO extractions VALUES (?, ?, ?)",
-                    (source_id, PARSER_VERSION, json.dumps(result, sort_keys=True)),
+                    (source_id, RESULT_VERSION, json.dumps(result, sort_keys=True)),
                 )
         return record | result
 
@@ -175,7 +178,7 @@ class SourceStore:
         result = self._read_extraction(connection, record["source_id"])
         if result is None:
             # Legacy stores and stores copied from earlier parser versions stay readable.
-            result = extract_revenue(original, record)
+            result = inspect_revenue(original, record)
         return record | result
 
     @staticmethod
@@ -186,7 +189,7 @@ class SourceStore:
             return None
         row = connection.execute(
             "SELECT result FROM extractions WHERE source_id = ? AND parser_version = ?",
-            (source_id, PARSER_VERSION),
+            (source_id, RESULT_VERSION),
         ).fetchone()
         result: dict[str, Any] | None = json.loads(row[0]) if row else None
         return result

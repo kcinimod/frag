@@ -1,0 +1,506 @@
+{
+  "evidence_version": "microsoft-fy2023-revenue-v2",
+  "inspection_method": "Manual inspection of visible statement and disclosure text, raw HTML tags and merged cells, and referenced inline XBRL contexts and unit. SEC filing index corroborates identity and document size. SHA-256 fingerprints were computed from the manually selected source coordinates, independently of the extractor.",
+  "identity": {
+    "company": "Microsoft Corporation",
+    "cik": "0000789019",
+    "accession": "0000950170-23-035122",
+    "form": "10-K",
+    "filing_date": "2023-07-27",
+    "report_end": "2023-06-30",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm",
+    "filing_index_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/0000950170-23-035122-index.htm",
+    "reviewed_copy_url": "https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm",
+    "byte_count": 9963591,
+    "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea"
+  },
+  "fact_fields": {
+    "metric": "reported_consolidated_revenue",
+    "metric_label": "Total revenue",
+    "currency": "USD",
+    "scale": 1000000,
+    "basis": "as_reported_in_filing",
+    "scope": "consolidated"
+  },
+  "statement_anchors": {
+    "statement_heading": {
+      "locator": {
+        "line": 4267,
+        "character": 3
+      },
+      "length": 557,
+      "sha256": "99ca28bfd78b8064f204d5efa114c06d3b0f47b9b2328b87221b8d6fd04fb14b"
+    },
+    "table": {
+      "locator": {
+        "line": 4269,
+        "character": 3,
+        "table": 25
+      },
+      "length": 125,
+      "sha256": "cb605233a18da2cabdb92c60c31f352269263a308ed1581eedb9f8491fb2bf30"
+    },
+    "unit_header": {
+      "locator": {
+        "line": 4286,
+        "character": 5,
+        "table": 25,
+        "row": 2,
+        "cell": 1,
+        "column": 1
+      },
+      "length": 475,
+      "sha256": "2794cf3cfb591c42d6cea21f3fee0ac8aced66c200ba8a2338ed2aff08bbdf3e"
+    },
+    "annual_header": {
+      "locator": {
+        "line": 4309,
+        "character": 5,
+        "table": 25,
+        "row": 5,
+        "cell": 1,
+        "column": 1
+      },
+      "length": 455,
+      "sha256": "006ef5a906a42b00d72b0e30c17b3cbb7acad60bfd0911b0daea7ac74aba6d34"
+    },
+    "metric_label": {
+      "locator": {
+        "line": 4396,
+        "character": 5,
+        "table": 25,
+        "row": 12,
+        "cell": 1,
+        "column": 1
+      },
+      "length": 513,
+      "sha256": "67b85f1094c601cc3f5df82775c7cad726fc29543833f8530ca10c2e5089eafa"
+    },
+    "currency_measure": {
+      "locator": {
+        "line": 8,
+        "character": 232933
+      },
+      "length": 42,
+      "sha256": "5505fd1365456533f5ace9fec2828aef0cb1a4de7c777dc8f9c614923629b141"
+    }
+  },
+  "observations": {
+    "2022": {
+      "fields": {
+        "raw_amount": "198,270",
+        "normalized_amount": "198270000000",
+        "reporting_period": {
+          "kind": "annual",
+          "fiscal_year": 2022,
+          "start": "2021-07-01",
+          "end": "2022-06-30"
+        },
+        "comparative": true,
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "C_efe853fc-8e8a-4899-b65b-e33c17faff7c",
+          "fact_element_id": "F_9e4cb859-32cb-499b-861d-cc7439e04b9b",
+          "unit_id": "U_USD"
+        }
+      },
+      "anchors": {
+        "year_header": {
+          "locator": {
+            "line": 4314,
+            "character": 5,
+            "table": 25,
+            "row": 5,
+            "cell": 6,
+            "column": 7
+          },
+          "length": 471,
+          "sha256": "40a2f99981b359352e109ac7fdb8f8fd37df3fe5824ba60cb74f2b9f19343443"
+        },
+        "value": {
+          "locator": {
+            "line": 4403,
+            "character": 5,
+            "table": 25,
+            "row": 12,
+            "cell": 8,
+            "column": 8
+          },
+          "length": 790,
+          "sha256": "460c29703452e863c4bbb26028e2a1730fa5bf93dcdea93f61637fbc25623f3b"
+        },
+        "inline_context": {
+          "locator": {
+            "line": 8,
+            "character": 159559
+          },
+          "length": 298,
+          "sha256": "f2cd231ca97196a35a57cfa97c372bc4c57dc0b1281b8a8ede7ace6ff3150499"
+        }
+      }
+    },
+    "2023": {
+      "fields": {
+        "raw_amount": "211,915",
+        "normalized_amount": "211915000000",
+        "reporting_period": {
+          "kind": "annual",
+          "fiscal_year": 2023,
+          "start": "2022-07-01",
+          "end": "2023-06-30"
+        },
+        "comparative": false,
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "C_da7a1266-ce2b-41b7-83ff-bb6e03dc1fa5",
+          "fact_element_id": "F_1574d8d7-79cc-48b4-b29c-3394ed5cb819",
+          "unit_id": "U_USD"
+        }
+      },
+      "anchors": {
+        "year_header": {
+          "locator": {
+            "line": 4311,
+            "character": 5,
+            "table": 25,
+            "row": 5,
+            "cell": 3,
+            "column": 3
+          },
+          "length": 471,
+          "sha256": "15899ff2195f95f99ef8c4ebccc7942ce306b72e24d1594ce1091b3d2b2c7931"
+        },
+        "value": {
+          "locator": {
+            "line": 4399,
+            "character": 5,
+            "table": 25,
+            "row": 12,
+            "cell": 4,
+            "column": 4
+          },
+          "length": 788,
+          "sha256": "220a1878d69886a63bd7e6a8ec66a1bef67d18ce8bc28476e39159490818c884"
+        },
+        "inline_context": {
+          "locator": {
+            "line": 8,
+            "character": 130787
+          },
+          "length": 298,
+          "sha256": "1d0098bfe783ba92661ab65c56b6c2f8d91633979dc83122214326ac60ccccf4"
+        }
+      }
+    }
+  },
+  "note_headings": {
+    "1": {
+      "locator": {
+        "line": 7233,
+        "character": 255
+      },
+      "length": 388,
+      "sha256": "cdac7c35e87fc56406bf892bd05e7d6b30434dea1a2871b3193a10e960bc8b89"
+    },
+    "2": {
+      "locator": {
+        "line": 7608,
+        "character": 242
+      },
+      "length": 388,
+      "sha256": "670f36417602bedf9cee9e76648fd7b4d6c616e9509b39fe08e3cd01bef37fa4"
+    },
+    "3": {
+      "locator": {
+        "line": 7919,
+        "character": 259
+      },
+      "length": 561,
+      "sha256": "f11cc92a4f43356c7fe321ba2a9c6dcb1f382973bdceb790efc2a3482784696e"
+    },
+    "4": {
+      "locator": {
+        "line": 8439,
+        "character": 317
+      },
+      "length": 380,
+      "sha256": "d852db13d4b71b2404877d7ab369995b0004485da97ef268375ccb8c77be36e8"
+    },
+    "5": {
+      "locator": {
+        "line": 12073,
+        "character": 277
+      },
+      "length": 544,
+      "sha256": "7b89e130116200387a73c6d147e696159e43cbe9f231718bc7e04c94dcbf37dc"
+    },
+    "6": {
+      "locator": {
+        "line": 13621,
+        "character": 245
+      },
+      "length": 845,
+      "sha256": "a1e9d9a319a2ceacc140feaa4d819f3d3c162035f7c5959056ccc3831d2452b2"
+    },
+    "7": {
+      "locator": {
+        "line": 13740,
+        "character": 261
+      },
+      "length": 555,
+      "sha256": "71908533d86584e8a40d03360927b99edce9616276f67201f34d27943c68deaa"
+    },
+    "8": {
+      "locator": {
+        "line": 13913,
+        "character": 203
+      },
+      "length": 555,
+      "sha256": "e9cf93d87dfa698bae824ef49d668bbc4c6e8ab1499c49b569d4eebc7888becc"
+    },
+    "9": {
+      "locator": {
+        "line": 14339,
+        "character": 244
+      },
+      "length": 542,
+      "sha256": "d60a8224be3c4605b9e957993091e52f47ba500ee115f4138b38f357e2917dc9"
+    },
+    "10": {
+      "locator": {
+        "line": 14684,
+        "character": 252
+      },
+      "length": 1017,
+      "sha256": "216e10abb97b920b34cd7b4f286cb05a730e3becd4b7a8f7e3ed8ac8faa89743"
+    },
+    "11": {
+      "locator": {
+        "line": 15315,
+        "character": 240
+      },
+      "length": 538,
+      "sha256": "8824f07c420fd5b4d48607e12071486143d2756e8d03959a52fdfe0dc1be08ec"
+    },
+    "12": {
+      "locator": {
+        "line": 16079,
+        "character": 245
+      },
+      "length": 382,
+      "sha256": "961c60d2807666db7444e9655f497ebad84c6884716fa58682354f44104d9c57"
+    },
+    "13": {
+      "locator": {
+        "line": 17612,
+        "character": 257
+      },
+      "length": 551,
+      "sha256": "ba9bd92ff741b3a83f93c6835a9383a2966c4f512483bb11fa12c00d1ef51b8d"
+    },
+    "14": {
+      "locator": {
+        "line": 17827,
+        "character": 254
+      },
+      "length": 1006,
+      "sha256": "4d6559bb063523a629d22ffb5efd53a2ad04519e7c645f831f86da946327f4f5"
+    },
+    "15": {
+      "locator": {
+        "line": 18949,
+        "character": 254
+      },
+      "length": 383,
+      "sha256": "4134baee358b3434fca13233683f40739855ae9f5cf99d2d1e9dd8d2deac88b0"
+    },
+    "16": {
+      "locator": {
+        "line": 18955,
+        "character": 258
+      },
+      "length": 1027,
+      "sha256": "7f34718c9c6343755d19ff094d6c6dbdc9f6e4593c627a0f1bf8be921e5d0b3c"
+    },
+    "17": {
+      "locator": {
+        "line": 19850,
+        "character": 249
+      },
+      "length": 416,
+      "sha256": "cf455721cac6082101799c81396e5ebf74bd7ad654efbf8077e0fb1e97bd222d"
+    },
+    "18": {
+      "locator": {
+        "line": 20510,
+        "character": 261
+      },
+      "length": 402,
+      "sha256": "e66e9a4151161babc4b36f00f5bd59c376d433dd319f8c0ad8c5bbd735b3c8fc"
+    },
+    "19": {
+      "locator": {
+        "line": 20936,
+        "character": 184
+      },
+      "length": 410,
+      "sha256": "243ce4031e5b57d42a62f1f0a2d076da68dd979d74002a24fe89c1e1519f3cb0"
+    }
+  },
+  "notes": [
+    {
+      "number": 1,
+      "title": "Accounting Policies",
+      "next_heading": 2,
+      "interpretation": "US GAAP and consolidated Microsoft plus subsidiaries, with intercompany eliminations. Revenue is recognized on transfer of control. Disclosed prior-period recasts had no effect on the consolidated income statements. Foreign currency revenue is translated at average rates.",
+      "locator": {
+        "start": {
+          "line": 7233,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 7608,
+          "character": 1
+        }
+      },
+      "sha256": "fc7eaa52f7ab11bc87c6fceaf94224ee88eeead8532bd8d228290ba76b889a46",
+      "scope_caveat": "Reported revenue reflects foreign currency translation at average rates for each year."
+    },
+    {
+      "number": 8,
+      "title": "Business Combinations",
+      "next_heading": 9,
+      "interpretation": "Nuance entered consolidated results on March 4, 2022, partway through FY2022. ZeniMax entered in March 2021 before both periods. Activision Blizzard was pending as of the filing.",
+      "locator": {
+        "start": {
+          "line": 13913,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 14339,
+          "character": 1
+        }
+      },
+      "sha256": "b34e1d7aee77aa571a3e36eaa4070787e2bddfa2e3f0c7a75dae6f02835d72b3",
+      "scope_caveat": "Nuance was consolidated from March 4, 2022. FY2022 includes a partial year of Nuance and FY2023 includes a full year."
+    },
+    {
+      "number": 13,
+      "title": "Unearned Revenue",
+      "next_heading": 14,
+      "interpretation": "Contract liability rollforward and remaining performance obligations provide timing context for recognition. Unearned revenue balances are distinct from recognized total revenue.",
+      "locator": {
+        "start": {
+          "line": 17612,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 17827,
+          "character": 1
+        }
+      },
+      "sha256": "b8c6684408f0b606d270ea21852dced19de3625e22a724fcb0ead80727d0f9f7"
+    },
+    {
+      "number": 19,
+      "title": "Segment Information and Geographic Data",
+      "next_heading": null,
+      "interpretation": "Prior segment amounts were recast for internal management reporting. The segment revenue table reconciles to consolidated total revenue for both years.",
+      "locator": {
+        "start": {
+          "line": 20936,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 21846,
+          "character": 1
+        }
+      },
+      "sha256": "27479fda2c3a86d8e8ac319c28983dd5b2a8a74a4bb30816739cc3ab717e7880"
+    }
+  ],
+  "after_final_note": {
+    "locator": {
+      "line": 21846,
+      "character": 3
+    },
+    "length": 633,
+    "sha256": "ad122cc1208a94502002fdda693594f057600ea8417502ecd98a5a85c43b0677"
+  },
+  "comparison_evidence": [
+    {
+      "id": "segment_recast",
+      "interpretation": "MD&A describes recast prior-period segment amounts on the internal management reporting basis.",
+      "locator": {
+        "start": {
+          "line": 1909,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 1912,
+          "character": 1
+        }
+      },
+      "sha256": "c2067d33778a19e836fc95725da769ca985c6310d0b1120ba6e11615ea00c5f5"
+    },
+    {
+      "id": "acquisition_and_exchange_rates",
+      "interpretation": "The FY2023 versus FY2022 discussion identifies a foreign currency impact on reported revenue and separately discusses Nuance and Xandr in operating expenses.",
+      "locator": {
+        "start": {
+          "line": 2315,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 2324,
+          "character": 1
+        }
+      },
+      "sha256": "626d2c5b77a7b26ce07edf2a88c3f4f6eabd9df6a1d46925fe7b2a519f7b0467",
+      "scope_caveat": "Microsoft disclosed an unfavorable foreign currency impact on revenue in its FY2023 comparison."
+    },
+    {
+      "id": "xandr_acquisition",
+      "interpretation": "The More Personal Computing discussion identifies Xandr as a contributor to search and news advertising revenue excluding traffic acquisition costs.",
+      "scope_caveat": "The filing identifies Xandr in a component revenue discussion. This evidence supplies no adjustment to total consolidated revenue.",
+      "locator": {
+        "start": {
+          "line": 2671,
+          "character": 1
+        },
+        "end_exclusive": {
+          "line": 2672,
+          "character": 1
+        }
+      },
+      "sha256": "9a4bcc08c1d6cb9c8547840de05246ebac3d207a3cde9c0ae37432b0b7e9040c"
+    }
+  ],
+  "comparison_basis": "The adjoining annual periods use the same June 30 year-end and reported consolidated US GAAP revenue definition in the FY2023 filing. The FY2022 observation is the comparative reported in that filing. Note 1 says the disclosed recasts did not affect consolidated income statements.",
+  "cover_anchors": {
+    "cik": {
+      "locator": {
+        "line": 8,
+        "character": 52
+      },
+      "length": 170,
+      "sha256": "c76e4f814c9dd992c4c8db439f7d43415d9e08e96e1162f57dd7bd7fccedc5aa"
+    },
+    "form": {
+      "locator": {
+        "line": 16,
+        "character": 403
+      },
+      "length": 358,
+      "sha256": "6027d67e70ebbc56a155307cc538e5be0c14a4940bc6081b2c45910b277b6ad0"
+    },
+    "report_end": {
+      "locator": {
+        "line": 37,
+        "character": 531
+      },
+      "length": 849,
+      "sha256": "370314332df2675cd7d791277b746c7a409d4a5bd192030465af286bf8fc9297"
+    }
+  }
+}
