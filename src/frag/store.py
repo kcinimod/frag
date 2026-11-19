@@ -1,4 +1,4 @@
-"""Preserve local input bytes separately from immutable source records."""
+"""Preserve original bytes separately from immutable source records."""
 
 import hashlib
 import json
@@ -76,15 +76,17 @@ class SourceStore:
         self,
         original: bytes,
         *,
-        provenance: Literal["local_original", "synthetic"],
+        provenance: Literal["local_original", "synthetic", "sec_download"],
         metadata: SourceMetadata | None = None,
         input_path: str | None = None,
         upload_name: str | None = None,
     ) -> dict[str, Any]:
-        """Preserve bytes from either a local path or a browser upload."""
-        if provenance not in ("local_original", "synthetic"):
-            raise SourceError("Explicit local_original or synthetic provenance is required.")
+        """Preserve bytes from a local path, browser upload, or SEC response."""
+        if provenance not in ("local_original", "synthetic", "sec_download"):
+            raise SourceError("Explicit local_original, synthetic, or sec_download provenance is required.")
         metadata = metadata or SourceMetadata()
+        if provenance == "sec_download" and metadata.source_url is None:
+            raise SourceError("Downloaded input requires a source URL.")
         if not original:
             raise SourceError("Input is empty; supply original HTML or a labeled synthetic fixture.")
         digest = hashlib.sha256(original).hexdigest()
@@ -154,6 +156,25 @@ class SourceStore:
                     (source_id, RESULT_VERSION, json.dumps(result, sort_keys=True)),
                 )
         return record | result
+
+    def inspect_download(self, source_url: str) -> dict[str, Any] | None:
+        """Read a cached SEC response, checking original bytes as in inspect."""
+        database = self.root / "sources.sqlite3"
+        if not database.is_file():
+            return None
+        with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True)) as connection:
+            # A concurrent first ingest may have opened a new catalogue file.
+            if connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'sources'"
+            ).fetchone() is None:
+                return None
+            row = connection.execute(
+                "SELECT record FROM sources "
+                "WHERE json_extract(record, '$.provenance.kind') = 'sec_download' "
+                "AND json_extract(record, '$.source_url') = ? ORDER BY rowid LIMIT 1",
+                (source_url,),
+            ).fetchone()
+            return self._inspect_record(connection, json.loads(row[0])) if row else None
 
     def inspect(self, source_id: str | None = None) -> dict[str, Any]:
         database = self.root / "sources.sqlite3"

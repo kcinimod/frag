@@ -2,11 +2,13 @@
 
 import argparse
 import json
+import os
 import sqlite3
 import sys
 from pathlib import Path
 from typing import Sequence
 
+from frag.sec import download_microsoft_filing
 from frag.store import SourceError, SourceMetadata, SourceStore
 
 
@@ -19,6 +21,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--provenance", choices=("local_original", "synthetic"), required=True)
     for field in ("company", "accession", "form", "filing-date", "source-url"):
         ingest.add_argument("--" + field)
+    download = commands.add_parser("download", help="Download or reuse Microsoft's FY2023 10-K")
+    download.add_argument("--store", type=Path, required=True)
     inspect = commands.add_parser("inspect", help="Inspect one source or list all sources")
     inspect.add_argument("source_id", nargs="?")
     inspect.add_argument("--store", type=Path, required=True)
@@ -38,6 +42,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                     filing_date=args.filing_date, source_url=args.source_url,
                 ),
             )
+        elif args.command == "download":
+            result = download_microsoft_filing(store, os.environ.get("SEC_USER_AGENT"))
         elif args.command == "inspect":
             result = store.inspect(args.source_id)
         else:

@@ -78,3 +78,19 @@ The catalogue cache key combines parser and evidence versions. Observation IDs
 remain byte-, metric-, and period-based. A failed per-observation annual context
 leaves the other period available. Ambiguous shared statement geometry still
 produces a source-level diagnostic.
+
+## Issue #5 SEC acquisition
+
+The download command targets the selected EDGAR document and checks the source
+catalogue for a preserved SEC response before validating the user-agent
+setting or opening a connection. The original bytes and catalogue record are the cache. A local
+input can cite the same filing URL while retaining its local provenance, so the
+download lookup uses both the URL and the `sec_download` provenance. Use
+separate stores when comparing direct and locally supplied bytes to preserve
+the storage contract for immutable provenance.
+
+Requests use an operator-configured identifying user agent. Retry delays start
+at one second for transient errors and respect a longer `Retry-After` within
+the wait limit. A server-requested wait beyond the limit ends the command so
+the next request can be scheduled separately. The workstation's direct SEC
+request returned HTTP 403. [SEC access guidance](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)

@@ -53,7 +53,7 @@ type Source = {
   diagnostics: { code: string; message: string; fiscal_year?: number }[];
   unresolved_requirements: string[];
   provenance: {
-    kind: 'local_original' | 'synthetic';
+    kind: 'local_original' | 'synthetic' | 'sec_download';
     input_path: string | null;
     upload_name?: string;
     preserved_at: string;
@@ -66,6 +66,7 @@ const fields = [
 ] as const;
 
 function provenanceLabel(source: Source) {
+  if (source.provenance.kind === 'sec_download') return 'Downloaded from SEC EDGAR';
   return source.provenance.kind === 'synthetic' ? 'Synthetic input' : 'Declared local original';
 }
 
@@ -88,7 +89,9 @@ function SourceDetail({ source }: { source: Source }) {
         <dt>SHA-256</dt><dd className="mono">{source.source_hash}</dd>
         <dt>Original size</dt><dd>{source.byte_count.toLocaleString()} bytes</dd>
         <dt>First input</dt>
-        <dd>{source.provenance.upload_name ?? source.provenance.input_path ?? 'Unknown'}</dd>
+        <dd>{source.provenance.kind === 'sec_download'
+          ? source.source_url ?? 'Unknown'
+          : source.provenance.upload_name ?? source.provenance.input_path ?? 'Unknown'}</dd>
         <dt>Preserved at</dt><dd>{new Date(source.provenance.preserved_at).toLocaleString()}</dd>
       </dl>
       <h3>Filing metadata</h3>

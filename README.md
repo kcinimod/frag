@@ -31,6 +31,8 @@ choose its provenance, and preserve the source. Try `tests/fixtures/synthetic.ht
 with the **Synthetic fixture** option. To inspect browser uploads through the CLI,
 run `uv run --offline frag inspect --store artifacts/phase01/local-store/browser`.
 Click **Refresh** to see sources ingested through the CLI while the page was open.
+Sources acquired by the CLI appear as **Downloaded from SEC EDGAR** when the
+browser workspace uses the same store.
 Use `--port` to choose another available port. Setup may fetch dependencies.
 Once built and installed, the app uses only localhost during review.
 
@@ -66,6 +68,51 @@ Omitted metadata is JSON `null`. The source record retains the supplied claims
 as `supplied_unverified`. The parser recognizes the selected Microsoft FY2023
 10-K from its inline cover fields and checks the statement's annual headers
 against inline XBRL contexts. Declare synthetic inputs as `synthetic`.
+
+## Download and inspect the Microsoft filing
+
+Set `SEC_USER_AGENT` to your project or organization name and a monitored contact
+address before a fresh download. The command requests only the Microsoft FY2023
+10-K. It makes up to three attempts for transient failures and honors
+`Retry-After` within a ten-second wait limit. The SEC asks scripted clients to
+identify themselves, minimize requests, and stay within ten requests per second
+across all machines. [SEC access guidance](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+[SEC user-agent guidance](https://www.sec.gov/about/webmaster-frequently-asked-questions)
+
+```powershell
+$env:SEC_USER_AGENT = 'Your Organization contact@your-domain.example'
+$secStore = 'artifacts/phase01/local-store/sec'
+uv run --locked --offline frag download --store $secStore
+```
+
+Here `--offline` governs uv's dependency setup. On a cache miss, `frag download`
+contacts SEC EDGAR. Once there is a cached download, the same command reuses the
+saved original and checks its hash without contacting the SEC or requiring the
+user agent. The download and inspect commands return the source record as JSON.
+If inspection shows an unsupported document or a damaged original, use a new
+store for another download and keep the previous store for review.
+
+```powershell
+$secStore = 'artifacts/phase01/local-store/sec'
+$cached = uv run --locked --offline frag download --store $secStore | ConvertFrom-Json
+uv run --locked --offline frag inspect $cached.source_id --store $secStore
+```
+
+For a local fallback, set `$filingPath` to the path to your original HTML. Use a
+separate store so the original provenance stays intact if both inputs have
+identical bytes.
+
+```powershell
+$localStore = 'artifacts/phase01/local-store/microsoft-local'
+$local = uv run --locked --offline frag ingest $filingPath --store $localStore --provenance local_original | ConvertFrom-Json
+uv run --locked --offline frag inspect $local.source_id --store $localStore
+```
+
+The live SEC request returned HTTP 403 on this workstation. The controlled
+download and cached inspection passed, and the retained Microsoft HTML passed
+local replay. [Acquisition run record](artifacts/phase01/SEC_ACQUISITION.md)
+
+## Offline replay and source records
 
 Replay the retained synthetic input or Microsoft HTML with networking
 actively forbidden in each ingest and inspection process.
