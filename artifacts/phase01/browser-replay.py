@@ -1,5 +1,6 @@
 """Exercise the built workspace and CLI using Chrome and a temporary store."""
 
+import gzip
 import hashlib
 import json
 import os
@@ -94,6 +95,14 @@ def main() -> None:
                     expect(page.get_by_text("2021-07-01 through 2022-06-30")).to_be_visible()
                     expanded = page.locator("details[open]").filter(has_text="FY2022")
                     expect(expanded.get_by_text("Revenue cell", exact=True)).to_be_visible()
+                    filing = base / "msft-20230630.htm"
+                    archive = ROOT / "artifacts/phase01/originals/msft-20230630.htm.gz"
+                    filing.write_bytes(gzip.decompress(archive.read_bytes()))
+                    page.get_by_label("Company", exact=True).fill("")
+                    page.get_by_label("Local original", exact=True).check()
+                    page.get_by_label("HTML file").set_input_files(filing)
+                    save.click()
+                    expect(page.get_by_text("FY2023 · USD 211,915,000,000 · Provisional")).to_be_visible()
                 finally:
                     browser.close()
             print("Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, provisional facts and evidence. External page requests blocked.")

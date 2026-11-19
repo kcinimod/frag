@@ -67,6 +67,8 @@ class StatementHTML(HTMLParser):
         self.tables: list[Table] = []
         self.unit_measures: dict[str, list[EvidenceText]] = {}
         self.contexts: dict[str, list[InlineContext]] = {}
+        self.cover_facts: dict[str, list[EvidenceText]] = {}
+        self._cover_fact: EvidenceText | None = None
         self._context: InlineContext | None = None
         self._context_field: EvidenceText | None = None
         self._unit: str | None = None
@@ -86,6 +88,11 @@ class StatementHTML(HTMLParser):
         if tag in {"script", "style"}:
             self._ignored = tag
             return
+        if tag == "ix:nonnumeric":
+            name = (dict(attributes).get("name") or "").casefold()
+            if name in COVER_FACTS:
+                self._cover_fact = EvidenceText(self.getpos())
+                self.cover_facts.setdefault(name, []).append(self._cover_fact)
         if tag == "xbrli:unit":
             self._unit = dict(attributes).get("id")
         elif tag == "xbrli:measure" and self._unit:
@@ -140,6 +147,8 @@ class StatementHTML(HTMLParser):
             if tag == self._ignored:
                 self._ignored = None
             return
+        if tag == "ix:nonnumeric":
+            self._cover_fact = None
         if tag == "xbrli:measure":
             self._measure = None
         elif tag == "xbrli:unit":
@@ -165,6 +174,8 @@ class StatementHTML(HTMLParser):
     def handle_data(self, data: str) -> None:
         if self._ignored:
             return
+        if self._cover_fact:
+            self._cover_fact.parts.append(data)
         if self._measure:
             self._measure.parts.append(data)
         if self._context_field:
@@ -199,6 +210,7 @@ class StatementHTML(HTMLParser):
 
 BLOCK_TAGS = {"div", "p", "h1", "h2", "h3", "h4", "h5", "h6"}
 CONTEXT_FIELDS = {"xbrli:identifier", "xbrli:startdate", "xbrli:enddate"}
+COVER_FACTS = {"dei:documenttype", "dei:documentperiodenddate", "dei:entitycentralindexkey"}
 
 
 @dataclass(frozen=True)
@@ -215,11 +227,17 @@ class GridCell:
         }
 
 
-def table_grid(table: Table) -> list[list[GridCell]]:
+@dataclass(frozen=True)
+class GridRow:
+    cells: list[GridCell]
+    width: int
+
+
+def table_grid(table: Table) -> list[GridRow]:
     if table.nested or not table.complete:
         raise UnsupportedLayout("The income statement has nested or incomplete table markup.")
     reserved_until: dict[int, int] = {}
-    grid: list[list[GridCell]] = []
+    grid: list[GridRow] = []
     for row_number, row in enumerate(table.rows, 1):
         placed: list[GridCell] = []
         column = 1
@@ -235,7 +253,10 @@ def table_grid(table: Table) -> list[list[GridCell]]:
                 reserved_until.update((slot, row_number + height - 1) for slot in columns)
             placed.append(GridCell(cell, row_number, cell_number, columns))
             column += width
-        grid.append(placed)
+        last_reserved = max(
+            (slot for slot, end in reserved_until.items() if end >= row_number), default=0,
+        )
+        grid.append(GridRow(placed, max(last_reserved, column - 1)))
     return grid
 
 

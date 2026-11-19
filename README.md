@@ -41,9 +41,9 @@ at the build step above and run:
 uv run --locked --offline --with playwright python artifacts/phase01/browser-replay.py
 ```
 
-The check starts its own localhost server, uses a temporary store and synthetic
-inputs, and blocks page requests to other origins. Omit `--offline` on the
-first run if uv needs to fetch Playwright.
+The check starts its own localhost server, uploads synthetic inputs and the
+retained filing to a temporary store, and blocks page requests to other origins.
+Omit `--offline` on the first run if uv needs to fetch Playwright.
 
 The following runnable example uses an explicitly labeled **synthetic document**:
 
@@ -63,13 +63,12 @@ For a locally supplied original HTML document, use the same ingest command with
 its disk path and `--provenance local_original`. Optional metadata flags are
 `--company`, `--accession`, `--form`, `--filing-date YYYY-MM-DD`, and `--source-url`.
 Omitted metadata is JSON `null`. The source record retains the supplied claims
-as `supplied_unverified`. To extract the selected Microsoft statement from an
-original HTML input, supply accession `0000950170-23-035122` and form `10-K`.
-The parser checks the statement's annual headers against inline XBRL contexts.
-Declare synthetic inputs as `synthetic`.
+as `supplied_unverified`. The parser recognizes the selected Microsoft FY2023
+10-K from its inline cover fields and checks the statement's annual headers
+against inline XBRL contexts. Declare synthetic inputs as `synthetic`.
 
-Replay with networking actively forbidden, including new ingest and inspection
-processes, using the retained synthetic input:
+Replay the retained synthetic input or Microsoft HTML with networking
+actively forbidden in each ingest and inspection process.
 
 ```powershell
 uv run --offline python artifacts/phase01/replay.py

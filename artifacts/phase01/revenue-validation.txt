@@ -2,13 +2,15 @@ Issue #3 validation from the repository root in Windows PowerShell
 
 uv run --locked --offline pytest tests/test_revenue_workflow.py -q
 TDD baseline: failed because ingest exposed an empty facts list.
-Final focused result: 11 passed in 2.94s.
+Review regressions reproduced incorrect year association with competing
+headers and omitted cells before both were rejected by the parser.
+Final focused result: 13 passed in 3.74s.
 
 uv run --locked --offline mypy
 Success: no issues found in 10 source files.
 
 uv run --locked --offline pytest -q
-30 passed in 6.41s.
+32 passed in 7.02s.
 
 npm.cmd --prefix web run build
 TypeScript and Vite production build passed, 28 modules transformed.
@@ -16,11 +18,15 @@ TypeScript and Vite production build passed, 28 modules transformed.
 uv run --locked --offline --with playwright python artifacts/phase01/browser-replay.py
 Browser replay passed: upload, hash, unknowns, retry, conflict, CLI
 interoperability, provisional facts and evidence. External page requests blocked.
+Included original Microsoft HTML uploaded with all optional metadata blank.
 
 uv run --locked --offline python artifacts/phase01/replay.py --microsoft
 Exit 0. Two provisional observations, no extraction diagnostics, stable
 identifiers across reingestion, retained-byte equality after input removal,
-and year/value locators resolved. See microsoft-revenue.json for the output.
+and year/value locators resolved. The replay also checked extraction with no
+supplied metadata and diagnosed a conflicting company claim. Output matched
+microsoft-revenue.json. Reingestion into the earlier local store selected
+annual-revenue-v2 while preserving the source ID and both fact IDs from v1.
 
 Direct SEC requests to the primary HTML returned HTTP 403.
 curl.exe --fail --location --max-time 30 --output artifacts/phase01/local-store/msft-20230630.htm https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm

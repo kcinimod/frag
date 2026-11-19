@@ -80,6 +80,21 @@ def replay_microsoft() -> None:
         )
         first = invoke(*args)
         assert invoke(*args) == first
+        assert invoke("inspect", "--store", store) == {"source_count": 1, "sources": [first]}
+        metadata_free = invoke(
+            "ingest", str(input_path), "--store", str(Path(temp) / "metadata-free"),
+            "--provenance", "local_original",
+        )
+        assert metadata_free["company"] is None
+        assert [fact["fact_id"] for fact in metadata_free["facts"]] == [
+            fact["fact_id"] for fact in first["facts"]
+        ]
+        assert {fact["company"] for fact in metadata_free["facts"]} == {"Microsoft Corporation"}
+        conflict = invoke(
+            "ingest", str(input_path), "--store", str(Path(temp) / "conflicting-company"),
+            "--provenance", "local_original", "--company", "Conflicting company",
+        )
+        assert not conflict["facts"] and "supplied company conflicts" in conflict["diagnostics"][0]["message"]
         input_path.unlink()
         inspected = invoke("inspect", first["source_id"], "--store", store)
         assert inspected == first

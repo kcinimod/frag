@@ -74,7 +74,11 @@ def test_missing_or_unresolved_amount_stays_unknown(tmp_path: Path, symbol: str)
 @pytest.mark.parametrize(("original", "changed"), [
     ('<th colspan="4">Year Ended', '<th colspan="5">Year Ended'),
     ('<td>817</td><td>$</td>', '<td colspan="2">817</td>'),
+    ('<td>$</td><td>817</td>', ''),
     ('<th colspan="2">2023</th>', '<th colspan="2">2022</th>'),
+    ('<tr><th colspan="2">2022</th><th colspan="2">2023</th></tr>',
+     '<tr><th colspan="2">2023</th><th colspan="2">2022</th></tr>\n'
+     '<tr><th colspan="2">2022</th><th colspan="2">2023</th></tr>'),
     ('<h2>Consolidated Income Statements</h2>', '<h2>Segment Income Statements</h2>'),
 ])
 def test_ambiguous_or_unsupported_geometry_reports_a_diagnostic(

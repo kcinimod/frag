@@ -49,7 +49,9 @@ is tracked in [issue #7](https://github.com/kcinimod/frag/issues/7).
 
 The parser selects the statement heading and Total revenue label, associates
 the displayed years with values through the logical table grid, and checks the
-inline XBRL annual contexts for the original layout. Currency comes from the
+inline XBRL annual contexts for the original layout. The original document's
+inline cover fields identify the supported form, entity, and report end without
+requiring supplied metadata. Currency comes from the
 statement's USD declaration or referenced XBRL unit. The statement scale applies
 to revenue even when the disclosure also has a per-share exception. Amounts use
 exact decimal strings. An unresolved amount stays null and ambiguous geometry

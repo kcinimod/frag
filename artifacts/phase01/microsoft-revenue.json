@@ -84,7 +84,7 @@
         "metric_label": "Total revenue",
         "normalized_amount": "198270000000",
         "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
-        "parser_version": "annual-revenue-v1",
+        "parser_version": "annual-revenue-v2",
         "raw_amount": "198,270",
         "reporting_period": {
           "end": "2022-06-30",
@@ -178,7 +178,7 @@
         "metric_label": "Total revenue",
         "normalized_amount": "211915000000",
         "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
-        "parser_version": "annual-revenue-v1",
+        "parser_version": "annual-revenue-v2",
         "raw_amount": "211,915",
         "reporting_period": {
           "end": "2023-06-30",
@@ -200,7 +200,7 @@
     "form": "10-K",
     "hash_algorithm": "sha256",
     "metadata_status": "supplied_unverified",
-    "parser_version": "annual-revenue-v1",
+    "parser_version": "annual-revenue-v2",
     "provenance": {
       "archive": "artifacts/phase01/originals/msft-20230630.htm.gz",
       "kind": "local_original",
