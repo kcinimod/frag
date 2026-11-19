@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "frag"
+version = "0.1.0"
+description = "Local preservation and inspection of SEC source evidence"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+frag = "frag.cli:main"
+
+[dependency-groups]
+dev = ["mypy>=1.15,<2", "pytest>=8,<10"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests", "artifacts/phase01/replay.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

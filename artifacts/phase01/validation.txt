@@ -1,0 +1,64 @@
+Issue #2 final validation
+Windows PowerShell; Python 3.12.14; uv 0.12.17
+
+PS> uv sync --locked
+Exit code: 0
+Resolved 12 packages in 0.80ms
+Checked 12 packages in 0.73ms
+
+PS> uv run --offline mypy
+Exit code: 0
+Success: no issues found in 5 source files
+
+PS> uv run --offline pytest
+Exit code: 0
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\domin\Desktop\Projects\FRAG
+configfile: pyproject.toml
+testpaths: tests
+collected 17 items
+
+tests\test_source_workflow.py .................                          [100%]
+
+============================= 17 passed in 3.15s ==============================
+
+PS> uv run --offline python artifacts/phase01/replay.py
+Exit code: 0
+{
+  "input_kind": "synthetic",
+  "network_policy": "all socket audit events rejected in each CLI subprocess",
+  "identical_reingest": true,
+  "source_count": 1,
+  "source": {
+    "accession": null,
+    "byte_count": 163,
+    "company": "Synthetic Example",
+    "facts": [],
+    "filing_date": null,
+    "form": "10-K",
+    "hash_algorithm": "sha256",
+    "metadata_status": "supplied_unverified",
+    "original_path": "C:\\Users\\domin\\Desktop\\Projects\\FRAG\\artifacts\\phase01\\local-store\\originals\\6b6e91d29f4abad0191f2f1702a2263653413c7954893a74fd6aa9200e5d9f80.html",
+    "parser_version": null,
+    "provenance": {
+      "input_path": "C:\\Users\\domin\\Desktop\\Projects\\FRAG\\tests\\fixtures\\synthetic.html",
+      "kind": "synthetic",
+      "preserved_at": "2026-11-19T02:56:08.586577+00:00"
+    },
+    "real_source_acceptance": false,
+    "schema_version": "source-v1",
+    "source_hash": "6b6e91d29f4abad0191f2f1702a2263653413c7954893a74fd6aa9200e5d9f80",
+    "source_id": "sha256:6b6e91d29f4abad0191f2f1702a2263653413c7954893a74fd6aa9200e5d9f80",
+    "source_url": null,
+    "status": "source_preserved",
+    "unresolved_requirements": [
+      "source_identity_verification",
+      "extraction",
+      "evidence_verification"
+    ]
+  },
+  "real_source_acceptance": false,
+  "extraction_performed": false,
+  "verification_performed": false
+}
