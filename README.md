@@ -1,8 +1,8 @@
 # FRAG
 
-Local, evidence-first SEC financial QA work in progress. The CLI and local
-browser workspace preserve and inspect sources. Revenue extraction and
-verification are later Phase 1 slices.
+Local, evidence-first SEC financial QA work in progress. The CLI and browser
+workspace preserve original source bytes and expose provisional consolidated
+revenue for FY2022 and FY2023 from the selected Microsoft FY2023 10-K.
 
 From the repository root in Windows PowerShell, with uv installed:
 
@@ -38,12 +38,12 @@ To repeat the automated browser check with an installed Google Chrome, stop
 at the build step above and run:
 
 ```powershell
-uv run --locked --with playwright python artifacts/phase01/browser-replay.py
+uv run --locked --offline --with playwright python artifacts/phase01/browser-replay.py
 ```
 
 The check starts its own localhost server, uses a temporary store and synthetic
-inputs, and blocks page requests to other origins. uv may fetch Playwright on
-the first run.
+inputs, and blocks page requests to other origins. Omit `--offline` on the
+first run if uv needs to fetch Playwright.
 
 The following runnable example uses an explicitly labeled **synthetic document**:
 
@@ -62,22 +62,24 @@ uv run --offline frag inspect $source.source_id --store artifacts/phase01/local-
 For a locally supplied original HTML document, use the same ingest command with
 its disk path and `--provenance local_original`. Optional metadata flags are
 `--company`, `--accession`, `--form`, `--filing-date YYYY-MM-DD`, and `--source-url`.
-Omitted metadata is JSON `null`. These are supplied claims, recorded as
-`supplied_unverified`; no identity is inferred from filenames or content.
-Declare synthetic inputs as `synthetic`. This command does not authenticate a
-document, and neither provenance choice establishes real-source acceptance.
-No original filing was available for the recorded run.
+Omitted metadata is JSON `null`. The source record retains the supplied claims
+as `supplied_unverified`. To extract the selected Microsoft statement from an
+original HTML input, supply accession `0000950170-23-035122` and form `10-K`.
+The parser checks the statement's annual headers against inline XBRL contexts.
+Declare synthetic inputs as `synthetic`.
 
 Replay with networking actively forbidden, including new ingest and inspection
 processes, using the retained synthetic input:
 
 ```powershell
 uv run --offline python artifacts/phase01/replay.py
+uv run --locked --offline python artifacts/phase01/replay.py --microsoft
 ```
 
 `uv --offline` prevents uv downloads. The replay harness and regression tests
 add a Python audit hook that rejects all socket operations in CLI processes.
-The application has no download or inference functionality.
+The Microsoft replay decompresses a retained snapshot into a temporary input,
+then ingests it twice and inspects the saved facts after removing that input.
 
 The store keeps unchanged bytes under `originals/<sha256>.html`, separately from
 the source catalogue `sources.sqlite3`. `sha256:<hex>` identifies source bytes.
@@ -90,15 +92,18 @@ Treat the store as trusted local state, and keep backups of original evidence.
 
 Successful commands print JSON to stdout. Operational errors print JSON to stderr
 and exit 1; invalid command syntax exits 2. `inspect` without an ID lists all
-sources and their count. Each source exposes an empty `facts` list, null
-`parser_version`, `source_preserved` status, and outstanding requirements.
-Inputs are preserved as opaque bytes without parsing or executing HTML; the
-caller is responsible for supplying HTML. Synthetic inputs and successful
-hash checks are insufficient for financial evidence verification.
+sources and their count. Each source exposes the parser version, any provisional
+facts, extraction diagnostics, and open verification requirements. Amounts are
+decimal strings, with JSON `null` for unknown normalized amounts. The parser reads
+HTML as data. The locators point to the original HTML using one-based line and
+character offsets and physical table, row, and cell ordinals. Column ordinals use
+the logical grid after spans are applied. Expand a provisional observation in
+the browser to see these coordinates.
 
 Importable entry points are `frag.store.SourceStore`, `SourceMetadata`, and
 `SourceError`. Use `SourceStore(Path(...)).ingest(...)` and `.inspect(...)` with
 the same metadata and provenance semantics as the CLI.
 
 See [project status](docs/PROJECT_STATUS.md) and the
-[checkpoint handoff](artifacts/phase01/HANDOFF.md) for evidence and remaining work.
+[revenue extraction handoff](artifacts/phase01/REVENUE_HANDOFF.md) for evidence
+and remaining work.

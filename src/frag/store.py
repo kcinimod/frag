@@ -9,6 +9,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
+from frag.revenue import PARSER_VERSION, extract_revenue
+
 
 class SourceError(ValueError):
     """The requested source cannot be preserved or inspected safely."""
@@ -101,13 +103,8 @@ class SourceStore:
             },
             "original_path": str(raw_path),
             "byte_count": len(original),
-            "parser_version": None,
             "status": "source_preserved",
-            "facts": [],
             "real_source_acceptance": False,
-            "unresolved_requirements": [
-                "source_identity_verification", "extraction", "evidence_verification",
-            ],
         }
         with closing(sqlite3.connect(self.root / "sources.sqlite3")) as connection, connection:
             connection.execute(
@@ -129,18 +126,31 @@ class SourceStore:
                         "existing evidence is unchanged. Replay with the original metadata."
                     )
                 self._check_original(saved)
-                return saved
-            try:
-                with raw_path.open("xb") as handle:
-                    handle.write(original)
-            except FileExistsError:
-                if raw_path.read_bytes() != original:
-                    raise SourceError("Preserved original bytes have changed; refusing overwrite.")
+                record = saved
+            else:
+                try:
+                    with raw_path.open("xb") as handle:
+                        handle.write(original)
+                except FileExistsError:
+                    if raw_path.read_bytes() != original:
+                        raise SourceError("Preserved original bytes have changed; refusing overwrite.")
+                connection.execute(
+                    "INSERT INTO sources (source_id, record) VALUES (?, ?)",
+                    (source_id, json.dumps(record, sort_keys=True)),
+                )
             connection.execute(
-                "INSERT INTO sources (source_id, record) VALUES (?, ?)",
-                (source_id, json.dumps(record, sort_keys=True)),
+                "CREATE TABLE IF NOT EXISTS extractions "
+                "(source_id TEXT NOT NULL, parser_version TEXT NOT NULL, result TEXT NOT NULL, "
+                "PRIMARY KEY (source_id, parser_version))"
             )
-        return record
+            result = self._read_extraction(connection, source_id)
+            if result is None:
+                result = extract_revenue(original, record)
+                connection.execute(
+                    "INSERT INTO extractions VALUES (?, ?, ?)",
+                    (source_id, PARSER_VERSION, json.dumps(result, sort_keys=True)),
+                )
+        return record | result
 
     def inspect(self, source_id: str | None = None) -> dict[str, Any]:
         database = self.root / "sources.sqlite3"
@@ -149,22 +159,44 @@ class SourceStore:
         with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True)) as connection:
             if source_id is None:
                 rows = connection.execute("SELECT record FROM sources ORDER BY source_id")
-                records = [json.loads(row[0]) for row in rows]
-                for record in records:
-                    self._check_original(record)
+                records = [self._inspect_record(connection, json.loads(row[0])) for row in rows]
                 return {"source_count": len(records), "sources": records}
             row = connection.execute(
                 "SELECT record FROM sources WHERE source_id = ?", (source_id,)
             ).fetchone()
-        if row is None:
-            raise SourceNotFound(f"Source not found: {source_id}")
-        result: dict[str, Any] = json.loads(row[0])
-        self._check_original(result)
+            if row is None:
+                raise SourceNotFound(f"Source not found: {source_id}")
+            return self._inspect_record(connection, json.loads(row[0]))
+
+    def _inspect_record(
+        self, connection: sqlite3.Connection, record: dict[str, Any],
+    ) -> dict[str, Any]:
+        original = self._check_original(record)
+        result = self._read_extraction(connection, record["source_id"])
+        if result is None:
+            # Legacy stores and stores copied from earlier parser versions stay readable.
+            result = extract_revenue(original, record)
+        return record | result
+
+    @staticmethod
+    def _read_extraction(connection: sqlite3.Connection, source_id: str) -> dict[str, Any] | None:
+        if connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'extractions'"
+        ).fetchone() is None:
+            return None
+        row = connection.execute(
+            "SELECT result FROM extractions WHERE source_id = ? AND parser_version = ?",
+            (source_id, PARSER_VERSION),
+        ).fetchone()
+        result: dict[str, Any] | None = json.loads(row[0]) if row else None
         return result
 
-    def _check_original(self, record: dict[str, Any]) -> None:
-        original_path = self.root / "originals" / (record["source_hash"] + ".html")
-        if hashlib.sha256(original_path.read_bytes()).hexdigest() != record["source_hash"]:
+    def _check_original(self, record: dict[str, Any]) -> bytes:
+        digest: str = record["source_hash"]
+        original_path = self.root / "originals" / (digest + ".html")
+        original = original_path.read_bytes()
+        if hashlib.sha256(original).hexdigest() != record["source_hash"]:
             raise SourceError("Preserved original hash mismatch; evidence integrity failed.")
         # Resolve the path for this store, including after an offline copy or move.
         record["original_path"] = str(original_path)
+        return original

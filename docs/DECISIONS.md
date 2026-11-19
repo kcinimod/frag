@@ -44,3 +44,19 @@ The browser acceptance checks cover offline upload and inspection, repeat
 submissions, conflicting claims, and shared storage with the CLI. The local
 Phase 1 specification now includes the browser workflow. The first UI follow-up
 is tracked in [issue #7](https://github.com/kcinimod/frag/issues/7).
+
+## Issue #3 provisional annual revenue
+
+The parser selects the statement heading and Total revenue label, associates
+the displayed years with values through the logical table grid, and checks the
+inline XBRL annual contexts for the original layout. Currency comes from the
+statement's USD declaration or referenced XBRL unit. The statement scale applies
+to revenue even when the disclosure also has a per-share exception. Amounts use
+exact decimal strings. An unresolved amount stays null and ambiguous geometry
+produces a diagnostic.
+
+The source record keeps its byte-derived identity. The fact ID derives from
+source ID, metric, and fiscal year. The SQLite catalogue stores extraction
+results by source ID and parser version separately from the original source
+record. Reingestion fills the current parser version while preserving earlier
+results. Inspect can derive the current view in memory for older stores.

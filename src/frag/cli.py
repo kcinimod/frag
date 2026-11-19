@@ -13,7 +13,7 @@ from frag.store import SourceError, SourceMetadata, SourceStore
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="frag")
     commands = parser.add_subparsers(dest="command", required=True)
-    ingest = commands.add_parser("ingest", help="Preserve local HTML without extraction")
+    ingest = commands.add_parser("ingest", help="Preserve local HTML and extract supported revenue evidence")
     ingest.add_argument("path", type=Path)
     ingest.add_argument("--store", type=Path, required=True)
     ingest.add_argument("--provenance", choices=("local_original", "synthetic"), required=True)

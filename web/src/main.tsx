@@ -2,6 +2,29 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
+type Locator = {
+  line: number;
+  character: number;
+  table?: number;
+  row?: number;
+  cell?: number;
+  column?: number;
+};
+
+type RevenueFact = {
+  fact_id: string;
+  metric_label: string;
+  raw_amount: string | null;
+  normalized_amount: string | null;
+  currency: string | null;
+  scale: number | null;
+  comparative: boolean;
+  reporting_period: { fiscal_year: number; start: string; end: string };
+  parent_table_id: string;
+  locators: Record<string, Locator | null>;
+  unresolved_requirements: string[];
+};
+
 type Source = {
   source_id: string;
   source_hash: string;
@@ -11,6 +34,10 @@ type Source = {
   filing_date: string | null;
   source_url: string | null;
   byte_count: number;
+  parser_version: string;
+  facts: RevenueFact[];
+  diagnostics: { code: string; message: string; fiscal_year?: number }[];
+  unresolved_requirements: string[];
   provenance: {
     kind: 'local_original' | 'synthetic';
     input_path: string | null;
@@ -57,7 +84,61 @@ function SourceDetail({ source }: { source: Source }) {
           <div className="pair" key={key}><dt>{label}</dt><dd>{source[key] ?? 'Unknown'}</dd></div>
         ))}
       </dl>
+      <h3>Reported consolidated revenue</h3>
+      <dl>
+        <dt>Parser version</dt><dd className="mono">{source.parser_version}</dd>
+        <dt>Open requirements</dt>
+        <dd>{source.unresolved_requirements.map(requirement => requirement.replaceAll('_', ' ')).join(', ')}</dd>
+      </dl>
+      {source.diagnostics.length > 0 && (
+        <ul>{source.diagnostics.map(diagnostic => (
+          <li key={`${diagnostic.code}-${diagnostic.fiscal_year ?? 'source'}`}>{diagnostic.message}</li>
+        ))}</ul>
+      )}
+      {source.facts.map(fact => <RevenueDetail fact={fact} key={fact.fact_id} />)}
     </section>
+  );
+}
+
+const locatorLabels: Record<string, string> = {
+  table: 'Statement table', statement_heading: 'Statement heading', metric_label: 'Metric label',
+  annual_header: 'Annual period header', year_header: 'Fiscal year header', value: 'Revenue cell',
+  unit_header: 'Scale disclosure', currency_measure: 'Currency measure', inline_context: 'Inline XBRL context',
+};
+
+function RevenueDetail({ fact }: { fact: RevenueFact }) {
+  const { fiscal_year: year, start, end } = fact.reporting_period;
+  const [integer, fraction] = (fact.normalized_amount ?? '').split('.');
+  const amount = fact.normalized_amount
+    ? `${fact.currency} ${integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${fraction ? `.${fraction}` : ''}`
+    : 'Unknown amount';
+  return (
+    <details className="fact">
+      <summary>FY{year} · {amount} · Provisional</summary>
+      <dl>
+        <dt>Original label and amount</dt><dd>{fact.metric_label} · {fact.raw_amount || 'Unknown'}</dd>
+        <dt>Currency</dt><dd>{fact.currency ?? 'Unknown'}</dd>
+        <dt>Scale multiplier</dt><dd>{fact.scale?.toLocaleString() ?? 'Unknown'}</dd>
+        <dt>Annual reporting period</dt><dd>{start} through {end}</dd>
+        <dt>Reporting basis</dt><dd>As reported in the filing{fact.comparative && ' · Comparative'}</dd>
+        <dt>Fact ID</dt><dd className="mono">{fact.fact_id}</dd>
+        <dt>Table ID</dt><dd className="mono">{fact.parent_table_id}</dd>
+        <dt>Open requirements</dt>
+        <dd>{fact.unresolved_requirements.map(requirement => requirement.replaceAll('_', ' ')).join(', ')}</dd>
+        {Object.entries(fact.locators).map(([key, location]) => (
+          <div className="pair" key={key}>
+            <dt>{locatorLabels[key] ?? key}</dt>
+            <dd>{location ? [
+              location.table && `Table ${location.table}`,
+              location.row && `row ${location.row}`,
+              location.cell && `cell ${location.cell}`,
+              location.column && `column ${location.column}`,
+              `line ${location.line}`, `character ${location.character}`,
+            ].filter(Boolean).join(', ') : 'Unavailable'}</dd>
+          </div>
+        ))}
+      </dl>
+    </details>
   );
 }
 

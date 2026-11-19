@@ -52,11 +52,12 @@ def test_preserve_and_inspect_synthetic_source_offline(tmp_path: Path) -> None:
     assert record["accession"] is None
     assert record["filing_date"] is None
     assert record["source_url"] is None
-    assert record["parser_version"] is None
+    assert record["parser_version"]
     assert record["provenance"]["kind"] == "synthetic"
     assert record["metadata_status"] == "supplied_unverified"
     assert record["status"] == "source_preserved"
     assert record["facts"] == []
+    assert record["diagnostics"][0]["code"] == "unsupported_layout"
     assert record["real_source_acceptance"] is False
 
 

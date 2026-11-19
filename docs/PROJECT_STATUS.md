@@ -1,23 +1,15 @@
 # Project status
 
-Issue #2 implements local source preservation and inspection. Phase 1 remains
-incomplete. No original Microsoft filing has been acquired, and no revenue has
-been extracted or verified.
+Phase 1 preserves original source bytes and exposes provisional FY2022 and
+FY2023 reported consolidated revenue from Microsoft's FY2023 10-K (accession
+`0000950170-23-035122`). The CLI and localhost browser use the same store and
+parser. The retained HTML and source manifest support offline replay. See the
+[revenue extraction handoff](../artifacts/phase01/REVENUE_HANDOFF.md).
 
-- Implemented: importable Python package, uv lockfile, ingest/inspect JSON CLI,
-  original-byte preservation, source metadata with explicit unknowns, stable
-  identifiers, duplicate-free replay, and conflict/integrity diagnostics.
-- Evidence: [checkpoint handoff](../artifacts/phase01/HANDOFF.md),
-  [synthetic source manifest](../artifacts/phase01/source-manifest.json),
-  and validation output under `artifacts/phase01/`.
-- Next milestone: acquire or supply the original selected Microsoft FY2023 10-K,
-  then implement the separately scoped extraction and verification tickets.
-- The local browser workspace ([#7](https://github.com/kcinimod/frag/issues/7))
-  supports HTML upload, browsing, and source
-  inspection using the same store as the CLI. The Windows build and type checks
-  passed, along with 19 Python tests and the Chrome replay using synthetic
-  inputs and blocked external page requests. See the README to reproduce.
-- Acquisition, inference, calculation, and retrieval remain outside this slice.
-
-The financial acceptance checklist remains unchecked because its items combine
-source preservation with facts, contexts, or verification outside this ticket.
+- Issue #2 delivered local source preservation, integrity checks, and repeatable
+  ingest and inspection. Issue #7 added local browser upload and inspection.
+- Issue #3 adds statement extraction, source and inline XBRL locators, explicit
+  unknown amounts, and diagnostics for unsupported or ambiguous geometry.
+- Phase 1 acceptance is pending. The next slice establishes independent references
+  for the two observations and resolves applicable notes, comparability, and
+  remaining source identity and evidence verification requirements.

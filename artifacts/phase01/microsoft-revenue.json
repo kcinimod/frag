@@ -1,0 +1,220 @@
+{
+  "identical_reingest": true,
+  "network_policy": "all socket audit events rejected in each CLI subprocess",
+  "source": {
+    "accession": "0000950170-23-035122",
+    "byte_count": 9963591,
+    "company": "Microsoft Corporation",
+    "diagnostics": [],
+    "facts": [
+      {
+        "applicable_notes": [],
+        "basis": "as_reported_in_filing",
+        "company": "Microsoft Corporation",
+        "comparative": true,
+        "currency": "USD",
+        "fact_id": "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+        "filing_date": "2023-07-27",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "C_efe853fc-8e8a-4899-b65b-e33c17faff7c",
+          "fact_element_id": "F_9e4cb859-32cb-499b-861d-cc7439e04b9b",
+          "unit_id": "U_USD"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4309,
+            "row": 5,
+            "table": 25
+          },
+          "currency_measure": {
+            "character": 232933,
+            "line": 8
+          },
+          "inline_context": {
+            "character": 159559,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4396,
+            "row": 12,
+            "table": 25
+          },
+          "statement_heading": {
+            "character": 3,
+            "line": 4267
+          },
+          "table": {
+            "character": 3,
+            "line": 4269,
+            "table": 25
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4286,
+            "row": 2,
+            "table": 25
+          },
+          "value": {
+            "cell": 8,
+            "character": 5,
+            "column": 8,
+            "line": 4403,
+            "row": 12,
+            "table": 25
+          },
+          "year_header": {
+            "cell": 6,
+            "character": 5,
+            "column": 7,
+            "line": 4314,
+            "row": 5,
+            "table": 25
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenue",
+        "normalized_amount": "198270000000",
+        "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
+        "parser_version": "annual-revenue-v1",
+        "raw_amount": "198,270",
+        "reporting_period": {
+          "end": "2022-06-30",
+          "fiscal_year": 2022,
+          "kind": "annual",
+          "start": "2021-07-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+        "status": "provisional",
+        "unresolved_requirements": [
+          "applicable_notes",
+          "independent_evidence_verification"
+        ]
+      },
+      {
+        "applicable_notes": [],
+        "basis": "as_reported_in_filing",
+        "company": "Microsoft Corporation",
+        "comparative": false,
+        "currency": "USD",
+        "fact_id": "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37",
+        "filing_date": "2023-07-27",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "C_da7a1266-ce2b-41b7-83ff-bb6e03dc1fa5",
+          "fact_element_id": "F_1574d8d7-79cc-48b4-b29c-3394ed5cb819",
+          "unit_id": "U_USD"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4309,
+            "row": 5,
+            "table": 25
+          },
+          "currency_measure": {
+            "character": 232933,
+            "line": 8
+          },
+          "inline_context": {
+            "character": 130787,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4396,
+            "row": 12,
+            "table": 25
+          },
+          "statement_heading": {
+            "character": 3,
+            "line": 4267
+          },
+          "table": {
+            "character": 3,
+            "line": 4269,
+            "table": 25
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4286,
+            "row": 2,
+            "table": 25
+          },
+          "value": {
+            "cell": 4,
+            "character": 5,
+            "column": 4,
+            "line": 4399,
+            "row": 12,
+            "table": 25
+          },
+          "year_header": {
+            "cell": 3,
+            "character": 5,
+            "column": 3,
+            "line": 4311,
+            "row": 5,
+            "table": 25
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenue",
+        "normalized_amount": "211915000000",
+        "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
+        "parser_version": "annual-revenue-v1",
+        "raw_amount": "211,915",
+        "reporting_period": {
+          "end": "2023-06-30",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2022-07-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+        "status": "provisional",
+        "unresolved_requirements": [
+          "applicable_notes",
+          "independent_evidence_verification"
+        ]
+      }
+    ],
+    "filing_date": "2023-07-27",
+    "form": "10-K",
+    "hash_algorithm": "sha256",
+    "metadata_status": "supplied_unverified",
+    "parser_version": "annual-revenue-v1",
+    "provenance": {
+      "archive": "artifacts/phase01/originals/msft-20230630.htm.gz",
+      "kind": "local_original",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm"
+    },
+    "real_source_acceptance": false,
+    "schema_version": "source-v1",
+    "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+    "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm",
+    "status": "source_preserved",
+    "unresolved_requirements": [
+      "source_identity_verification",
+      "evidence_verification"
+    ]
+  }
+}

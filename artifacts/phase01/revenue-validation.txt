@@ -1,0 +1,27 @@
+Issue #3 validation from the repository root in Windows PowerShell
+
+uv run --locked --offline pytest tests/test_revenue_workflow.py -q
+TDD baseline: failed because ingest exposed an empty facts list.
+Final focused result: 11 passed in 2.94s.
+
+uv run --locked --offline mypy
+Success: no issues found in 10 source files.
+
+uv run --locked --offline pytest -q
+30 passed in 6.41s.
+
+npm.cmd --prefix web run build
+TypeScript and Vite production build passed, 28 modules transformed.
+
+uv run --locked --offline --with playwright python artifacts/phase01/browser-replay.py
+Browser replay passed: upload, hash, unknowns, retry, conflict, CLI
+interoperability, provisional facts and evidence. External page requests blocked.
+
+uv run --locked --offline python artifacts/phase01/replay.py --microsoft
+Exit 0. Two provisional observations, no extraction diagnostics, stable
+identifiers across reingestion, retained-byte equality after input removal,
+and year/value locators resolved. See microsoft-revenue.json for the output.
+
+Direct SEC requests to the primary HTML returned HTTP 403.
+curl.exe --fail --location --max-time 30 --output artifacts/phase01/local-store/msft-20230630.htm https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm
+Exit 0. Received 9,963,591 bytes. See REVENUE_HANDOFF.md for provenance.
