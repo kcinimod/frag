@@ -87,6 +87,21 @@ def main() -> None:
                     page.get_by_role("button", name="CLI synthetic fixture").click()
                     expect(page.get_by_role("heading", name="CLI synthetic fixture")).to_be_visible()
                     expect(page.get_by_text("Expected exactly one table headed Income Statements.")).to_be_visible()
+
+                    # Older servers can return a preserved source without extraction diagnostics.
+                    legacy = {**saved, "parser_version": None}
+                    legacy.pop("diagnostics")
+                    legacy_page = context.new_page()
+                    legacy_page.route(
+                        origin + "/api/sources",
+                        lambda route: route.fulfill(json={"source_count": 1, "sources": [legacy]}),
+                    )
+                    legacy_page.goto(origin)
+                    legacy_page.locator(".sources button").click()
+                    expect(legacy_page.get_by_role("heading", name="Source record")).to_be_visible(timeout=1500)
+                    expect(legacy_page.get_by_text("Revenue extraction is unavailable for this saved source.")).to_be_visible()
+                    legacy_page.close()
+
                     page.get_by_label("Company", exact=True).fill("Synthetic revenue fixture")
                     page.get_by_label("HTML file").set_input_files(ROOT / "tests/fixtures/synthetic_income.html")
                     save.click()

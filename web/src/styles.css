@@ -15,12 +15,15 @@ h2, h3, p { margin: 0; }
 h2 { font-size: 1.15rem; }
 h3 { font-size: 1rem; }
 .workspace { display: grid; grid-template-columns: minmax(17rem, 1fr) minmax(0, 1.7fr); gap: 1rem; align-items: start; }
-aside, form { display: grid; gap: 1rem; }
+aside, form, .download, .filing-results { display: grid; gap: 1rem; }
 .panel { min-width: 0; padding: 1.25rem; background: white; border: 1px solid #b9cbc7; border-radius: .65rem; }
 form { margin-top: 1rem; }
+.download form { margin-top: 0; }
 label, legend, summary, button { font-size: .875rem; font-weight: 650; }
-input:not([type=radio]) { display: block; margin-top: .3rem; width: 100%; min-height: 2.25rem; padding: .45rem; border: 1px solid #95aaa7; border-radius: .35rem; }
-input, button { font-family: inherit; }
+input:not([type=radio]), select { display: block; margin-top: .3rem; width: 100%; min-height: 2.25rem; padding: .45rem; border: 1px solid #95aaa7; border-radius: .35rem; }
+input, select, button { font-family: inherit; }
+.filing-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.filing-results { grid-template-columns: minmax(0, 1fr); }
 fieldset { margin: 0; border: 1px solid #95aaa7; border-radius: .35rem; }
 .choice { display: inline-flex; align-items: center; gap: .25rem; margin-right: .65rem; }
 details label { display: block; margin-top: .6rem; }

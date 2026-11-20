@@ -41,7 +41,7 @@ type Source = {
   filing_date: string | null;
   source_url: string | null;
   byte_count: number;
-  parser_version: string;
+  parser_version: string | null;
   facts: RevenueFact[];
   comparison?: {
     status: 'compatible' | 'unresolved';
@@ -50,7 +50,7 @@ type Source = {
     scope_caveats: string[];
     unresolved_requirements: string[];
   };
-  diagnostics: { code: string; message: string; fiscal_year?: number }[];
+  diagnostics?: { code: string; message: string; fiscal_year?: number }[];
   unresolved_requirements: string[];
   provenance: {
     kind: 'local_original' | 'synthetic' | 'sec_download';
@@ -58,6 +58,15 @@ type Source = {
     upload_name?: string;
     preserved_at: string;
   };
+};
+
+type FilingMatch = {
+  cik: string;
+  company: string;
+  accession: string;
+  form: string;
+  filing_date: string;
+  report_date: string | null;
 };
 
 const fields = [
@@ -79,7 +88,14 @@ async function api<T>(path: string, options?: RequestInit): Promise<T> {
   return response.json();
 }
 
+function secRequest<T>(path: string, data?: Record<string, string>): Promise<T> {
+  const headers = new Headers({ 'X-Frag-Download': '1' });
+  if (data) headers.set('Content-Type', 'application/json');
+  return api<T>(path, { method: 'POST', headers, body: data && JSON.stringify(data) });
+}
+
 function SourceDetail({ source }: { source: Source }) {
+  const diagnostics = source.diagnostics ?? [];
   return (
     <section className="panel detail" aria-labelledby="detail-title">
       <h2 id="detail-title">{source.company ?? 'Source record'}</h2>
@@ -103,12 +119,13 @@ function SourceDetail({ source }: { source: Source }) {
       </dl>
       <h3>Reported consolidated revenue</h3>
       <dl>
-        <dt>Parser version</dt><dd className="mono">{source.parser_version}</dd>
+        <dt>Parser version</dt><dd className="mono">{source.parser_version ?? 'Unavailable'}</dd>
         <dt>Open requirements</dt>
         <dd>{formatRequirements(source.unresolved_requirements)}</dd>
       </dl>
-      {source.diagnostics.length > 0 && (
-        <ul>{source.diagnostics.map(diagnostic => (
+      {source.parser_version === null && <p className="muted">Revenue extraction is unavailable for this saved source.</p>}
+      {diagnostics.length > 0 && (
+        <ul>{diagnostics.map(diagnostic => (
           <li key={`${diagnostic.code}-${diagnostic.fiscal_year ?? 'source'}`}>{diagnostic.message}</li>
         ))}</ul>
       )}
@@ -194,12 +211,28 @@ function RevenueDetail({ fact }: { fact: RevenueFact }) {
 function App() {
   const [sources, setSources] = useState<Source[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
+  const [filings, setFilings] = useState<FilingMatch[] | null>(null);
+  const [chosenAccession, setChosenAccession] = useState('');
   const [listError, setListError] = useState('');
   const [uploadError, setUploadError] = useState('');
+  const [downloadError, setDownloadError] = useState('');
+  const [downloadNotice, setDownloadNotice] = useState('');
   const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [searching, setSearching] = useState(false);
   const selected = sources.find(source => source.source_id === selectedId);
+  const chosenFiling = filings?.find(filing => filing.accession === chosenAccession);
+  const busy = loading || uploading || downloading || searching;
+  const hasCachedFiling = sources.some(source =>
+    source.provenance.kind === 'sec_download' && source.accession === '0000950170-23-035122',
+  );
+
+  function openSource(source: Source) {
+    setSources(current => [...current.filter(item => item.source_id !== source.source_id), source]);
+    setSelectedId(source.source_id);
+  }
 
   async function refresh() {
     setLoading(true);
@@ -226,8 +259,7 @@ function App() {
       const source = await api<Source>('/api/sources', {
         method: 'POST', body: new FormData(form), headers: { 'X-Frag-Upload': '1' },
       });
-      setSources(current => [...current.filter(item => item.source_id !== source.source_id), source]);
-      setSelectedId(source.source_id);
+      openSource(source);
       setNotice('Source saved and open for inspection.');
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : String(error));
@@ -236,11 +268,112 @@ function App() {
     }
   }
 
+  async function searchFilings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const fields = new FormData(event.currentTarget);
+    setSearching(true);
+    setFilings(null);
+    setChosenAccession('');
+    setDownloadError('');
+    setDownloadNotice('');
+    try {
+      const result = await secRequest<{ filings: FilingMatch[] }>('/api/filings/search', {
+        company: String(fields.get('company')).trim(), year: String(fields.get('year')),
+        form: String(fields.get('filingForm')),
+      });
+      setFilings(result.filings);
+      setChosenAccession(result.filings[0]?.accession ?? '');
+    } catch (error) {
+      setDownloadError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  async function download(filing?: FilingMatch) {
+    setDownloading(true);
+    setDownloadError('');
+    setDownloadNotice('');
+    try {
+      const source = await secRequest<Source>('/api/sources/download', filing && {
+        company: filing.cik, year: filing.filing_date.slice(0, 4), form: filing.form,
+        accession: filing.accession,
+      });
+      openSource(source);
+      setDownloadNotice('SEC filing open for inspection.');
+    } catch (error) {
+      setDownloadError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   return (
     <main>
       <header className="masthead"><span>FRAG</span><h1>Source inspector</h1></header>
       <div className="workspace">
         <aside>
+          <section className="panel download" aria-labelledby="download-title">
+            <h2 id="download-title">SEC EDGAR</h2>
+            <form onSubmit={searchFilings} onChange={() => {
+              setFilings(null);
+              setDownloadError('');
+              setDownloadNotice('');
+            }}>
+              <label>
+                Company ticker or SEC CIK
+                <input name="company" maxLength={20} placeholder="MSFT or 789019"
+                  autoCapitalize="characters" spellCheck={false} required disabled={busy} />
+              </label>
+              <div className="filing-filters">
+                <label>
+                  Filing year
+                  <input name="year" inputMode="numeric" pattern="[0-9]{4}" maxLength={4}
+                    defaultValue={new Date().getFullYear()} required disabled={busy} />
+                </label>
+                <label>
+                  SEC form
+                  <input name="filingForm" list="filing-forms" defaultValue="10-K" maxLength={30}
+                    autoCapitalize="characters" spellCheck={false} required disabled={busy} />
+                  <datalist id="filing-forms">
+                    {['10-K', '10-Q', '8-K', '20-F', '40-F', '6-K', '10-K/A', '10-Q/A'].map(form =>
+                      <option key={form} value={form} />,
+                    )}
+                  </datalist>
+                </label>
+              </div>
+              <button className="primary" type="submit" disabled={busy}>Find filings</button>
+            </form>
+            {filings?.length === 0 && <p className="muted" role="status">No matching HTML filings.</p>}
+            {chosenFiling && (
+              <div className="filing-results">
+                <label>
+                  {chosenFiling.company} filings
+                  <select value={chosenAccession} onChange={event => setChosenAccession(event.target.value)}
+                    disabled={busy}>
+                    {filings?.map(filing => (
+                      <option key={filing.accession} value={filing.accession}>
+                        {filing.form} filed {filing.filing_date}
+                        {filing.report_date ? ` · Period ended ${filing.report_date}` : ''} · {filing.accession}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button className="primary" type="button" disabled={busy} onClick={() => void download(chosenFiling)}>
+                  Download selected filing
+                </button>
+              </div>
+            )}
+            <button type="button" disabled={busy} onClick={() => void download()}>
+              {hasCachedFiling ? 'Open cached Microsoft FY2023 10-K' : 'Download Microsoft FY2023 10-K'}
+            </button>
+            {downloadError && <p className="error" role="alert">{downloadError}</p>}
+            <div className="muted" role="status">
+              {searching && 'Searching SEC EDGAR…'}
+              {downloading && 'Retrieving the SEC filing…'}
+              {!searching && !downloading && downloadNotice}
+            </div>
+          </section>
           <section className="panel" aria-labelledby="upload-title">
             <h2 id="upload-title">Upload HTML</h2>
             <form onSubmit={upload}>
@@ -256,7 +389,7 @@ function App() {
                   <label key={name}>{label}<input name={name} type={name === 'filing_date' ? 'date' : 'text'} /></label>
                 ))}
               </details>
-              <button className="primary" disabled={uploading || loading} type="submit">
+              <button className="primary" disabled={busy} type="submit">
                 {uploading ? 'Preserving…' : 'Preserve source'}
               </button>
               {uploadError && <p className="error" role="alert">{uploadError}</p>}
@@ -266,7 +399,7 @@ function App() {
           <section className="panel" aria-labelledby="sources-title">
             <div className="section-head">
               <h2 id="sources-title">Saved sources <span>({sources.length})</span></h2>
-              <button type="button" disabled={loading || uploading} onClick={() => void refresh()}>Refresh</button>
+              <button type="button" disabled={busy} onClick={() => void refresh()}>Refresh</button>
             </div>
             {listError && <p className="error" role="alert">{listError}</p>}
             {loading && <p className="muted" role="status">Loading sources…</p>}
@@ -284,7 +417,7 @@ function App() {
           </section>
         </aside>
         {selected ? <SourceDetail source={selected} /> : (
-          <section className="panel detail empty"><h2>Inspect a source</h2><p>Upload HTML or select a saved source to inspect its provenance and filing metadata.</p></section>
+          <section className="panel detail empty"><h2>Inspect a source</h2><p>Download a filing, upload HTML, or select a saved source.</p></section>
         )}
       </div>
     </main>

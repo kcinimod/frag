@@ -24,14 +24,17 @@ class SyntheticResponse(io.BytesIO):
     code = 200
     msg = "OK"
 
-    def __init__(self) -> None:
-        super().__init__(FIXTURE.read_bytes())
+    def __init__(
+        self, body: bytes | None = None, *, url: str = SEC_URL, content_type: str = "text/html",
+    ) -> None:
+        super().__init__(FIXTURE.read_bytes() if body is None else body)
+        self.url = url
         self.headers = Message()
-        self.headers["Content-Type"] = "text/html"
+        self.headers["Content-Type"] = content_type
         self.headers["Content-Length"] = str(len(self.getvalue()))
 
     def geturl(self) -> str:
-        return SEC_URL
+        return self.url
 
     def info(self) -> Message:
         return self.headers

@@ -31,10 +31,32 @@ choose its provenance, and preserve the source. Try `tests/fixtures/synthetic.ht
 with the **Synthetic fixture** option. To inspect browser uploads through the CLI,
 run `uv run --offline frag inspect --store artifacts/phase01/local-store/browser`.
 Click **Refresh** to see sources ingested through the CLI while the page was open.
-Sources acquired by the CLI appear as **Downloaded from SEC EDGAR** when the
-browser workspace uses the same store.
+To get a filing from **SEC EDGAR**, enter a company ticker or SEC CIK, the
+calendar year it was filed, and the form (for example, `MSFT`, `2023`, `10-K`).
+Click **Find filings**, choose a result by filing date or reporting period, and
+click **Download selected filing**. This opens the saved HTML source record with
+its hash and SEC provenance. To enable searches and fresh downloads, put the
+following line in the Git-ignored `.env` file at the repository root, using your
+project name and monitored contact address:
+
+```dotenv
+SEC_USER_AGENT="Your Organization contact@your-domain.example"
+```
+
+Start the UI with the saved setting:
+
+```powershell
+uv run --locked --offline --env-file .env frag serve --store artifacts/phase01/local-store/browser
+```
+
+Use the Microsoft FY2023 10-K
+shortcut or **Saved sources** to inspect a cached filing offline. Revenue
+extraction for original filings currently supports the Microsoft FY2023 layout.
+[SEC EDGAR submissions API](https://www.sec.gov/search-filings/edgar-application-programming-interfaces)
 Use `--port` to choose another available port. Setup may fetch dependencies.
-Once built and installed, the app uses only localhost during review.
+After updating FRAG, restart `frag serve` and reload the page so the browser
+and API use the same version.
+Offline review of saved sources uses only localhost.
 
 To repeat the automated browser check with an installed Google Chrome, stop
 at the build step above and run:
@@ -80,9 +102,8 @@ across all machines. [SEC access guidance](https://www.sec.gov/search-filings/ed
 [SEC user-agent guidance](https://www.sec.gov/about/webmaster-frequently-asked-questions)
 
 ```powershell
-$env:SEC_USER_AGENT = 'Your Organization contact@your-domain.example'
 $secStore = 'artifacts/phase01/local-store/sec'
-uv run --locked --offline frag download --store $secStore
+uv run --locked --offline --env-file .env frag download --store $secStore
 ```
 
 Here `--offline` governs uv's dependency setup. On a cache miss, `frag download`

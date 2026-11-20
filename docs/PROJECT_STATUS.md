@@ -5,7 +5,9 @@ Phase 1 acceptance checks passed for the retained original Microsoft FY2023
 revenue are independently verified and compatible on their reported basis.
 Reingestion kept one source and two stable fact IDs. Socket-blocked replay
 inspected the saved bytes and facts after removing the input. Issue #6
-delivers the evidence for Phase 1 review, the next milestone.
+delivered the acceptance evidence for Phase 1. The next roadmap milestone is
+a deterministic revenue growth calculation over the verified facts, pending
+authorization to begin Phase 2.
 [Phase 1 handoff](../artifacts/phase01/HANDOFF.md)
 
 - Issue #2 delivered local source preservation, integrity checks, and repeatable
@@ -21,3 +23,5 @@ delivers the evidence for Phase 1 review, the next milestone.
   element to the verified mirror copy. The direct response's observations
   are provisional under its own source hash.
   [Acquisition run record](../artifacts/phase01/SEC_ACQUISITION.md)
+- The browser workspace searches EDGAR by company ticker or CIK, filing year,
+  and form. It preserves the selected HTML through the same download cache.

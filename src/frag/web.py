@@ -1,12 +1,15 @@
 """Same-origin localhost API and built browser assets for the source inspector."""
 
+import os
 import sqlite3
+from dataclasses import asdict
 from pathlib import Path
 from typing import Literal, cast
 
 from flask import Flask, Response, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
 
+from frag.sec import download_edgar_filing, download_microsoft_filing, search_edgar_filings
 from frag.store import (
     SourceConflict,
     SourceError,
@@ -35,6 +38,38 @@ def create_app(store: SourceStore, assets: Path) -> Flask:
     @app.get("/api/sources/<source_id>")
     def inspect_source(source_id: str) -> Response:
         return jsonify(store.inspect(source_id))
+
+    def filing_query(data: object) -> tuple[str, str, str]:
+        if isinstance(data, dict):
+            company, year, form = (data.get(field) for field in ("company", "year", "form"))
+            if isinstance(company, str) and isinstance(year, str) and isinstance(form, str):
+                return company, year, form
+        raise SourceError("Enter a company ticker or SEC CIK, a filing year, and a form.")
+
+    @app.post("/api/filings/search")
+    def search_filings() -> Response | tuple[Response, int]:
+        if request.headers.get("X-Frag-Download") != "1":
+            return jsonify(error="Filing search requires the local FRAG workspace."), 403
+        company, year, form = filing_query(request.get_json(silent=True))
+        matches = search_edgar_filings(company, year, form, os.environ.get("SEC_USER_AGENT"))
+        return jsonify(filings=[asdict(match) for match in matches])
+
+    @app.post("/api/sources/download")
+    def download_source() -> Response | tuple[Response, int]:
+        if request.headers.get("X-Frag-Download") != "1":
+            return jsonify(error="Download requires the local FRAG workspace."), 403
+        user_agent = os.environ.get("SEC_USER_AGENT")
+        if request.is_json:
+            data = request.get_json(silent=True)
+            company, year, form = filing_query(data)
+            if not isinstance(data, dict) or not isinstance(data.get("accession"), str):
+                raise SourceError("Choose a filing from the search results.")
+            matches = search_edgar_filings(company, year, form, user_agent)
+            for match in matches:
+                if match.accession == data["accession"]:
+                    return jsonify(download_edgar_filing(store, match, user_agent))
+            raise SourceNotFound("This filing was not found. Search again to refresh the results.")
+        return jsonify(download_microsoft_filing(store, user_agent))
 
     @app.post("/api/sources")
     def ingest_source() -> Response | tuple[Response, int]:
