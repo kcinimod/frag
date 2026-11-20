@@ -1,6 +1,8 @@
 {
+  "fact_count": 2,
   "identical_reingest": true,
   "network_policy": "all socket audit events rejected in each CLI subprocess",
+  "saved_original_matched_after_input_removal": true,
   "source": {
     "accession": "0000950170-23-035122",
     "byte_count": 9963591,
@@ -432,5 +434,6 @@
         "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm"
       }
     }
-  }
+  },
+  "source_count": 1
 }

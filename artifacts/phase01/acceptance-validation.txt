@@ -1,0 +1,75 @@
+Issue #6 Phase 1 acceptance run
+Windows PowerShell. Fresh checkout of the staged issue #6 files over base 365c14e.
+CLI JSON output summarized below. The full Microsoft replay JSON is microsoft-revenue.json.
+
+PS> uv --version
+uv 0.12.17 (635500036 2026-09-18 x86_64-pc-windows-msvc)
+Exit 0
+
+PS> uv run --locked --offline python --version
+Python 3.12.14
+Exit 0
+
+PS> uv sync --locked
+Initial isolated setup created .venv with CPython 3.12.14 and installed 19 packages from the lockfile.
+Locked verification:
+Resolved 19 packages in 0.85ms
+Checked 19 packages in 1ms
+Exit 0
+
+PS> uv run --locked --offline mypy
+Success: no issues found in 14 source files
+Exit 0
+
+PS> uv run --locked --offline pytest -q tests/test_verification_workflow.py
+...........                                                              [100%]
+11 passed in 13.08s
+Exit 0
+
+PS> $runDir = Join-Path ([IO.Path]::GetTempPath()) ('frag-phase01-' + [guid]::NewGuid())
+New-Item -ItemType Directory -Path $runDir | Out-Null
+$filingPath = Join-Path $runDir 'msft-20230630.htm'
+$filingStore = Join-Path $runDir 'store'
+uv run --locked --offline python -c 'import gzip, sys; from pathlib import Path; Path(sys.argv[1]).write_bytes(gzip.decompress(Path(sys.argv[2]).read_bytes()))' $filingPath artifacts/phase01/originals/msft-20230630.htm.gz
+if ($LASTEXITCODE -ne 0) { throw 'Could not decompress the retained filing.' }
+$filing = uv run --locked --offline frag ingest $filingPath --store $filingStore --provenance local_original --company 'Microsoft Corporation' --accession '0000950170-23-035122' --form '10-K' --filing-date '2023-07-27' --source-url 'https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm' | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0) { throw 'Filing ingestion failed.' }
+uv run --locked --offline frag inspect $filing.source_id --store $filingStore
+source_id=sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea
+byte_count=9963591, provenance=local_original
+parser_version=annual-revenue-v4, evidence_version=microsoft-fy2023-revenue-v2
+fact_count=2, real_source_acceptance=True, comparison=compatible
+FY2022 verified raw=198,270 normalized_USD=198270000000 id=fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a
+FY2023 verified raw=211,915 normalized_USD=211915000000 id=fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37
+Exit 0
+
+PS> uv run --locked --offline python artifacts/phase01/replay.py
+source_count=1, identical_reingest=True
+network_policy=all socket audit events rejected in each CLI subprocess
+source_id=sha256:6b6e91d29f4abad0191f2f1702a2263653413c7954893a74fd6aa9200e5d9f80
+byte_count=163, provenance=synthetic
+parser_version=annual-revenue-v4, evidence_version=microsoft-fy2023-revenue-v2
+fact_count=0, real_source_acceptance=False, comparison=unresolved
+Exit 0
+
+PS> uv run --locked --offline python artifacts/phase01/replay.py --microsoft
+Replay JSON matched the published facts record.
+source_count=1, identical_reingest=True
+network_policy=all socket audit events rejected in each CLI subprocess
+saved_original_matched_after_input_removal=True
+source_id=sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea
+byte_count=9963591, provenance=local_original
+parser_version=annual-revenue-v4, evidence_version=microsoft-fy2023-revenue-v2
+fact_count=2, real_source_acceptance=True, comparison=compatible
+FY2022 verified raw=198,270 normalized_USD=198270000000 id=fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a
+FY2023 verified raw=211,915 normalized_USD=211915000000 id=fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37
+Exit 0
+
+PS> uv run --locked --offline python -O artifacts/phase01/replay.py --microsoft
+Run replay without Python optimization so its assertions execute.
+Exit 1 (expected)
+
+PS> uv run --locked --offline pytest -q
+..................................................                       [100%]
+50 passed in 24.10s
+Exit 0

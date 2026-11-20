@@ -1,10 +1,12 @@
 # Project status
 
-Phase 1 preserves original source bytes and exposes verified FY2022 and
-FY2023 reported consolidated revenue from Microsoft's FY2023 10-K (accession
-`0000950170-23-035122`). The CLI and localhost browser use the same store and
-parser. The retained HTML and source manifest support offline replay. See the
-[revenue verification handoff](../artifacts/phase01/VERIFICATION_HANDOFF.md).
+Phase 1 acceptance checks passed for the retained original Microsoft FY2023
+10-K (accession `0000950170-23-035122`). FY2022 and FY2023 reported consolidated
+revenue are independently verified and compatible on their reported basis.
+Reingestion kept one source and two stable fact IDs. Socket-blocked replay
+inspected the saved bytes and facts after removing the input. Issue #6
+delivers the evidence for Phase 1 review, the next milestone.
+[Phase 1 handoff](../artifacts/phase01/HANDOFF.md)
 
 - Issue #2 delivered local source preservation, integrity checks, and repeatable
   ingest and inspection. Issue #7 added local browser upload and inspection.
@@ -19,4 +21,3 @@ parser. The retained HTML and source manifest support offline replay. See the
   element to the verified mirror copy. The direct response's observations
   are provisional under its own source hash.
   [Acquisition run record](../artifacts/phase01/SEC_ACQUISITION.md)
-- The wider Phase 1 handoff remains open.

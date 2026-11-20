@@ -1,6 +1,7 @@
 """Independent reference checks through the public ingest and inspect commands."""
 
 import gzip
+import json
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +26,7 @@ def inspect_bytes(tmp_path: Path, data: bytes, provenance: str, *metadata: str) 
     assert result == success(*args)
     path.unlink()
     assert result == success("inspect", result["source_id"], "--store", store)
+    assert success("inspect", "--store", store) == {"source_count": 1, "sources": [result]}
     assert Path(result["original_path"]).read_bytes() == data
     return result
 
@@ -32,7 +34,7 @@ def inspect_bytes(tmp_path: Path, data: bytes, provenance: str, *metadata: str) 
 def test_preserved_microsoft_observations_match_independent_evidence(
     tmp_path: Path, original: bytes,
 ) -> None:
-    result = inspect_bytes(tmp_path, original, "local_original")
+    result = inspect_bytes(tmp_path, original, "local_original", "--filing-date", "2023-07-27")
     older, current = result["facts"]
     assert [f["status"] for f in (older, current)] == ["verified", "verified"]
     assert [f["normalized_amount"] for f in (older, current)] == ["198270000000", "211915000000"]
@@ -41,6 +43,14 @@ def test_preserved_microsoft_observations_match_independent_evidence(
     assert current["applicable_notes"][0]["locator"]["end_exclusive"]["line"] == 7608
     assert result["comparison"]["status"] == "compatible"
     assert result["real_source_acceptance"] is True
+    manifest = json.loads((ARCHIVE.parents[1] / "source-manifest.json").read_bytes())
+    recorded_facts = json.loads((ARCHIVE.parents[1] / manifest["facts"]).read_bytes())
+    assert manifest["source_id"] == result["source_id"]
+    assert manifest["source_hash"] == result["source_hash"]
+    assert manifest["parser_version"] == result["parser_version"]
+    assert manifest["evidence_version"] == result["evidence_version"]
+    assert recorded_facts["source"]["facts"] == result["facts"]
+    assert recorded_facts["source"]["comparison"] == result["comparison"]
 
 
 @pytest.mark.parametrize(("before", "after", "requirement"), [

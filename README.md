@@ -8,8 +8,8 @@ From the repository root in Windows PowerShell, with uv installed:
 
 ```powershell
 uv sync --locked
-uv run --offline mypy
-uv run --offline pytest
+uv run --locked --offline mypy
+uv run --locked --offline pytest -q
 ```
 
 Python 3.12 is selected by `.python-version`; uv can install it if needed. Setup
@@ -118,14 +118,17 @@ Replay the retained synthetic input or Microsoft HTML with networking
 actively forbidden in each ingest and inspection process.
 
 ```powershell
-uv run --offline python artifacts/phase01/replay.py
+uv run --locked --offline python artifacts/phase01/replay.py
 uv run --locked --offline python artifacts/phase01/replay.py --microsoft
 ```
 
 `uv --offline` prevents uv downloads. The replay harness and regression tests
 add a Python audit hook that rejects all socket operations in CLI processes.
-The Microsoft replay decompresses a retained snapshot into a temporary input,
-then ingests it twice and inspects the saved facts after removing that input.
+Both replays use temporary stores and write JSON to stdout. The Microsoft replay
+decompresses the preserved original, ingests it twice, checks the catalogue for
+one source, and inspects the two saved facts and bytes after removing the input.
+For the standalone PowerShell ingest and inspect commands using that same original,
+see the [Phase 1 handoff](artifacts/phase01/HANDOFF.md#reproduce).
 
 The store keeps unchanged bytes under `originals/<sha256>.html`, separately from
 the source catalogue `sources.sqlite3`. `sha256:<hex>` identifies source bytes.
@@ -153,6 +156,5 @@ Importable entry points are `frag.store.SourceStore`, `SourceMetadata`, and
 `SourceError`. Use `SourceStore(Path(...)).ingest(...)` and `.inspect(...)` with
 the same metadata and provenance semantics as the CLI.
 
-See [project status](docs/PROJECT_STATUS.md) and the
-[revenue verification handoff](artifacts/phase01/VERIFICATION_HANDOFF.md) for evidence
-and remaining work.
+See the [Phase 1 handoff](artifacts/phase01/HANDOFF.md) and
+[project status](docs/PROJECT_STATUS.md) for acceptance evidence and limitations.

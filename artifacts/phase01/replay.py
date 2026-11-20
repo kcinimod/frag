@@ -36,31 +36,29 @@ def invoke(*args: str) -> dict[str, Any]:
 
 
 def replay_synthetic() -> None:
-    store = str(ROOT / "artifacts/phase01/local-store")
-    args = (
-        "ingest", "tests/fixtures/synthetic.html", "--store", store,
-        "--provenance", "synthetic", "--company", "Synthetic Example", "--form", "10-K",
-    )
-    first = invoke(*args)
-    second = invoke(*args)
-    inspected = invoke("inspect", first["source_id"], "--store", store)
-    catalogue = invoke("inspect", "--store", store)
-    assert first == second == inspected
-    assert catalogue == {"source_count": 1, "sources": [first]}
-    assert Path(inspected["original_path"]).read_bytes() == (ROOT / "tests/fixtures/synthetic.html").read_bytes()
+    fixture = "tests/fixtures/synthetic.html"
+    with TemporaryDirectory() as temp:
+        args = (
+            "ingest", fixture, "--store", temp,
+            "--provenance", "synthetic", "--company", "Synthetic Example", "--form", "10-K",
+        )
+        first = invoke(*args)
+        second = invoke(*args)
+        inspected = invoke("inspect", first["source_id"], "--store", temp)
+        catalogue = invoke("inspect", "--store", temp)
+        assert first == second == inspected
+        assert catalogue == {"source_count": 1, "sources": [first]}
+        saved_path = Path(inspected.pop("original_path"))
+        assert saved_path.read_bytes() == (ROOT / fixture).read_bytes()
+    assert inspected["real_source_acceptance"] is False and not inspected["facts"]
+    inspected["provenance"] = {"kind": "synthetic", "fixture": fixture}
     output = {
         "input_kind": "synthetic",
         "network_policy": "all socket audit events rejected in each CLI subprocess",
         "identical_reingest": True,
         "source_count": catalogue["source_count"],
         "source": inspected,
-        "real_source_acceptance": False,
-        "extraction_performed": False,
-        "verification_performed": False,
     }
-    (ROOT / "artifacts/phase01/source-manifest.json").write_text(
-        json.dumps(output, indent=2) + "\n", encoding="utf-8",
-    )
     print(json.dumps(output, indent=2))
 
 
@@ -79,8 +77,10 @@ def replay_microsoft() -> None:
             "--form", "10-K", "--filing-date", "2023-07-27", "--source-url", MICROSOFT_URL,
         )
         first = invoke(*args)
-        assert invoke(*args) == first
-        assert invoke("inspect", "--store", store) == {"source_count": 1, "sources": [first]}
+        second = invoke(*args)
+        assert second == first
+        catalogue = invoke("inspect", "--store", store)
+        assert catalogue == {"source_count": 1, "sources": [first]}
         metadata_free = invoke(
             "ingest", str(input_path), "--store", str(Path(temp) / "metadata-free"),
             "--provenance", "local_original",
@@ -98,7 +98,8 @@ def replay_microsoft() -> None:
         input_path.unlink()
         inspected = invoke("inspect", first["source_id"], "--store", store)
         assert inspected == first
-        assert Path(inspected.pop("original_path")).read_bytes() == original
+        saved_path = Path(inspected.pop("original_path"))
+        assert saved_path.read_bytes() == original
     facts = inspected["facts"]
     assert [
         (fact["reporting_period"]["fiscal_year"], fact["raw_amount"], fact["normalized_amount"])
@@ -126,11 +127,16 @@ def replay_microsoft() -> None:
     print(json.dumps({
         "network_policy": "all socket audit events rejected in each CLI subprocess",
         "identical_reingest": True,
+        "source_count": catalogue["source_count"],
+        "fact_count": len(facts),
+        "saved_original_matched_after_input_removal": True,
         "source": inspected,
     }, indent=2, sort_keys=True))
 
 
 def main() -> None:
+    if not __debug__:
+        raise SystemExit("Run replay without Python optimization so its assertions execute.")
     flags = argparse.ArgumentParser()
     flags.add_argument("--microsoft", action="store_true", help="Replay the retained Microsoft FY2023 10-K")
     if flags.parse_args().microsoft:

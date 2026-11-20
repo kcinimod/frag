@@ -93,4 +93,16 @@ Requests use an operator-configured identifying user agent. Retry delays start
 at one second for transient errors and respect a longer `Retry-After` within
 the wait limit. A server-requested wait beyond the limit ends the command so
 the next request can be scheduled separately. The workstation's direct SEC
-request returned HTTP 403. [SEC access guidance](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+request initially returned HTTP 403. A monitored contact succeeded on a later
+attempt. [SEC acquisition record](../artifacts/phase01/SEC_ACQUISITION.md)
+
+## Issue #6 Phase 1 acceptance evidence
+
+The checked-in, independently reviewed mirror copy is the replay input. Its
+size matches the SEC filing index and its preserved source hash pins both
+verified observations. The separate direct response retains its own source hash
+and provisional status. The Phase 1 manifest points to the original archive,
+derived facts, and independent reference. Both replay modes use temporary
+stores and emit JSON to stdout so a synthetic run cannot replace that manifest.
+The replay blocks Python socket operations in each CLI process. The Phase 1
+handoff marks the review checkpoint. [Phase 1 handoff](../artifacts/phase01/HANDOFF.md)
