@@ -117,3 +117,13 @@ year and the selected filing's verified evidence. The model uses structured
 fact fields as context. The citation viewer renders the original cell.
 The process can run with the model loaded for repeated local questions.
 [Lookup acceptance and measurements](../artifacts/phase02/LOOKUP_HANDOFF.md)
+
+## Filing chatbot for reported revenue growth
+
+Resolve the requested operation and chronological fiscal-year roles before
+calling the planner. The plan must match the three-step program for the
+selected filing's eligible facts. The existing calculator checks comparison
+compatibility before arithmetic and returns the trace and original filing
+citations for both the calculator and the chatbot. Saved chatbot plans use
+`replay-ask`. The earlier `replay-lookup` command is an alias.
+[Growth chat acceptance](../artifacts/phase02/CHAT_GROWTH_HANDOFF.md)

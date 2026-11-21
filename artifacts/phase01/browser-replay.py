@@ -176,6 +176,33 @@ def main() -> None:
                     print("Browser growth replay passed: 6.88%, operation trace, both original cells, "
                           "all four applicable notes, three comparison disclosures, "
                           "and retained FY2023 evidence with a missing prior year.")
+                    if "--chat-growth" in sys.argv[1:]:
+                        chat = page.get_by_role("region", name="Ask the filing")
+                        question = chat.get_by_role("textbox")
+                        ask = chat.get_by_role("button", name="Ask", exact=True)
+                        question.fill("What was revenue growth from FY2023 to FY2022?")
+                        ask.click()
+                        expect(chat.get_by_text("name both fiscal years in order", exact=False)).to_be_visible()
+                        question.fill("How did reported consolidated revenue change from FY2022 to FY2023?")
+                        ask.click()
+                        expect(chat.get_by_text("6.88%", exact=True)).to_be_visible(timeout=35000)
+                        expect(chat.get_by_text("unfavorable foreign currency impact", exact=False)).to_be_visible()
+                        chat.get_by_text("Operation trace and operands").click()
+                        expect(chat.get_by_text("13645000000", exact=False)).to_be_visible()
+                        expect(chat.get_by_text("to_percent (divide) = 6.88", exact=True)).to_be_visible()
+                        for title, original_text in (
+                            ("FY2022 Total revenue cell", "198,270"),
+                            ("FY2023 Total revenue cell", "211,915"),
+                            ("Acquisition and exchange rates", "unfavorable foreign currency impact of 4%"),
+                        ):
+                            with context.expect_page() as excerpt:
+                                chat.get_by_role("link", name=title, exact=True).click()
+                            try:
+                                expect(excerpt.value.locator("body")).to_contain_text(original_text)
+                                expect(excerpt.value.locator("body")).to_contain_text(filing_hash)
+                            finally:
+                                excerpt.value.close()
+                        print("Browser growth chat passed: clarification, 6.88%, trace, caveats, and original citations.")
                     if "--lookup" in sys.argv[1:]:
                         chat = page.get_by_role("region", name="Ask the filing")
                         question = chat.get_by_role("textbox")

@@ -199,6 +199,12 @@ consolidated revenue in FY2023?”, “Revenue for fiscal year 2023”, and
 “What was FY2022 revenue?”. Specify one fiscal year. The answer uses a
 verified observation in the selected filing and links to the original cell.
 
+For reported consolidated revenue growth, provide both fiscal years in
+chronological order. Try “How did revenue change from FY2022 to FY2023?”,
+“Revenue growth from fiscal year 2022 to fiscal year 2023”, or “What was
+revenue growth between FY2022 and FY2023?”. The answer includes the
+percentage, calculation steps, and evidence from the original filing.
+
 Run the explicit setup from the repository root in Windows PowerShell. It
 downloads the pinned Windows x64 CPU build and Q4_K_M weights on cache miss,
 checks both SHA-256 digests, and unpacks the runtime into `.frag-model`.
@@ -233,6 +239,16 @@ the same store.
 ```
 
 [Model and runtime pins, measurements, and retained validation runs](artifacts/phase02/LOOKUP_HANDOFF.md)
+
+To record and replay a growth answer using the same filing store, ask while
+the planner is running, then stop the planner before running replay.
+
+```powershell
+.venv/Scripts/frag.exe ask $local.source_id 'How did revenue change from FY2022 to FY2023?' --store $localStore --record .frag-model/my-growth.json
+.venv/Scripts/frag.exe replay-ask .frag-model/my-growth.json --store $localStore
+```
+
+[Growth chat validation and measurements](artifacts/phase02/CHAT_GROWTH_HANDOFF.md)
 
 Importable entry points are `frag.store.SourceStore`, `SourceMetadata`, and
 `SourceError`. Use `SourceStore(Path(...)).ingest(...)` and `.inspect(...)` with

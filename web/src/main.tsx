@@ -156,9 +156,6 @@ function GrowthCalculator({ source }: { source: Source }) {
     }
   }
 
-  const citationQuery = result && new URLSearchParams({
-    prior: String(result.prior_year), current: String(result.current_year),
-  });
   return (
     <section aria-labelledby="growth-title">
       <h3 id="growth-title">Revenue growth</h3>
@@ -173,62 +170,71 @@ function GrowthCalculator({ source }: { source: Source }) {
       </form>
       {pending && <p role="status">Calculating revenue growth…</p>}
       {error && <p className="error" role="alert">{error}</p>}
-      {result && (
-        <div className="growth-result" aria-live="polite">
-          {result.percent && <p className="growth-value">{result.percent.value}%</p>}
-          {result.absolute_change && (
-            <>
-              <p>Percentage undefined because prior revenue is zero.</p>
-              <p>Absolute revenue change · {result.absolute_change.currency} {result.absolute_change.value}</p>
-            </>
-          )}
-          {result.issues.map(issue => (
-            <p key={issue.role ?? 'comparison'}>{growthIssueText(issue)}</p>
-          ))}
-          {result.trace.length > 0 && (
-            <>
-              <p>FY{result.prior_year} to FY{result.current_year} · {result.formula}</p>
-              {result.comparison_basis && <p>{result.comparison_basis}</p>}
-              {result.scope_caveats.map(caveat => <p key={caveat}>{caveat}</p>)}
-              <details>
-                <summary>Operation trace and operands</summary>
-                <p>Evidence version · {result.evidence_version}</p>
-                {result.operands.map(fact => (
-                  <p key={fact.fact_id}>
-                    {fact.role} · FY{fact.reporting_period.fiscal_year} · {fact.currency} {fact.normalized_amount}
-                    {' · '}<span className="mono">{fact.fact_id}</span>
-                  </p>
-                ))}
-                <ol>{result.trace.map(step => (
-                  <li key={step.operation}>{step.operation} ({step.inputs.join(', ')}) = {step.result}</li>
-                ))}</ol>
-              </details>
-              <h4>Original filing evidence</h4>
-              <ul>{result.citations.map(citation => (
-                <li key={citation.id}>
-                  <a href={`${path}/citations/${encodeURIComponent(citation.id)}?${citationQuery}`}
-                    target="_blank" rel="noopener noreferrer">{citation.title}</a>
-                </li>
-              ))}</ul>
-            </>
-          )}
-        </div>
-      )}
+      {result && <GrowthAnswer result={result} path={path} />}
     </section>
   );
 }
 
-type LookupResult =
+function GrowthAnswer({ result, path }: { result: GrowthResult; path: string }) {
+  const citationQuery = new URLSearchParams({
+    prior: String(result.prior_year), current: String(result.current_year),
+  });
+  return (
+    <div className="growth-result" aria-live="polite">
+      {result.percent && <p className="growth-value">{result.percent.value}%</p>}
+      {result.absolute_change && (
+        <>
+          <p>Percentage undefined because prior revenue is zero.</p>
+          <p>Absolute revenue change · {result.absolute_change.currency} {result.absolute_change.value}</p>
+        </>
+      )}
+      {result.issues.map(issue => (
+        <p key={issue.role ?? 'comparison'}>{growthIssueText(issue)}</p>
+      ))}
+      {result.trace.length > 0 && (
+        <>
+          <p>FY{result.prior_year} to FY{result.current_year} · {result.formula}</p>
+          {result.comparison_basis && <p>{result.comparison_basis}</p>}
+          {result.scope_caveats.map(caveat => <p key={caveat}>{caveat}</p>)}
+          <details>
+            <summary>Operation trace and operands</summary>
+            <p>Evidence version · {result.evidence_version}</p>
+            {result.operands.map(fact => (
+              <p key={fact.fact_id}>
+                {fact.role} · FY{fact.reporting_period.fiscal_year} · {fact.currency} {fact.normalized_amount}
+                {' · '}<span className="mono">{fact.fact_id}</span>
+              </p>
+            ))}
+            <ol>{result.trace.map(step => (
+              <li key={step.operation}>{step.operation} ({step.inputs.join(', ')}) = {step.result}</li>
+            ))}</ol>
+          </details>
+          <h4>Original filing evidence</h4>
+          <ul>{result.citations.map(citation => (
+            <li key={citation.id}>
+              <a href={`${path}/citations/${encodeURIComponent(citation.id)}?${citationQuery}`}
+                target="_blank" rel="noopener noreferrer">{citation.title}</a>
+            </li>
+          ))}</ul>
+        </>
+      )}
+    </div>
+  );
+}
+
+type RevenueAnswer =
   | { status: 'answered'; fiscal_year: number; fact: RevenueFact; citations: { id: string; title: string }[] }
+  | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline' | 'unavailable'; operation: 'growth' })
   | { status: 'clarify' | 'model_unavailable' | 'model_timeout' | 'invalid_plan' | 'evidence_unavailable'; message: string };
 
-function RevenueLookup({ source }: { source: Source }) {
+function RevenueChat({ source }: { source: Source }) {
   const [question, setQuestion] = useState('');
-  const [result, setResult] = useState<LookupResult>();
+  const [result, setResult] = useState<RevenueAnswer>();
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
   const year = (source.facts.find(fact => !fact.comparative) ?? source.facts[0])?.reporting_period.fiscal_year ?? 2023;
-  const path = `/api/sources/${encodeURIComponent(source.source_id)}/lookup`;
+  const sourcePath = `/api/sources/${encodeURIComponent(source.source_id)}`;
+  const path = `${sourcePath}/lookup`;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -236,13 +242,13 @@ function RevenueLookup({ source }: { source: Source }) {
     setResult(undefined);
     setError('');
     try {
-      setResult(await api<LookupResult>(path, {
+      setResult(await api<RevenueAnswer>(path, {
         method: 'POST',
         headers: { 'X-Frag-Ask': '1', 'Content-Type': 'application/json' },
         body: JSON.stringify({ question }),
       }));
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Revenue lookup failed.');
+      setError(problem instanceof Error ? problem.message : 'Revenue question failed.');
     } finally {
       setPending(false);
     }
@@ -253,7 +259,7 @@ function RevenueLookup({ source }: { source: Source }) {
       <h3 id="lookup-title">Ask the filing</h3>
       <form onSubmit={submit}>
         <label>
-          Question about annual revenue
+          Question about annual revenue or growth
           <input value={question} onChange={event => {
             setQuestion(event.target.value);
             setResult(undefined);
@@ -276,7 +282,8 @@ function RevenueLookup({ source }: { source: Source }) {
             ))}
           </>
         )}
-        {result && result.status !== 'answered' && <p>{result.message}</p>}
+        {result && 'operation' in result && <GrowthAnswer result={result} path={`${sourcePath}/growth`} />}
+        {result && 'message' in result && <p>{result.message}</p>}
       </div>
     </section>
   );
@@ -332,7 +339,7 @@ function SourceDetail({ source }: { source: Source }) {
         </section>
       )}
       <GrowthCalculator key={source.source_id} source={source} />
-      <RevenueLookup key={`lookup-${source.source_id}`} source={source} />
+      <RevenueChat key={`lookup-${source.source_id}`} source={source} />
     </section>
   );
 }

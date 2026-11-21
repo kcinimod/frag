@@ -11,7 +11,7 @@ from typing import Any, Sequence
 
 from frag.growth import calculate_growth
 from frag.local_model import propose_lookup
-from frag.lookup import ask_revenue, replay_lookup
+from frag.lookup import ask_revenue, replay_revenue
 from frag.sec import download_microsoft_filing
 from frag.store import SourceError, SourceMetadata, SourceStore
 
@@ -54,12 +54,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     growth.add_argument("prior_year", type=int)
     growth.add_argument("current_year", type=int)
     growth.add_argument("--store", type=Path, required=True)
-    ask = commands.add_parser("ask", help="Ask for verified annual revenue in a selected filing")
+    ask = commands.add_parser("ask", help="Ask for verified annual revenue or revenue growth in a selected filing")
     ask.add_argument("source_id")
     ask.add_argument("question", nargs="?", help="Question text. Omit to read from standard input.")
     ask.add_argument("--store", type=Path, required=True)
     ask.add_argument("--record", type=Path, help="Save an explicit validation run to a new JSON file")
-    replay = commands.add_parser("replay-lookup", help="Validate and execute a saved lookup plan offline")
+    replay = commands.add_parser("replay-ask", aliases=["replay-lookup"], help="Validate and execute a saved chatbot plan offline")
     replay.add_argument("record", type=Path)
     replay.add_argument("--store", type=Path, required=True)
     serve = commands.add_parser("serve", help="Run the browser workspace on localhost")
@@ -97,12 +97,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = ask_revenue(source, question, propose_lookup, record=record)
             if args.record and record is not None:
                 _write_validation_record(args.record, record)
-        elif args.command == "replay-lookup":
+        elif args.command in ("replay-ask", "replay-lookup"):
             saved = json.loads(args.record.read_text(encoding="utf-8"))
             identity = saved.get("source") if isinstance(saved, dict) else None
             if not isinstance(identity, dict) or not isinstance(identity.get("source_id"), str):
                 raise SourceError("The validation record must identify its preserved filing.")
-            result = replay_lookup(store.inspect(identity["source_id"]), saved)
+            result = replay_revenue(store.inspect(identity["source_id"]), saved)
         else:
             from frag.web import create_app
 

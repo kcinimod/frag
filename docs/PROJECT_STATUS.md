@@ -33,3 +33,7 @@ Phase 2 calculator and its offline results.
   CPU model answered both retained fiscal years offline. Explicit validation
   runs replayed with the model stopped.
   [Lookup handoff](../artifacts/phase02/LOOKUP_HANDOFF.md)
+- Issue #11 adds filing chatbot questions for growth between two fiscal years.
+  The local model returned a valid plan for Microsoft FY2022 to FY2023, and
+  the deterministic calculator returned 6.88% with its trace and citations.
+  [Growth chat handoff](../artifacts/phase02/CHAT_GROWTH_HANDOFF.md)

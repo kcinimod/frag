@@ -1,4 +1,7 @@
-param([switch]$Background)
+param(
+    [switch]$Background,
+    [ValidateRange(1, 65535)][int]$Port = 8087
+)
 
 $ErrorActionPreference = 'Stop'
 $modelDirectory = Join-Path $PSScriptRoot '../.frag-model'
@@ -14,7 +17,7 @@ if ((Get-FileHash -LiteralPath $weights -Algorithm SHA256).Hash -ne
 
 $plannerArguments = @(
     '--offline', '--model', $weights, '--alias', 'frag-qwen25-05b-q4km',
-    '--host', '127.0.0.1', '--port', '8087', '--ctx-size', '4096', '--threads', '4',
+    '--host', '127.0.0.1', '--port', $Port, '--ctx-size', '4096', '--threads', '4',
     '--n-gpu-layers', '0', '--parallel', '1', '--log-disable'
 )
 if ($Background) {

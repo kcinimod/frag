@@ -1,0 +1,25 @@
+{
+  "run": "growth-953ffd11-5347-4adc-b404-aff33bbb7924",
+  "model_startup_ms": 831.948,
+  "cold_start_through_cli_ms": 5222.356,
+  "gpu_samples": 10,
+  "runtime_gpu_samples": 0,
+  "sampled_runtime_peak_dedicated_vram_bytes": 0,
+  "requests": [
+    {
+      "case": "cold",
+      "cli_request_ms": 4390.408,
+      "planner_ms": 4166.284,
+      "runtime_peak_working_set_bytes": 601821184,
+      "percent": "6.88"
+    },
+    {
+      "case": "warm",
+      "cli_request_ms": 4322.821,
+      "planner_ms": 4168.816,
+      "runtime_peak_working_set_bytes": 601907200,
+      "percent": "6.88"
+    }
+  ],
+  "unloaded_replay_status": "calculated"
+}
