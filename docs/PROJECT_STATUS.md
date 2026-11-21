@@ -5,8 +5,8 @@ Phase 1 acceptance checks passed for the retained original Microsoft FY2023
 revenue are independently verified and compatible on their reported basis.
 Reingestion kept one source and two stable fact IDs. Socket-blocked replay
 inspected the saved bytes and facts after removing the input. Issue #6
-delivered the acceptance evidence for Phase 1. The Phase 2 calculator is
-ready for owner review.
+delivered the acceptance evidence for Phase 1. The project owner reviewed the
+Phase 2 calculator and its offline results.
 [Phase 1 handoff](../artifacts/phase01/HANDOFF.md)
 
 - Issue #2 delivered local source preservation, integrity checks, and repeatable
@@ -26,5 +26,10 @@ ready for owner review.
   and form. It preserves the selected HTML through the same download cache.
 - Issue #9 delivers verified revenue growth through the CLI and browser.
   Both replayed the retained Microsoft filing offline and returned 6.88%.
-  Owner review of the calculator evidence is the next milestone.
+  The project owner reviewed the calculator and its offline results.
   [Calculator handoff](../artifacts/phase02/GROWTH_HANDOFF.md)
+  [Owner review](https://github.com/kcinimod/frag/issues/9#issuecomment-7061708387)
+- Issue #10 adds annual revenue lookup through the local planner. The actual
+  CPU model answered both retained fiscal years offline. Explicit validation
+  runs replayed with the model stopped.
+  [Lookup handoff](../artifacts/phase02/LOOKUP_HANDOFF.md)

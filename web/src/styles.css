@@ -51,5 +51,7 @@ dd { margin: 0; overflow-wrap: anywhere; }
 .growth-result { margin-top: 1rem; overflow-wrap: anywhere; }
 .growth-result > * + * { margin-top: .6rem; }
 .growth-value { color: #135b53; font-size: 1.75rem; font-weight: 750; }
+.detail > section[aria-labelledby="lookup-title"] { margin-top: 1.5rem; }
+.lookup-result:not(:empty) { margin-top: .75rem; }
 .empty p { margin-top: .45rem; }
 @media (max-width: 45rem) { .workspace { grid-template-columns: minmax(0, 1fr); } }

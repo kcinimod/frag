@@ -23,6 +23,7 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 - [ ] Each operand resolves to a verified fact, earlier result or justified constant. Check operator, operand role/order, output units and requested metric separately from syntax.
 - [x] Validate the denominator before division in the verified revenue growth calculator. An explicitly verified zero returns an undefined percentage and a labeled absolute change. [Synthetic regression](tests/test_growth_workflow.py)
 - [x] The verified revenue growth calculator returns a typed percent, operands, an operation trace, and comparison caveats. Browser citations open the original cells and notes offline. [Calculator replay](artifacts/phase02/GROWTH_HANDOFF.md)
+- [x] The annual revenue lookup validates the proposed fact against the resolved fiscal year and the selected filing's verified evidence. It rejects an unsupported operation, an unknown fact ID, or a different year's verified fact. Both retained revenue citations opened offline in Chrome. [Lookup verification](artifacts/phase02/LOOKUP_HANDOFF.md) · [Lookup regressions](tests/test_lookup_workflow.py)
 - [ ] Validate each claim: a citation must support the exact period and metric. Attribute management statements; separate actuals, guidance and scenarios. A coincidental numeric match does not establish support.
 - [ ] Error routing: timeout → bounded retry; unsupported fact → retrieve; invalid program → targeted repair and rerun; valid program → preserve. Measure fixes minus regressions.
 

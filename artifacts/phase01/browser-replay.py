@@ -176,6 +176,30 @@ def main() -> None:
                     print("Browser growth replay passed: 6.88%, operation trace, both original cells, "
                           "all four applicable notes, three comparison disclosures, "
                           "and retained FY2023 evidence with a missing prior year.")
+                    if "--lookup" in sys.argv[1:]:
+                        chat = page.get_by_role("region", name="Ask the filing")
+                        question = chat.get_by_role("textbox")
+                        ask = chat.get_by_role("button", name="Ask", exact=True)
+                        question.fill("What was revenue?")
+                        ask.click()
+                        expect(chat.get_by_text("Ask for annual reported consolidated revenue",
+                                                exact=False)).to_be_visible()
+                        for year, amount, cell in (
+                            (2022, "198,270,000,000", "198,270"),
+                            (2023, "211,915,000,000", "211,915"),
+                        ):
+                            question.fill(f"What was FY{year} revenue?")
+                            ask.click()
+                            expect(chat.get_by_text(f"USD {amount}", exact=True)).to_be_visible(timeout=35000)
+                            with context.expect_page() as excerpt:
+                                chat.get_by_role("link", name=f"FY{year} Total revenue cell").click()
+                            try:
+                                body = excerpt.value.locator("body")
+                                expect(body).to_contain_text(f"Total revenue {year} (In millions, except per share amounts) {cell}")
+                                expect(body).to_contain_text(filing_hash)
+                            finally:
+                                excerpt.value.close()
+                        print("Browser lookup passed: clarification, both verified answers, and both original cells.")
                 finally:
                     browser.close()
             print("Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, "

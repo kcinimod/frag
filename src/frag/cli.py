@@ -6,11 +6,33 @@ import os
 import sqlite3
 import sys
 from pathlib import Path
-from typing import Sequence
+from tempfile import NamedTemporaryFile
+from typing import Any, Sequence
 
 from frag.growth import calculate_growth
+from frag.local_model import propose_lookup
+from frag.lookup import ask_revenue, replay_lookup
 from frag.sec import download_microsoft_filing
 from frag.store import SourceError, SourceMetadata, SourceStore
+
+
+def _write_validation_record(path: Path, record: dict[str, Any]) -> None:
+    body = (json.dumps(record, indent=2) + "\n").encode("utf-8")
+    temporary = None
+    try:
+        with NamedTemporaryFile(dir=path.parent, prefix=".frag-lookup-", delete=False) as output:
+            temporary = Path(output.name)
+            output.write(body)
+        # Publish the complete file without replacing another run.
+        if os.name == "nt":
+            temporary.rename(path)
+        else:
+            os.link(temporary, path)
+    except FileExistsError as exc:
+        raise SourceError("Choose a new validation record path.") from exc
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -32,6 +54,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     growth.add_argument("prior_year", type=int)
     growth.add_argument("current_year", type=int)
     growth.add_argument("--store", type=Path, required=True)
+    ask = commands.add_parser("ask", help="Ask for verified annual revenue in a selected filing")
+    ask.add_argument("source_id")
+    ask.add_argument("question", nargs="?", help="Question text. Omit to read from standard input.")
+    ask.add_argument("--store", type=Path, required=True)
+    ask.add_argument("--record", type=Path, help="Save an explicit validation run to a new JSON file")
+    replay = commands.add_parser("replay-lookup", help="Validate and execute a saved lookup plan offline")
+    replay.add_argument("record", type=Path)
+    replay.add_argument("--store", type=Path, required=True)
     serve = commands.add_parser("serve", help="Run the browser workspace on localhost")
     serve.add_argument("--store", type=Path, required=True)
     serve.add_argument("--assets", type=Path, default=Path("web/dist"))
@@ -54,6 +84,25 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = store.inspect(args.source_id)
         elif args.command == "growth":
             result = calculate_growth(store.inspect(args.source_id), args.prior_year, args.current_year)
+        elif args.command == "ask":
+            record: dict[str, Any] | None = {} if args.record else None
+            if args.record and args.record.exists():
+                raise SourceError("Choose a new validation record path.")
+            source = store.inspect(args.source_id)
+            question = args.question
+            if question is None:
+                if sys.stdin.isatty():
+                    print("Question: ", end="", file=sys.stderr, flush=True)
+                question = sys.stdin.readline(301).rstrip("\r\n")
+            result = ask_revenue(source, question, propose_lookup, record=record)
+            if args.record and record is not None:
+                _write_validation_record(args.record, record)
+        elif args.command == "replay-lookup":
+            saved = json.loads(args.record.read_text(encoding="utf-8"))
+            identity = saved.get("source") if isinstance(saved, dict) else None
+            if not isinstance(identity, dict) or not isinstance(identity.get("source_id"), str):
+                raise SourceError("The validation record must identify its preserved filing.")
+            result = replay_lookup(store.inspect(identity["source_id"]), saved)
         else:
             from frag.web import create_app
 

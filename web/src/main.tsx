@@ -218,6 +218,70 @@ function GrowthCalculator({ source }: { source: Source }) {
   );
 }
 
+type LookupResult =
+  | { status: 'answered'; fiscal_year: number; fact: RevenueFact; citations: { id: string; title: string }[] }
+  | { status: 'clarify' | 'model_unavailable' | 'model_timeout' | 'invalid_plan' | 'evidence_unavailable'; message: string };
+
+function RevenueLookup({ source }: { source: Source }) {
+  const [question, setQuestion] = useState('');
+  const [result, setResult] = useState<LookupResult>();
+  const [error, setError] = useState('');
+  const [pending, setPending] = useState(false);
+  const year = (source.facts.find(fact => !fact.comparative) ?? source.facts[0])?.reporting_period.fiscal_year ?? 2023;
+  const path = `/api/sources/${encodeURIComponent(source.source_id)}/lookup`;
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setResult(undefined);
+    setError('');
+    try {
+      setResult(await api<LookupResult>(path, {
+        method: 'POST',
+        headers: { 'X-Frag-Ask': '1', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      }));
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'Revenue lookup failed.');
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <section aria-labelledby="lookup-title">
+      <h3 id="lookup-title">Ask the filing</h3>
+      <form onSubmit={submit}>
+        <label>
+          Question about annual revenue
+          <input value={question} onChange={event => {
+            setQuestion(event.target.value);
+            setResult(undefined);
+            setError('');
+          }} placeholder={`What was revenue in FY${year}?`} autoComplete="off"
+            required maxLength={300} disabled={pending} />
+        </label>
+        <button type="submit" disabled={pending || !question.trim()}>Ask</button>
+      </form>
+      <div className="lookup-result" aria-live="polite">
+        {pending && <p>Checking the selected filing…</p>}
+        {error && <p className="error">{error}</p>}
+        {result?.status === 'answered' && (
+          <>
+            <p><strong>FY{result.fiscal_year} reported consolidated revenue</strong></p>
+            <p className="growth-value">{revenueAmount(result.fact)}</p>
+            {result.citations.map(citation => (
+              <a key={citation.id} href={`${path}/citations/${result.fiscal_year}/${encodeURIComponent(citation.id)}`}
+                target="_blank" rel="noopener noreferrer">{citation.title}</a>
+            ))}
+          </>
+        )}
+        {result && result.status !== 'answered' && <p>{result.message}</p>}
+      </div>
+    </section>
+  );
+}
+
 function SourceDetail({ source }: { source: Source }) {
   const diagnostics = source.diagnostics ?? [];
   return (
@@ -268,6 +332,7 @@ function SourceDetail({ source }: { source: Source }) {
         </section>
       )}
       <GrowthCalculator key={source.source_id} source={source} />
+      <RevenueLookup key={`lookup-${source.source_id}`} source={source} />
     </section>
   );
 }
@@ -294,15 +359,18 @@ const locatorLabels: Record<string, string> = {
   unit_header: 'Scale disclosure', currency_measure: 'Currency measure', inline_context: 'Inline XBRL context',
 };
 
-function RevenueDetail({ fact }: { fact: RevenueFact }) {
-  const { fiscal_year: year, start, end } = fact.reporting_period;
+function revenueAmount(fact: RevenueFact) {
   const [integer, fraction] = (fact.normalized_amount ?? '').split('.');
-  const amount = fact.normalized_amount
+  return fact.normalized_amount
     ? `${fact.currency} ${integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${fraction ? `.${fraction}` : ''}`
     : 'Unknown amount';
+}
+
+function RevenueDetail({ fact }: { fact: RevenueFact }) {
+  const { fiscal_year: year, start, end } = fact.reporting_period;
   return (
     <details className="fact">
-      <summary>FY{year} · {amount} · {fact.status === 'verified' ? 'Verified' : 'Provisional'}</summary>
+      <summary>FY{year} · {revenueAmount(fact)} · {fact.status === 'verified' ? 'Verified' : 'Provisional'}</summary>
       <dl>
         <dt>Original label and amount</dt><dd>{fact.metric_label} · {fact.raw_amount || 'Unknown'}</dd>
         <dt>Currency</dt><dd>{fact.currency ?? 'Unknown'}</dd>

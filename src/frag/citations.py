@@ -11,6 +11,18 @@ CELL_END = re.compile(r"</(?:td|th)\s*>", re.IGNORECASE)
 BLOCK_TAGS = {"div", "p", "tr", "h1", "h2", "h3", "li"}
 
 
+def revenue_cell_citation(fact: dict[str, Any], citation_id: str) -> dict[str, Any]:
+    year = fact["reporting_period"]["fiscal_year"]
+    return {
+        "id": citation_id,
+        "title": f'FY{year} {fact["metric_label"]} cell',
+        "locator": fact["locators"]["value"],
+        "context_locators": {
+            key: fact["locators"][key] for key in ("metric_label", "year_header", "unit_header")
+        },
+    }
+
+
 class _ExcerptText(HTMLParser):
     def __init__(self) -> None:
         super().__init__()

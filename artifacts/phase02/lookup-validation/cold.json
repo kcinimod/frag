@@ -1,0 +1,324 @@
+{
+  "version": 1,
+  "question": "What was reported consolidated revenue in FY2023?",
+  "resolved_request": {
+    "operation": "lookup",
+    "metric": "reported_consolidated_revenue",
+    "fiscal_year": 2023
+  },
+  "source": {
+    "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+    "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+    "parser_version": "annual-revenue-v4",
+    "evidence_version": "microsoft-fy2023-revenue-v2"
+  },
+  "evidence": [
+    {
+      "fact_id": "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+      "metric": "reported_consolidated_revenue",
+      "reporting_period": {
+        "end": "2022-06-30",
+        "fiscal_year": 2022,
+        "kind": "annual",
+        "start": "2021-07-01"
+      },
+      "normalized_amount": "198270000000",
+      "currency": "USD",
+      "scale": 1000000
+    },
+    {
+      "fact_id": "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37",
+      "metric": "reported_consolidated_revenue",
+      "reporting_period": {
+        "end": "2023-06-30",
+        "fiscal_year": 2023,
+        "kind": "annual",
+        "start": "2022-07-01"
+      },
+      "normalized_amount": "211915000000",
+      "currency": "USD",
+      "scale": 1000000
+    }
+  ],
+  "model_settings": {
+    "expected_server_configuration": {
+      "runtime": "llama.cpp b6500-a7a98e0f",
+      "weights": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+      "quantization": "Q4_K_M",
+      "context_size": 4096,
+      "threads": 4,
+      "gpu_layers": 0,
+      "parallel": 1,
+      "offline": true,
+      "timeout_seconds": 30
+    }
+  },
+  "model_request": {
+    "model": "frag-qwen25-05b-q4km",
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 120,
+    "cache_prompt": false,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Plan a reported consolidated revenue lookup. Find the evidence whose reporting_period.fiscal_year equals requested_fiscal_year. Copy its exact fact_id into a JSON object of the form {\"operation\":\"lookup\",\"fact_id\":\"<ID>\"}."
+      },
+      {
+        "role": "user",
+        "content": "{\"evidence\": [{\"fact_id\": \"fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a\", \"metric\": \"reported_consolidated_revenue\", \"reporting_period\": {\"end\": \"2022-06-30\", \"fiscal_year\": 2022, \"kind\": \"annual\", \"start\": \"2021-07-01\"}, \"normalized_amount\": \"198270000000\", \"currency\": \"USD\", \"scale\": 1000000}, {\"fact_id\": \"fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37\", \"metric\": \"reported_consolidated_revenue\", \"reporting_period\": {\"end\": \"2023-06-30\", \"fiscal_year\": 2023, \"kind\": \"annual\", \"start\": \"2022-07-01\"}, \"normalized_amount\": \"211915000000\", \"currency\": \"USD\", \"scale\": 1000000}], \"requested_fiscal_year\": 2023}"
+      }
+    ],
+    "response_format": {
+      "type": "json_object",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "lookup"
+          },
+          "fact_id": {
+            "type": "string",
+            "enum": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ]
+          }
+        },
+        "required": [
+          "operation",
+          "fact_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "proposed_plan": "{\"operation\":\"lookup\",\"fact_id\":\"fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37\"}",
+  "validation_status": "answered",
+  "result": {
+    "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+    "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+    "parser_version": "annual-revenue-v4",
+    "evidence_version": "microsoft-fy2023-revenue-v2",
+    "status": "answered",
+    "fiscal_year": 2023,
+    "fact": {
+      "applicable_notes": [
+        {
+          "interpretation": "US GAAP and consolidated Microsoft plus subsidiaries, with intercompany eliminations. Revenue is recognized on transfer of control. Disclosed prior-period recasts had no effect on the consolidated income statements. Foreign currency revenue is translated at average rates.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 7608
+            },
+            "start": {
+              "character": 1,
+              "line": 7233
+            }
+          },
+          "next_heading": 2,
+          "number": 1,
+          "scope_caveat": "Reported revenue reflects foreign currency translation at average rates for each year.",
+          "sha256": "fc7eaa52f7ab11bc87c6fceaf94224ee88eeead8532bd8d228290ba76b889a46",
+          "title": "Accounting Policies"
+        },
+        {
+          "interpretation": "Nuance entered consolidated results on March 4, 2022, partway through FY2022. ZeniMax entered in March 2021 before both periods. Activision Blizzard was pending as of the filing.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 14339
+            },
+            "start": {
+              "character": 1,
+              "line": 13913
+            }
+          },
+          "next_heading": 9,
+          "number": 8,
+          "scope_caveat": "Nuance was consolidated from March 4, 2022. FY2022 includes a partial year of Nuance and FY2023 includes a full year.",
+          "sha256": "b34e1d7aee77aa571a3e36eaa4070787e2bddfa2e3f0c7a75dae6f02835d72b3",
+          "title": "Business Combinations"
+        },
+        {
+          "interpretation": "Contract liability rollforward and remaining performance obligations provide timing context for recognition. Unearned revenue balances are distinct from recognized total revenue.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 17827
+            },
+            "start": {
+              "character": 1,
+              "line": 17612
+            }
+          },
+          "next_heading": 14,
+          "number": 13,
+          "sha256": "b8c6684408f0b606d270ea21852dced19de3625e22a724fcb0ead80727d0f9f7",
+          "title": "Unearned Revenue"
+        },
+        {
+          "interpretation": "Prior segment amounts were recast for internal management reporting. The segment revenue table reconciles to consolidated total revenue for both years.",
+          "locator": {
+            "end_exclusive": {
+              "character": 1,
+              "line": 21846
+            },
+            "start": {
+              "character": 1,
+              "line": 20936
+            }
+          },
+          "next_heading": null,
+          "number": 19,
+          "sha256": "27479fda2c3a86d8e8ac319c28983dd5b2a8a74a4bb30816739cc3ab717e7880",
+          "title": "Segment Information and Geographic Data"
+        }
+      ],
+      "basis": "as_reported_in_filing",
+      "company": "Microsoft Corporation",
+      "comparative": false,
+      "currency": "USD",
+      "evidence_version": "microsoft-fy2023-revenue-v2",
+      "fact_id": "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37",
+      "filing_date": null,
+      "inline_xbrl": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "C_da7a1266-ce2b-41b7-83ff-bb6e03dc1fa5",
+        "fact_element_id": "F_1574d8d7-79cc-48b4-b29c-3394ed5cb819",
+        "unit_id": "U_USD"
+      },
+      "locators": {
+        "annual_header": {
+          "cell": 1,
+          "character": 5,
+          "column": 1,
+          "line": 4309,
+          "row": 5,
+          "table": 25
+        },
+        "currency_measure": {
+          "character": 232933,
+          "line": 8
+        },
+        "inline_context": {
+          "character": 130787,
+          "line": 8
+        },
+        "metric_label": {
+          "cell": 1,
+          "character": 5,
+          "column": 1,
+          "line": 4396,
+          "row": 12,
+          "table": 25
+        },
+        "statement_heading": {
+          "character": 3,
+          "line": 4267
+        },
+        "table": {
+          "character": 3,
+          "line": 4269,
+          "table": 25
+        },
+        "unit_header": {
+          "cell": 1,
+          "character": 5,
+          "column": 1,
+          "line": 4286,
+          "row": 2,
+          "table": 25
+        },
+        "value": {
+          "cell": 4,
+          "character": 5,
+          "column": 4,
+          "line": 4399,
+          "row": 12,
+          "table": 25
+        },
+        "year_header": {
+          "cell": 3,
+          "character": 5,
+          "column": 3,
+          "line": 4311,
+          "row": 5,
+          "table": 25
+        }
+      },
+      "metric": "reported_consolidated_revenue",
+      "metric_label": "Total revenue",
+      "normalized_amount": "211915000000",
+      "parent_table_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea#table-25",
+      "parser_version": "annual-revenue-v4",
+      "raw_amount": "211,915",
+      "reference_status": "matched",
+      "reporting_period": {
+        "end": "2023-06-30",
+        "fiscal_year": 2023,
+        "kind": "annual",
+        "start": "2022-07-01"
+      },
+      "scale": 1000000,
+      "scope": "consolidated",
+      "source_id": "sha256:6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+      "status": "verified",
+      "unresolved_requirements": []
+    },
+    "citations": [
+      {
+        "id": "revenue",
+        "title": "FY2023 Total revenue cell",
+        "locator": {
+          "cell": 4,
+          "character": 5,
+          "column": 4,
+          "line": 4399,
+          "row": 12,
+          "table": 25
+        },
+        "context_locators": {
+          "metric_label": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4396,
+            "row": 12,
+            "table": 25
+          },
+          "year_header": {
+            "cell": 3,
+            "character": 5,
+            "column": 3,
+            "line": 4311,
+            "row": 5,
+            "table": 25
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 5,
+            "column": 1,
+            "line": 4286,
+            "row": 2,
+            "table": 25
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "operation": "lookup",
+        "fact_id": "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37",
+        "normalized_amount": "211915000000",
+        "currency": "USD"
+      }
+    ]
+  },
+  "timings_ms": {
+    "model": 2427.984,
+    "validation_and_execution": 0.026,
+    "total": 2428.079
+  }
+}

@@ -11,6 +11,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 
 from frag.citations import citation_text
 from frag.growth import calculate_growth
+from frag.local_model import propose_lookup
+from frag.lookup import Planner, ask_revenue, lookup_citation
 from frag.sec import download_edgar_filing, download_microsoft_filing, search_edgar_filings
 from frag.store import (
     SourceConflict,
@@ -22,7 +24,7 @@ from frag.store import (
 )
 
 
-def create_app(store: SourceStore, assets: Path) -> Flask:
+def create_app(store: SourceStore, assets: Path, *, planner: Planner = propose_lookup) -> Flask:
     app = Flask(__name__, static_folder=str(assets.resolve()), static_url_path="")
     app.config.update(TRUSTED_HOSTS=["localhost", "127.0.0.1"], MAX_CONTENT_LENGTH=32 * 1024 * 1024)
 
@@ -66,6 +68,29 @@ def create_app(store: SourceStore, assets: Path) -> Flask:
                     headers={"X-Content-Type-Options": "nosniff"},
                 )
         raise SourceNotFound("Citation is unavailable for this calculation.")
+
+    @app.post("/api/sources/<source_id>/lookup")
+    def lookup(source_id: str) -> Response | tuple[Response, int]:
+        if request.headers.get("X-Frag-Ask") != "1":
+            return jsonify(error="Chat requires the local FRAG workspace."), 403
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict) or not isinstance(data.get("question"), str):
+            raise SourceError("Enter a question about the selected filing.")
+        response = jsonify(ask_revenue(store.inspect(source_id), data["question"], planner))
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.get("/api/sources/<source_id>/lookup/citations/<int:year>/<citation_id>")
+    def lookup_excerpt(source_id: str, year: int, citation_id: str) -> Response:
+        source, original = store.inspect_with_original(source_id)
+        citation = lookup_citation(source, year, citation_id)
+        if citation is None:
+            raise SourceNotFound("Citation is unavailable for this revenue lookup.")
+        return Response(
+            citation_text(original, source["source_hash"], citation),
+            mimetype="text/plain",
+            headers={"X-Content-Type-Options": "nosniff"},
+        )
 
     def filing_query(data: object) -> tuple[str, str, str]:
         if isinstance(data, dict):

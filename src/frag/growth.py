@@ -4,6 +4,7 @@ from decimal import Context, Decimal
 from fractions import Fraction
 from typing import Any
 
+from frag.citations import revenue_cell_citation
 from frag.store import SourceError
 
 FORMULA = "(current revenue - prior revenue) / prior revenue × 100"
@@ -109,15 +110,7 @@ def _comparison_issue(
 def _citations(operands: list[dict[str, Any]], comparison: dict[str, Any]) -> list[dict[str, Any]]:
     citations: dict[str, dict[str, Any]] = {}
     for fact in operands:
-        year = fact["reporting_period"]["fiscal_year"]
-        citations[fact["role"]] = {
-            "id": fact["role"],
-            "title": f'FY{year} {fact["metric_label"]} cell',
-            "locator": fact["locators"]["value"],
-            "context_locators": {
-                key: fact["locators"][key] for key in ("metric_label", "year_header", "unit_header")
-            },
-        }
+        citations[fact["role"]] = revenue_cell_citation(fact, fact["role"])
     for fact in operands:
         for note in fact["applicable_notes"]:
             number = note["number"]

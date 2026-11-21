@@ -191,6 +191,49 @@ returns `status: "unavailable"` with the reason and any available observations.
 A verified zero baseline returns `status: "undefined_zero_baseline"` with a
 labeled absolute change. [Calculator validation and replay](artifacts/phase02/GROWTH_HANDOFF.md)
 
+## Ask the filing for annual revenue
+
+In the browser, open a preserved filing and use **Ask the filing**. Each
+question is independent. Supported examples include “What was reported
+consolidated revenue in FY2023?”, “Revenue for fiscal year 2023”, and
+“What was FY2022 revenue?”. Specify one fiscal year. The answer uses a
+verified observation in the selected filing and links to the original cell.
+
+Run the explicit setup from the repository root in Windows PowerShell. It
+downloads the pinned Windows x64 CPU build and Q4_K_M weights on cache miss,
+checks both SHA-256 digests, and unpacks the runtime into `.frag-model`.
+
+```powershell
+.\scripts\setup-local-model.ps1
+```
+
+Start the planner in its own PowerShell window from the repository root.
+It loads the saved weights in offline mode and listens on loopback.
+
+```powershell
+.\scripts\start-local-model.ps1
+```
+
+Use the browser workspace or ask from PowerShell after ingesting the local
+filing shown above. The CLI reads the question at its prompt, which keeps
+the text out of shell command history. Enter `What was revenue in FY2023?`
+when prompted. The application saves a run only when you pass `--record`.
+
+```powershell
+.venv/Scripts/frag.exe ask $local.source_id --store $localStore
+.venv/Scripts/frag.exe ask $local.source_id --store $localStore --record .frag-model/my-lookup.json
+```
+
+The `--record` option requires a new path and saves the full validation run.
+Stop the planner with Ctrl+C in its PowerShell window, then replay against
+the same store.
+
+```powershell
+.venv/Scripts/frag.exe replay-lookup .frag-model/my-lookup.json --store $localStore
+```
+
+[Model and runtime pins, measurements, and retained validation runs](artifacts/phase02/LOOKUP_HANDOFF.md)
+
 Importable entry points are `frag.store.SourceStore`, `SourceMetadata`, and
 `SourceError`. Use `SourceStore(Path(...)).ingest(...)` and `.inspect(...)` with
 the same metadata and provenance semantics as the CLI.

@@ -106,3 +106,14 @@ derived facts, and independent reference. Both replay modes use temporary
 stores and emit JSON to stdout so a synthetic run cannot replace that manifest.
 The replay blocks Python socket operations in each CLI process. The Phase 1
 handoff marks the review checkpoint. [Phase 1 handoff](../artifacts/phase01/HANDOFF.md)
+
+## Local planner for annual revenue lookup
+
+Use llama.cpp b6500 and Qwen2.5-0.5B-Instruct Q4_K_M on the CPU for issue #10.
+Setup verifies the runtime archive and weights against pinned SHA-256
+digests. The application sends one schema-constrained request over loopback
+and validates the proposed fact ID against the independently resolved fiscal
+year and the selected filing's verified evidence. The model uses structured
+fact fields as context. The citation viewer renders the original cell.
+The process can run with the model loaded for repeated local questions.
+[Lookup acceptance and measurements](../artifacts/phase02/LOOKUP_HANDOFF.md)
