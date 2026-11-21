@@ -9,6 +9,8 @@ from typing import Literal, cast
 from flask import Flask, Response, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
 
+from frag.citations import citation_text
+from frag.growth import calculate_growth
 from frag.sec import download_edgar_filing, download_microsoft_filing, search_edgar_filings
 from frag.store import (
     SourceConflict,
@@ -38,6 +40,32 @@ def create_app(store: SourceStore, assets: Path) -> Flask:
     @app.get("/api/sources/<source_id>")
     def inspect_source(source_id: str) -> Response:
         return jsonify(store.inspect(source_id))
+
+    def fiscal_years() -> tuple[int, int]:
+        prior = request.args.get("prior", type=int)
+        current = request.args.get("current", type=int)
+        if prior is None or current is None:
+            raise SourceError("Enter a prior and current fiscal year.")
+        return prior, current
+
+    @app.get("/api/sources/<source_id>/growth")
+    def growth(source_id: str) -> Response:
+        years = fiscal_years()
+        return jsonify(calculate_growth(store.inspect(source_id), *years))
+
+    @app.get("/api/sources/<source_id>/growth/citations/<citation_id>")
+    def growth_citation(source_id: str, citation_id: str) -> Response:
+        years = fiscal_years()
+        source, original = store.inspect_with_original(source_id)
+        result = calculate_growth(source, *years)
+        for citation in result["citations"]:
+            if citation["id"] == citation_id:
+                return Response(
+                    citation_text(original, result["source_hash"], citation),
+                    mimetype="text/plain",
+                    headers={"X-Content-Type-Options": "nosniff"},
+                )
+        raise SourceNotFound("Citation is unavailable for this calculation.")
 
     def filing_query(data: object) -> tuple[str, str, str]:
         if isinstance(data, dict):

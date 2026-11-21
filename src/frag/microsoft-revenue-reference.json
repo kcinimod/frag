@@ -477,6 +477,9 @@
     }
   ],
   "comparison_basis": "The adjoining annual periods use the same June 30 year-end and reported consolidated US GAAP revenue definition in the FY2023 filing. The FY2022 observation is the comparative reported in that filing. Note 1 says the disclosed recasts did not affect consolidated income statements.",
+  "citation_heading_lines": {
+    "xandr_acquisition": [2642, 2666]
+  },
   "cover_anchors": {
     "cik": {
       "locator": {

@@ -174,17 +174,19 @@ class SourceStore:
                 "AND json_extract(record, '$.source_url') = ? ORDER BY rowid LIMIT 1",
                 (source_url,),
             ).fetchone()
-            return self._inspect_record(connection, json.loads(row[0])) if row else None
+            return self._inspect_record(connection, json.loads(row[0]))[0] if row else None
 
     def inspect(self, source_id: str | None = None) -> dict[str, Any]:
-        database = self.root / "sources.sqlite3"
-        if not database.is_file():
-            raise StoreMissing("Store does not exist; ingest a local HTML file first.")
-        with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True)) as connection:
-            if source_id is None:
-                rows = connection.execute("SELECT record FROM sources ORDER BY source_id")
-                records = [self._inspect_record(connection, json.loads(row[0])) for row in rows]
-                return {"source_count": len(records), "sources": records}
+        if source_id is not None:
+            return self.inspect_with_original(source_id)[0]
+        with closing(self._open_catalogue()) as connection:
+            rows = connection.execute("SELECT record FROM sources ORDER BY source_id")
+            records = [self._inspect_record(connection, json.loads(row[0]))[0] for row in rows]
+            return {"source_count": len(records), "sources": records}
+
+    def inspect_with_original(self, source_id: str) -> tuple[dict[str, Any], bytes]:
+        """Read the evidence record and the exact hash-checked bytes supporting it."""
+        with closing(self._open_catalogue()) as connection:
             row = connection.execute(
                 "SELECT record FROM sources WHERE source_id = ?", (source_id,)
             ).fetchone()
@@ -192,15 +194,21 @@ class SourceStore:
                 raise SourceNotFound(f"Source not found: {source_id}")
             return self._inspect_record(connection, json.loads(row[0]))
 
+    def _open_catalogue(self) -> sqlite3.Connection:
+        database = self.root / "sources.sqlite3"
+        if not database.is_file():
+            raise StoreMissing("Store does not exist; ingest a local HTML file first.")
+        return sqlite3.connect(database.as_uri() + "?mode=ro", uri=True)
+
     def _inspect_record(
         self, connection: sqlite3.Connection, record: dict[str, Any],
-    ) -> dict[str, Any]:
+    ) -> tuple[dict[str, Any], bytes]:
         original = self._check_original(record)
         result = self._read_extraction(connection, record["source_id"])
         if result is None:
             # Legacy stores and stores copied from earlier parser versions stay readable.
             result = inspect_revenue(original, record)
-        return record | result
+        return record | result, original
 
     @staticmethod
     def _read_extraction(connection: sqlite3.Connection, source_id: str) -> dict[str, Any] | None:

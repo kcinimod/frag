@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
+from frag.growth import calculate_growth
 from frag.sec import download_microsoft_filing
 from frag.store import SourceError, SourceMetadata, SourceStore
 
@@ -26,6 +27,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     inspect = commands.add_parser("inspect", help="Inspect one source or list all sources")
     inspect.add_argument("source_id", nargs="?")
     inspect.add_argument("--store", type=Path, required=True)
+    growth = commands.add_parser("growth", help="Calculate verified fiscal-year revenue growth")
+    growth.add_argument("source_id")
+    growth.add_argument("prior_year", type=int)
+    growth.add_argument("current_year", type=int)
+    growth.add_argument("--store", type=Path, required=True)
     serve = commands.add_parser("serve", help="Run the browser workspace on localhost")
     serve.add_argument("--store", type=Path, required=True)
     serve.add_argument("--assets", type=Path, default=Path("web/dist"))
@@ -46,6 +52,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = download_microsoft_filing(store, os.environ.get("SEC_USER_AGENT"))
         elif args.command == "inspect":
             result = store.inspect(args.source_id)
+        elif args.command == "growth":
+            result = calculate_growth(store.inspect(args.source_id), args.prior_year, args.current_year)
         else:
             from frag.web import create_app
 

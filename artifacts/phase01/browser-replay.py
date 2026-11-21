@@ -15,9 +15,20 @@ from urllib.request import urlopen
 
 from playwright.sync_api import expect, sync_playwright
 
+from replay import CLI
 
 ROOT = Path(__file__).resolve().parents[2]
-CLI = "from frag.cli import main; raise SystemExit(main())"
+SERVER_CLI = """
+import sys
+def loopback_only(event, args):
+    if event in {'socket.connect', 'socket.getaddrinfo', 'socket.gethostbyname'}:
+        host = args[1][0] if event == 'socket.connect' else args[0]
+        if host not in {'127.0.0.1', 'localhost', '::1'}:
+            raise RuntimeError('External network access is disabled for the browser replay')
+sys.addaudithook(loopback_only)
+from frag.cli import main
+raise SystemExit(main())
+"""
 
 
 def main() -> None:
@@ -31,7 +42,7 @@ def main() -> None:
             port = listener.getsockname()[1]
         origin = f"http://127.0.0.1:{port}"
         server = subprocess.Popen(
-            [sys.executable, "-c", CLI, "serve", "--store", store, "--port", str(port)],
+            [sys.executable, "-c", SERVER_CLI, "serve", "--store", store, "--port", str(port)],
             cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
         try:
@@ -112,7 +123,9 @@ def main() -> None:
                     expect(expanded.get_by_text("Revenue cell", exact=True)).to_be_visible()
                     filing = base / "msft-20230630.htm"
                     archive = ROOT / "artifacts/phase01/originals/msft-20230630.htm.gz"
-                    filing.write_bytes(gzip.decompress(archive.read_bytes()))
+                    original = gzip.decompress(archive.read_bytes())
+                    filing.write_bytes(original)
+                    filing_hash = hashlib.sha256(original).hexdigest()
                     page.get_by_label("Company", exact=True).fill("")
                     page.get_by_label("Local original", exact=True).check()
                     page.get_by_label("HTML file").set_input_files(filing)
@@ -123,9 +136,50 @@ def main() -> None:
                     expect(expanded.get_by_text("Note 8 · Business Combinations")).to_be_visible()
                     expect(expanded.get_by_text("HTML lines 13913–14338")).to_be_visible()
                     expect(page.get_by_text("Nuance was consolidated from March 4, 2022.", exact=False)).to_be_visible()
+
+                    filing.unlink()
+                    calculate = page.get_by_role("button", name="Calculate revenue growth")
+                    calculate.click()
+                    growth = page.get_by_role("region", name="Revenue growth", exact=True)
+                    expect(growth.get_by_text("6.88%", exact=True)).to_be_visible()
+                    expect(growth.get_by_text("Microsoft disclosed an unfavorable foreign currency impact",
+                                              exact=False)).to_be_visible()
+                    growth.get_by_text("Operation trace and operands").click()
+                    expect(growth.get_by_text("13645000000", exact=False).first).to_be_visible()
+                    for link, evidence in (
+                        ("FY2022 Total revenue cell", ("HTML line 4403", "Total revenue", "198,270")),
+                        ("FY2023 Total revenue cell", ("HTML line 4399", "Total revenue", "211,915")),
+                        ("Note 1 · Accounting Policies", ("NOTE 1", "ACCOUNTING POLICIES")),
+                        ("Note 8 · Business Combinations", ("NOTE 8", "On March 4, 2022")),
+                        ("Note 13 · Unearned Revenue", ("NOTE 13", "UNEARNED REVENUE")),
+                        ("Note 19 · Segment Information and Geographic Data", ("NOTE 19", "GEOGRAPHIC DATA")),
+                        ("Segment recast", ("HTML line 1909", "Reportable Segments", "We have recast")),
+                        ("Acquisition and exchange rates", ("HTML line 2315", "Fiscal Year 2023 Compared with Fiscal Year 2022",
+                                                            "unfavorable foreign currency impact of 4%")),
+                        ("Xandr acquisition", ("HTML line 2671", "Fiscal Year 2023 Compared with Fiscal Year 2022",
+                                               "More Personal Computing", "the Xandr acquisition")),
+                    ):
+                        with context.expect_page() as excerpt:
+                            growth.get_by_role("link", name=link, exact=True).click()
+                        try:
+                            for text in evidence:
+                                expect(excerpt.value.locator("body")).to_contain_text(text)
+                            expect(excerpt.value.locator("body")).to_contain_text(filing_hash)
+                        finally:
+                            excerpt.value.close()
+
+                    page.get_by_label("Prior fiscal year").fill("2021")
+                    calculate.click()
+                    expect(growth.get_by_text("Missing reported consolidated revenue for FY2021 (prior).")).to_be_visible()
+                    expect(growth.get_by_text("6.88%", exact=True)).to_have_count(0)
+                    expect(page.get_by_text("FY2023 · USD 211,915,000,000 · Verified")).to_be_visible()
+                    print("Browser growth replay passed: 6.88%, operation trace, both original cells, "
+                          "all four applicable notes, three comparison disclosures, "
+                          "and retained FY2023 evidence with a missing prior year.")
                 finally:
                     browser.close()
-            print("Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, provisional and verified facts, notes, and comparison. External page requests blocked.")
+            print("Browser replay passed: upload, hash, unknowns, retry, conflict, CLI interoperability, "
+                  "provisional and verified facts, notes, and comparison. External requests blocked.")
         finally:
             server.terminate()
             server.wait(timeout=10)

@@ -94,6 +94,130 @@ function secRequest<T>(path: string, data?: Record<string, string>): Promise<T> 
   return api<T>(path, { method: 'POST', headers, body: data && JSON.stringify(data) });
 }
 
+type GrowthIssue = {
+  code: 'missing' | 'unverified' | 'incompatible';
+  role: 'prior' | 'current' | null;
+  fiscal_year: number | null;
+  detail?: string;
+};
+
+type GrowthResult = {
+  prior_year: number;
+  current_year: number;
+  percent: { unit: 'percent'; value: string } | null;
+  absolute_change: { currency: string; value: string } | null;
+  formula: string;
+  operands: (RevenueFact & { role: 'prior' | 'current' })[];
+  issues: GrowthIssue[];
+  trace: { operation: string; inputs: string[]; result: string }[];
+  citations: { id: string; title: string }[];
+  comparison_basis: string | null;
+  scope_caveats: string[];
+  evidence_version: string | null;
+};
+
+function growthIssueText(issue: GrowthIssue) {
+  const period = issue.role ? `FY${issue.fiscal_year} (${issue.role})` : 'The selected fiscal years';
+  switch (issue.code) {
+    case 'missing': return `Missing reported consolidated revenue for ${period}.`;
+    case 'unverified': return `Unverified reported consolidated revenue for ${period}.`;
+    case 'incompatible': return issue.detail ?? `Comparison evidence is incompatible or unresolved for ${period}.`;
+  }
+}
+
+function GrowthCalculator({ source }: { source: Source }) {
+  const priorYear = source.facts.find(fact => fact.comparative)?.reporting_period.fiscal_year;
+  const currentYear = source.facts.find(fact => !fact.comparative)?.reporting_period.fiscal_year;
+  const [prior, setPrior] = useState(String(priorYear ?? (currentYear ? currentYear - 1 : 2022)));
+  const [current, setCurrent] = useState(String(currentYear ?? (priorYear ? priorYear + 1 : 2023)));
+  const [result, setResult] = useState<GrowthResult>();
+  const [error, setError] = useState('');
+  const [pending, setPending] = useState(false);
+  const path = `/api/sources/${encodeURIComponent(source.source_id)}/growth`;
+
+  function editYear(setYear: (year: string) => void, year: string) {
+    setYear(year);
+    setResult(undefined);
+    setError('');
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setResult(undefined);
+    setError('');
+    try {
+      const query = new URLSearchParams({ prior, current });
+      setResult(await api<GrowthResult>(`${path}?${query}`));
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'Revenue growth calculation failed.');
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const citationQuery = result && new URLSearchParams({
+    prior: String(result.prior_year), current: String(result.current_year),
+  });
+  return (
+    <section aria-labelledby="growth-title">
+      <h3 id="growth-title">Revenue growth</h3>
+      <form onSubmit={submit}>
+        <fieldset className="growth-years" disabled={pending}>
+          <label>Prior fiscal year<input type="number" min="1" max="9999" required value={prior}
+            onChange={event => editYear(setPrior, event.target.value)} /></label>
+          <label>Current fiscal year<input type="number" min="1" max="9999" required value={current}
+            onChange={event => editYear(setCurrent, event.target.value)} /></label>
+        </fieldset>
+        <button type="submit" disabled={pending}>Calculate revenue growth</button>
+      </form>
+      {pending && <p role="status">Calculating revenue growth…</p>}
+      {error && <p className="error" role="alert">{error}</p>}
+      {result && (
+        <div className="growth-result" aria-live="polite">
+          {result.percent && <p className="growth-value">{result.percent.value}%</p>}
+          {result.absolute_change && (
+            <>
+              <p>Percentage undefined because prior revenue is zero.</p>
+              <p>Absolute revenue change · {result.absolute_change.currency} {result.absolute_change.value}</p>
+            </>
+          )}
+          {result.issues.map(issue => (
+            <p key={issue.role ?? 'comparison'}>{growthIssueText(issue)}</p>
+          ))}
+          {result.trace.length > 0 && (
+            <>
+              <p>FY{result.prior_year} to FY{result.current_year} · {result.formula}</p>
+              {result.comparison_basis && <p>{result.comparison_basis}</p>}
+              {result.scope_caveats.map(caveat => <p key={caveat}>{caveat}</p>)}
+              <details>
+                <summary>Operation trace and operands</summary>
+                <p>Evidence version · {result.evidence_version}</p>
+                {result.operands.map(fact => (
+                  <p key={fact.fact_id}>
+                    {fact.role} · FY{fact.reporting_period.fiscal_year} · {fact.currency} {fact.normalized_amount}
+                    {' · '}<span className="mono">{fact.fact_id}</span>
+                  </p>
+                ))}
+                <ol>{result.trace.map(step => (
+                  <li key={step.operation}>{step.operation} ({step.inputs.join(', ')}) = {step.result}</li>
+                ))}</ol>
+              </details>
+              <h4>Original filing evidence</h4>
+              <ul>{result.citations.map(citation => (
+                <li key={citation.id}>
+                  <a href={`${path}/citations/${encodeURIComponent(citation.id)}?${citationQuery}`}
+                    target="_blank" rel="noopener noreferrer">{citation.title}</a>
+                </li>
+              ))}</ul>
+            </>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function SourceDetail({ source }: { source: Source }) {
   const diagnostics = source.diagnostics ?? [];
   return (
@@ -143,6 +267,7 @@ function SourceDetail({ source }: { source: Source }) {
           ))}
         </section>
       )}
+      <GrowthCalculator key={source.source_id} source={source} />
     </section>
   );
 }

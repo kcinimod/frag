@@ -5,9 +5,8 @@ Phase 1 acceptance checks passed for the retained original Microsoft FY2023
 revenue are independently verified and compatible on their reported basis.
 Reingestion kept one source and two stable fact IDs. Socket-blocked replay
 inspected the saved bytes and facts after removing the input. Issue #6
-delivered the acceptance evidence for Phase 1. The next roadmap milestone is
-a deterministic revenue growth calculation over the verified facts, pending
-authorization to begin Phase 2.
+delivered the acceptance evidence for Phase 1. The Phase 2 calculator is
+ready for owner review.
 [Phase 1 handoff](../artifacts/phase01/HANDOFF.md)
 
 - Issue #2 delivered local source preservation, integrity checks, and repeatable
@@ -25,3 +24,7 @@ authorization to begin Phase 2.
   [Acquisition run record](../artifacts/phase01/SEC_ACQUISITION.md)
 - The browser workspace searches EDGAR by company ticker or CIK, filing year,
   and form. It preserves the selected HTML through the same download cache.
+- Issue #9 delivers verified revenue growth through the CLI and browser.
+  Both replayed the retained Microsoft filing offline and returned 6.88%.
+  Owner review of the calculator evidence is the next milestone.
+  [Calculator handoff](../artifacts/phase02/GROWTH_HANDOFF.md)

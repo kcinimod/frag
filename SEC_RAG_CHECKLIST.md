@@ -21,8 +21,8 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 
 ## 3. Validate the calculation and answer
 - [ ] Each operand resolves to a verified fact, earlier result or justified constant. Check operator, operand role/order, output units and requested metric separately from syntax.
-- [ ] Validate the denominator before division; report an undefined percentage when prior revenue is genuinely zero. Offer a labeled absolute change; do not silently change formulas.
-- [ ] Return cited facts, calculation, typed result and limitations. Format ratios/percentages once. Link to supporting cells/notes, not just the filing homepage.
+- [x] Validate the denominator before division in the verified revenue growth calculator. An explicitly verified zero returns an undefined percentage and a labeled absolute change. [Synthetic regression](tests/test_growth_workflow.py)
+- [x] The verified revenue growth calculator returns a typed percent, operands, an operation trace, and comparison caveats. Browser citations open the original cells and notes offline. [Calculator replay](artifacts/phase02/GROWTH_HANDOFF.md)
 - [ ] Validate each claim: a citation must support the exact period and metric. Attribute management statements; separate actuals, guidance and scenarios. A coincidental numeric match does not establish support.
 - [ ] Error routing: timeout → bounded retry; unsupported fact → retrieve; invalid program → targeted repair and rerun; valid program → preserve. Measure fixes minus regressions.
 

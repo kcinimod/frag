@@ -173,6 +173,24 @@ and scope caveats appear below the observations. Verification currently covers
 the retained Microsoft filing and uses an independently inspected reference
 with a recorded source hash.
 
+## Calculate verified revenue growth
+
+In the browser, select the preserved filing, enter the prior and current fiscal
+years, and choose **Calculate revenue growth**. The result includes a trace and
+links that open the original cells and disclosures as text in new tabs.
+
+From PowerShell, after ingesting a filing as shown above:
+
+```powershell
+.venv/Scripts/frag.exe growth $local.source_id 2022 2023 --store $localStore
+```
+
+The same calculator serves both entry points. The CLI emits JSON with typed
+percent, operand roles, citations, and comparison caveats. An evidence issue
+returns `status: "unavailable"` with the reason and any available observations.
+A verified zero baseline returns `status: "undefined_zero_baseline"` with a
+labeled absolute change. [Calculator validation and replay](artifacts/phase02/GROWTH_HANDOFF.md)
+
 Importable entry points are `frag.store.SourceStore`, `SourceMetadata`, and
 `SourceError`. Use `SourceStore(Path(...)).ingest(...)` and `.inspect(...)` with
 the same metadata and provenance semantics as the CLI.
