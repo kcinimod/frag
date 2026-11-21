@@ -15,6 +15,8 @@ h2, h3, p { margin: 0; }
 h2 { font-size: 1.15rem; }
 h3 { font-size: 1rem; }
 .workspace { display: grid; grid-template-columns: minmax(17rem, 1fr) minmax(0, 1.7fr); gap: 1rem; align-items: start; }
+.collection { margin-bottom: 1rem; }
+.collection form { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
 aside, form, .download, .filing-results { display: grid; gap: 1rem; }
 .panel { min-width: 0; padding: 1.25rem; background: white; border: 1px solid #b9cbc7; border-radius: .65rem; }
 form { margin-top: 1rem; }
@@ -54,4 +56,6 @@ dd { margin: 0; overflow-wrap: anywhere; }
 .detail > section[aria-labelledby="lookup-title"] { margin-top: 1.5rem; }
 .lookup-result:not(:empty) { margin-top: .75rem; }
 .empty p { margin-top: .45rem; }
-@media (max-width: 45rem) { .workspace { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 45rem) {
+  .workspace, .collection form { grid-template-columns: minmax(0, 1fr); }
+}

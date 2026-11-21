@@ -14,6 +14,8 @@ from frag.income_html import (
 
 PARSER_VERSION = "annual-revenue-v4"
 ACCESSION = "0000950170-23-035122"
+PRIOR_ACCESSION = "0001564590-22-026876"
+PRIOR_LAYOUT_VERSION = "microsoft-fy2022-layout-v1"
 MICROSOFT_CIK = "0000789019"
 TARGET_YEARS = (2022, 2023)
 ANNUAL_HEADER = re.compile(r"Year Ended ([A-Za-z]+) ([0-9]{1,2}),?", re.IGNORECASE)
@@ -46,11 +48,15 @@ def extract_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
         document = StatementHTML()
         document.feed(original.decode("utf-8-sig"))
         document.close()
-        if source["provenance"]["kind"] == "local_original":
-            _check_document(document, source)
+        parser_version, target_years = PARSER_VERSION, TARGET_YEARS
+        if source["provenance"]["kind"] != "synthetic":
+            parser_version, target_years = _check_document(document, source)
+        result["parser_version"] = parser_version
         if len(document.tables) != 1:
             raise UnsupportedLayout("Expected exactly one table headed Income Statements.")
-        facts, diagnostics = _extract_table(document, document.tables[0], source)
+        facts, diagnostics = _extract_table(document, document.tables[0], source, target_years)
+        for fact in facts:
+            fact["parser_version"] = parser_version
     except (UnsupportedLayout, UnicodeDecodeError) as exc:
         result["diagnostics"] = [{"code": "unsupported_layout", "message": str(exc)}]
         return result
@@ -60,19 +66,23 @@ def extract_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _check_document(document: StatementHTML, source: dict[str, Any]) -> None:
+def _check_document(document: StatementHTML, source: dict[str, Any]) -> tuple[str, tuple[int, int]]:
+    is_prior = source["accession"] == PRIOR_ACCESSION
+    period_end = "June 30, 2022" if is_prior else "June 30, 2023"
+    expected_accession = PRIOR_ACCESSION if is_prior else ACCESSION
     expected = {
         "dei:documenttype": ["10-K"],
-        "dei:documentperiodenddate": ["June 30, 2023"],
+        "dei:documentperiodenddate": [period_end],
         "dei:entitycentralindexkey": [MICROSOFT_CIK],
     }
     actual = {key: [item.text for item in items] for key, items in document.cover_facts.items()}
     if actual != expected:
-        raise UnsupportedLayout("Expected inline cover fields for Microsoft's FY2023 Form 10-K.")
+        raise UnsupportedLayout(f"Expected inline cover fields for Microsoft's Form 10-K ended {period_end}.")
     if not matches_microsoft_company(source["company"]):
         raise UnsupportedLayout("The supplied company conflicts with the Microsoft inline cover fields.")
-    if source["accession"] not in (None, ACCESSION) or source["form"] not in (None, "10-K"):
-        raise UnsupportedLayout(f"Supplied metadata conflicts with Form 10-K accession {ACCESSION}.")
+    if source["accession"] not in (None, expected_accession) or source["form"] not in (None, "10-K"):
+        raise UnsupportedLayout(f"Supplied metadata conflicts with Form 10-K accession {expected_accession}.")
+    return (PRIOR_LAYOUT_VERSION, (2021, 2022)) if is_prior else (PARSER_VERSION, TARGET_YEARS)
 
 
 def matches_microsoft_company(company: str | None) -> bool:
@@ -83,6 +93,7 @@ def matches_microsoft_company(company: str | None) -> bool:
 
 def _extract_table(
     document: StatementHTML, table: Table, source: dict[str, Any],
+    target_years: tuple[int, int],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     rows = table_grid(table)
     labels = [
@@ -99,7 +110,7 @@ def _extract_table(
     if len(annual_headers) != 1:
         raise UnsupportedLayout("Expected one annual period header above Total revenue.")
     annual = annual_headers[0]
-    year_cells = _year_headers(header_rows, annual)
+    year_cells = _year_headers(header_rows, annual, target_years)
     value_row = rows[label.row - 1]
     # Unit disclosures may appear in a distinct row or in a merged header.
     unit_cells = [entry for row in header_rows for entry in row.cells if SCALE.search(entry.cell.text)]
@@ -109,13 +120,13 @@ def _extract_table(
     evidence = StatementEvidence(table, annual, label, units)
     facts = []
     diagnostics = []
-    for year in TARGET_YEARS:
+    for year in target_years:
         header = year_cells[year]
         if value_row.width != rows[header.row - 1].width:
             raise UnsupportedLayout("The Total revenue row width differs from the year header row.")
         try:
             value = _value_cell(value_row.cells, label, header)
-            fact = _revenue_fact(document, source, evidence, header, value, year)
+            fact = _revenue_fact(document, source, evidence, header, value, year, target_years[-1])
         except UnsupportedLayout as exc:
             diagnostics.append({
                 "code": "unsupported_observation", "fiscal_year": year, "message": str(exc),
@@ -133,7 +144,9 @@ def _extract_table(
     return facts, diagnostics
 
 
-def _year_headers(rows: list[GridRow], annual: GridCell) -> dict[int, GridCell]:
+def _year_headers(
+    rows: list[GridRow], annual: GridCell, target_years: tuple[int, int],
+) -> dict[int, GridCell]:
     candidates: list[dict[int, GridCell]] = []
     for grid_row in rows[annual.row - 1:]:
         row = grid_row.cells
@@ -145,14 +158,16 @@ def _year_headers(rows: list[GridRow], annual: GridCell) -> dict[int, GridCell]:
         if not filled or not all(YEAR.fullmatch(entry.cell.text) for entry in filled):
             continue
         years = {int(entry.cell.text): entry for entry in filled}
-        if len(years) != len(filled) or not all(year in years for year in TARGET_YEARS):
+        if len(years) != len(filled) or not all(year in years for year in target_years):
             continue
         if len(annual.columns) > 1 and annual not in row:
             if set(annual.columns) != {column for entry in filled for column in entry.columns}:
                 raise UnsupportedLayout("Year headers do not cover the merged annual period header.")
         candidates.append(years)
     if len(candidates) != 1:
-        raise UnsupportedLayout("Annual header columns do not uniquely identify FY2022 and FY2023.")
+        raise UnsupportedLayout(
+            f"Annual header columns do not uniquely identify FY{target_years[0]} and FY{target_years[1]}."
+        )
     return candidates[0]
 
 
@@ -175,7 +190,7 @@ def _value_cell(row: list[GridCell], label: GridCell, header: GridCell) -> GridC
 
 def _revenue_fact(
     document: StatementHTML, source: dict[str, Any], evidence: StatementEvidence,
-    header: GridCell, value: GridCell | None, year: int,
+    header: GridCell, value: GridCell | None, year: int, current_year: int,
 ) -> dict[str, Any]:
     table = evidence.table
     annual = evidence.annual_header
@@ -229,15 +244,15 @@ def _revenue_fact(
             raise UnsupportedLayout("Inline XBRL scale conflicts with the table's scale declaration.")
         if inline.get("sign") == "-" and raw and not raw.startswith(("-", "(")):
             raise UnsupportedLayout("Inline XBRL sign conflicts with the displayed revenue amount.")
-    elif source["provenance"]["kind"] == "local_original" and _normalize(raw, 1) is not None:
+    elif source["provenance"]["kind"] != "synthetic" and _normalize(raw, 1) is not None:
         raise UnsupportedLayout("The selected filing layout requires an inline XBRL tag for numeric revenue.")
     identity = f'{source["source_id"]}:reported_consolidated_revenue:{year}'
     heading = table.caption if table.caption and is_statement_heading(table.caption.text) else table.heading
     assert heading is not None
     return {
         "fact_id": "fact:" + hashlib.sha256(identity.encode()).hexdigest(),
-        "source_id": source["source_id"], "parser_version": PARSER_VERSION,
-        "company": "Microsoft Corporation" if source["provenance"]["kind"] == "local_original"
+        "source_id": source["source_id"],
+        "company": "Microsoft Corporation" if source["provenance"]["kind"] != "synthetic"
         else source["company"],
         "filing_date": source["filing_date"],
         "metric": "reported_consolidated_revenue", "metric_label": label.cell.text,
@@ -246,7 +261,7 @@ def _revenue_fact(
         "scope": "consolidated", "status": "provisional",
         "reporting_period": {"kind": "annual", "fiscal_year": year,
                              "start": start.isoformat(), "end": end.isoformat()},
-        "comparative": year < max(TARGET_YEARS),
+        "comparative": year < current_year,
         "parent_table_id": f'{source["source_id"]}#table-{table.number}',
         "inline_xbrl": inline_evidence,
         "locators": {

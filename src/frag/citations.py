@@ -11,6 +11,12 @@ CELL_END = re.compile(r"</(?:td|th)\s*>", re.IGNORECASE)
 BLOCK_TAGS = {"div", "p", "tr", "h1", "h2", "h3", "li"}
 
 
+def has_citable_amount(fact: dict[str, Any]) -> bool:
+    return fact["normalized_amount"] is not None and bool(
+        fact["currency"] and fact["scale"] and fact["locators"].get("value")
+    )
+
+
 def revenue_cell_citation(fact: dict[str, Any], citation_id: str) -> dict[str, Any]:
     year = fact["reporting_period"]["fiscal_year"]
     return {

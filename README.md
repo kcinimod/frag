@@ -51,7 +51,8 @@ uv run --locked --offline --env-file .env frag serve --store artifacts/phase01/l
 
 Use the Microsoft FY2023 10-K
 shortcut or **Saved sources** to inspect a cached filing offline. Revenue
-extraction for original filings currently supports the Microsoft FY2023 layout.
+extraction supports the Microsoft FY2023 layout and the Microsoft FY2022
+layout when its accession is supplied. The FY2022 filing's facts are provisional.
 [SEC EDGAR submissions API](https://www.sec.gov/search-filings/edgar-application-programming-interfaces)
 Use `--port` to choose another available port. Setup may fetch dependencies.
 After updating FRAG, restart `frag serve` and reload the page so the browser
@@ -87,9 +88,10 @@ For a locally supplied original HTML document, use the same ingest command with
 its disk path and `--provenance local_original`. Optional metadata flags are
 `--company`, `--accession`, `--form`, `--filing-date YYYY-MM-DD`, and `--source-url`.
 Omitted metadata is JSON `null`. The source record retains the supplied claims
-as `supplied_unverified`. The parser recognizes the selected Microsoft FY2023
-10-K from its inline cover fields and checks the statement's annual headers
-against inline XBRL contexts. Declare synthetic inputs as `synthetic`.
+as `supplied_unverified`. The parser checks the Microsoft FY2023 10-K's inline
+cover fields and matches the statement's annual headers to inline XBRL
+contexts. To extract provisional facts from the Microsoft FY2022 10-K,
+supply `--accession 0001564590-22-026876`. Declare synthetic inputs as `synthetic`.
 
 ## Download and inspect the Microsoft filing
 
@@ -256,3 +258,25 @@ the same metadata and provenance semantics as the CLI.
 
 See the [Phase 1 handoff](artifacts/phase01/HANDOFF.md) and
 [project status](docs/PROJECT_STATUS.md) for acceptance evidence and limitations.
+
+## Annual revenue across preserved filings
+
+Use **Ask the collection** on the browser home screen or `ask-collection`
+in PowerShell. Name one company and one fiscal year. The workspace can open
+the exact revenue cell from cached filing HTML without a model or network.
+
+Build the reproducible collection and keep its store and validation records.
+
+```powershell
+$collectionRun = Join-Path 'build' ([guid]::NewGuid().ToString())
+uv run --locked --offline python artifacts/phase03/collection-replay.py --work-dir $collectionRun
+$collectionStore = Join-Path $collectionRun 'store'
+$collectionRecord = Join-Path $collectionRun 'manual-lookup.json'
+.venv/Scripts/frag.exe index-collection --store $collectionStore
+.venv/Scripts/frag.exe ask-collection "What was Microsoft's revenue in FY2023?" --store $collectionStore --record $collectionRecord
+.venv/Scripts/frag.exe replay-collection $collectionRecord --store $collectionStore
+```
+
+Omit the question argument to enter it at the prompt. The application creates
+a validation record only when you pass `--record`.
+[Corpus, expected results, and browser smoke commands](artifacts/phase03/COLLECTION_HANDOFF.md)

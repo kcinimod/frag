@@ -6,7 +6,7 @@ from collections.abc import Callable
 from time import perf_counter
 from typing import Any, Literal, TypedDict
 
-from frag.citations import revenue_cell_citation
+from frag.citations import has_citable_amount, revenue_cell_citation
 from frag.growth import calculate_growth
 from frag.local_model import MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable
 from frag.store import SourceError
@@ -49,7 +49,7 @@ class ResolvedGrowth(TypedDict):
 ResolvedRequest = ResolvedLookup | ResolvedGrowth
 
 
-def _resolve_request(question: str) -> ResolvedRequest | None:
+def resolve_request(question: str) -> ResolvedRequest | None:
     if len(question) > 300:
         return None
     normalized = " ".join(question.lower().split())
@@ -72,10 +72,7 @@ def _eligible_facts(source: dict[str, Any]) -> list[dict[str, Any]]:
         and fact["metric"] == METRIC
         and fact["reporting_period"]["kind"] == "annual"
         and fact["status"] == "verified"
-        and fact["normalized_amount"] is not None
-        and fact["currency"]
-        and fact["scale"]
-        and fact["locators"].get("value")
+        and has_citable_amount(fact)
     ]
 
 
@@ -260,7 +257,7 @@ def ask_revenue(
     source: dict[str, Any], question: str, planner: Planner, *, record: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     start = perf_counter()
-    request = _resolve_request(question)
+    request = resolve_request(question)
     if request is None:
         if record is not None:
             raise SourceError("Validation runs require a supported annual revenue lookup or growth question.")
@@ -310,7 +307,7 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
     question, proposal = record.get("question"), record.get("proposed_plan")
     if record.get("version") != RECORD_VERSION or not isinstance(question, str) or not isinstance(proposal, str):
         raise SourceError("The validation record must contain a supported saved proposal.")
-    request = _resolve_request(question)
+    request = resolve_request(question)
     if request is None or record.get("resolved_request") != request:
         raise SourceError("The saved request does not match its question.")
     facts = _eligible_facts(source)

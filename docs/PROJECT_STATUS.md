@@ -37,3 +37,7 @@ Phase 2 calculator and its offline results.
   The local model returned a valid plan for Microsoft FY2022 to FY2023, and
   the deterministic calculator returned 6.88% with its trace and citations.
   [Growth chat handoff](../artifacts/phase02/CHAT_GROWTH_HANDOFF.md)
+- Issue #13 adds collection-wide annual revenue lookup in the CLI and browser.
+  The offline corpus reproduced Microsoft FY2022 and FY2023 revenue and
+  Chrome opened both original cells.
+  [Collection handoff](../artifacts/phase03/COLLECTION_HANDOFF.md)

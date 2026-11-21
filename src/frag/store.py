@@ -9,10 +9,10 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
-from frag.revenue import PARSER_VERSION
+from frag.revenue import PARSER_VERSION, PRIOR_LAYOUT_VERSION
 from frag.verification import EVIDENCE_VERSION, inspect_revenue
 
-RESULT_VERSION = f"{PARSER_VERSION}:{EVIDENCE_VERSION}"
+RESULT_VERSION = f"{PARSER_VERSION}:{PRIOR_LAYOUT_VERSION}:{EVIDENCE_VERSION}"
 
 
 class SourceError(ValueError):
@@ -179,10 +179,24 @@ class SourceStore:
     def inspect(self, source_id: str | None = None) -> dict[str, Any]:
         if source_id is not None:
             return self.inspect_with_original(source_id)[0]
+        records = self.inspect_sources()
+        return {"source_count": len(records), "sources": records}
+
+    def inspect_sources(self, source_ids: set[str] | None = None) -> list[dict[str, Any]]:
+        """Read a coherent catalogue view, optionally limited to replay inputs."""
         with closing(self._open_catalogue()) as connection:
-            rows = connection.execute("SELECT record FROM sources ORDER BY source_id")
-            records = [self._inspect_record(connection, json.loads(row[0]))[0] for row in rows]
-            return {"source_count": len(records), "sources": records}
+            connection.execute("BEGIN")
+            rows = connection.execute("SELECT source_id, record FROM sources ORDER BY source_id")
+            records = []
+            for source_id, saved in rows:
+                if source_ids is None or source_id in source_ids:
+                    record: dict[str, Any] = json.loads(saved)
+                    if record["source_id"] != source_id:
+                        raise SourceError("Source catalogue identity mismatch.")
+                    records.append(self._inspect_record(connection, record)[0])
+            if source_ids is not None and len(records) != len(source_ids):
+                raise SourceNotFound("The saved collection snapshot requires missing originals.")
+            return records
 
     def inspect_with_original(self, source_id: str) -> tuple[dict[str, Any], bytes]:
         """Read the evidence record and the exact hash-checked bytes supporting it."""

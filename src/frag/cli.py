@@ -9,6 +9,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Sequence
 
+from frag.collection import CollectionIndex, ask_collection, replay_collection
 from frag.growth import calculate_growth
 from frag.local_model import propose_lookup
 from frag.lookup import ask_revenue, replay_revenue
@@ -33,6 +34,14 @@ def _write_validation_record(path: Path, record: dict[str, Any]) -> None:
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+
+
+def _read_question(question: str | None) -> str:
+    if question is not None:
+        return question
+    if sys.stdin.isatty():
+        print("Question: ", end="", file=sys.stderr, flush=True)
+    return sys.stdin.readline(301).rstrip("\r\n")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -62,6 +71,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     replay = commands.add_parser("replay-ask", aliases=["replay-lookup"], help="Validate and execute a saved chatbot plan offline")
     replay.add_argument("record", type=Path)
     replay.add_argument("--store", type=Path, required=True)
+    collection_index = commands.add_parser("index-collection", help="Build and show the validated local index snapshot")
+    collection_index.add_argument("--store", type=Path, required=True)
+    collection = commands.add_parser("ask-collection", help="Search preserved filings for verified annual revenue")
+    collection.add_argument("question", nargs="?", help="Question text. Omit to read from standard input.")
+    collection.add_argument("--store", type=Path, required=True)
+    collection.add_argument("--record", type=Path, help="Save the candidates and outcome to a new JSON file")
+    collection_replay = commands.add_parser("replay-collection", help="Reproduce a saved collection run offline")
+    collection_replay.add_argument("record", type=Path)
+    collection_replay.add_argument("--store", type=Path, required=True)
     serve = commands.add_parser("serve", help="Run the browser workspace on localhost")
     serve.add_argument("--store", type=Path, required=True)
     serve.add_argument("--assets", type=Path, default=Path("web/dist"))
@@ -89,12 +107,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.record and args.record.exists():
                 raise SourceError("Choose a new validation record path.")
             source = store.inspect(args.source_id)
-            question = args.question
-            if question is None:
-                if sys.stdin.isatty():
-                    print("Question: ", end="", file=sys.stderr, flush=True)
-                question = sys.stdin.readline(301).rstrip("\r\n")
-            result = ask_revenue(source, question, propose_lookup, record=record)
+            result = ask_revenue(source, _read_question(args.question), propose_lookup, record=record)
             if args.record and record is not None:
                 _write_validation_record(args.record, record)
         elif args.command in ("replay-ask", "replay-lookup"):
@@ -103,6 +116,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             if not isinstance(identity, dict) or not isinstance(identity.get("source_id"), str):
                 raise SourceError("The validation record must identify its preserved filing.")
             result = replay_revenue(store.inspect(identity["source_id"]), saved)
+        elif args.command == "index-collection":
+            result = CollectionIndex.build(store).manifest
+        elif args.command == "ask-collection":
+            collection_record: dict[str, Any] | None = {} if args.record else None
+            if args.record and args.record.exists():
+                raise SourceError("Choose a new validation record path.")
+            question = _read_question(args.question)
+            result = ask_collection(CollectionIndex.build(store), question, record=collection_record)
+            if args.record and collection_record is not None:
+                _write_validation_record(args.record, collection_record)
+        elif args.command == "replay-collection":
+            result = replay_collection(store, json.loads(args.record.read_text(encoding="utf-8")))
         else:
             from frag.web import create_app
 

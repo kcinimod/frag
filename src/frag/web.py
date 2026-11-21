@@ -10,6 +10,7 @@ from flask import Flask, Response, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
 
 from frag.citations import citation_text
+from frag.collection import CollectionIndex, ask_collection, collection_excerpt
 from frag.growth import calculate_growth
 from frag.local_model import propose_lookup
 from frag.lookup import Planner, ask_revenue, lookup_citation
@@ -42,6 +43,25 @@ def create_app(store: SourceStore, assets: Path, *, planner: Planner = propose_l
     @app.get("/api/sources/<source_id>")
     def inspect_source(source_id: str) -> Response:
         return jsonify(store.inspect(source_id))
+
+    @app.post("/api/collection/lookup")
+    def collection_lookup() -> Response | tuple[Response, int]:
+        if request.headers.get("X-Frag-Ask") != "1":
+            return jsonify(error="Search requires the local FRAG workspace."), 403
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict) or not isinstance(data.get("question"), str):
+            raise SourceError("Enter a question about the preserved collection.")
+        response = jsonify(ask_collection(CollectionIndex.build(store), data["question"]))
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.get("/api/collection/citations/<source_id>/<fact_id>/<fingerprint>")
+    def collection_citation(source_id: str, fact_id: str, fingerprint: str) -> Response:
+        return Response(
+            collection_excerpt(store, source_id, fact_id, fingerprint),
+            mimetype="text/plain",
+            headers={"X-Content-Type-Options": "nosniff"},
+        )
 
     def fiscal_years() -> tuple[int, int]:
         prior = request.args.get("prior", type=int)

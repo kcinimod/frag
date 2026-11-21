@@ -289,6 +289,75 @@ function RevenueChat({ source }: { source: Source }) {
   );
 }
 
+type CollectionCitation = { title: string; href: string };
+
+type CollectionResult =
+  | { status: 'answered'; request: { company: string; fiscal_year: number }; fact: RevenueFact;
+      citations: CollectionCitation[] }
+  | { status: 'conflicting_evidence'; message: string;
+      alternatives: { fact: RevenueFact; citation: CollectionCitation }[] }
+  | { status: 'clarify' | 'evidence_unavailable'; message: string };
+
+function CollectionLookup() {
+  const [result, setResult] = useState<CollectionResult>();
+  const [error, setError] = useState('');
+  const [pending, setPending] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const question = new FormData(event.currentTarget).get('question');
+    setPending(true);
+    setResult(undefined);
+    setError('');
+    try {
+      setResult(await api<CollectionResult>('/api/collection/lookup', {
+        method: 'POST',
+        headers: { 'X-Frag-Ask': '1', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      }));
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'Collection search failed.');
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <section className="panel collection" aria-labelledby="collection-title">
+      <h2 id="collection-title">Ask the collection</h2>
+      <form onSubmit={submit} onChange={() => { setResult(undefined); setError(''); }}>
+        <label>
+          Question about annual company revenue
+          <input name="question" placeholder="What was Microsoft's revenue in FY2023?"
+            autoComplete="off" required maxLength={300} disabled={pending} />
+        </label>
+        <button className="primary" type="submit" disabled={pending}>Search collection</button>
+      </form>
+      <div className="lookup-result" aria-live="polite">
+        {pending && <p>Searching preserved filings…</p>}
+        {error && <p className="error">{error}</p>}
+        {result?.status === 'answered' && (
+          <>
+            <p><strong>{result.request.company} FY{result.request.fiscal_year} reported consolidated revenue</strong></p>
+            <p className="growth-value">{revenueAmount(result.fact)}</p>
+            {result.citations.map(citation => (
+              <a key={citation.href} href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
+            ))}
+          </>
+        )}
+        {result && 'message' in result && <p>{result.message}</p>}
+        {result?.status === 'conflicting_evidence' && (
+          <ul>{result.alternatives.map(({ fact, citation }) => (
+            <li key={fact.fact_id}>{revenueAmount(fact)} ·{' '}
+              <a href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
+            </li>
+          ))}</ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function SourceDetail({ source }: { source: Source }) {
   const diagnostics = source.diagnostics ?? [];
   return (
@@ -511,6 +580,7 @@ function App() {
   return (
     <main>
       <header className="masthead"><span>FRAG</span><h1>Source inspector</h1></header>
+      <CollectionLookup />
       <div className="workspace">
         <aside>
           <section className="panel download" aria-labelledby="download-title">

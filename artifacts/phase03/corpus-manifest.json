@@ -1,0 +1,72 @@
+{
+  "schema_version": "phase03-collection-corpus-v1",
+  "sources": [
+    {
+      "name": "msft-20230630.htm",
+      "anchor_manifest": "artifacts/phase01/source-manifest.json",
+      "path": "artifacts/phase01/originals/msft-20230630.htm.gz",
+      "archive_sha256": "1b12d4d44357f1fc080749abb7d654073197dbaeabd04031bdc6ac164beeca40",
+      "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+      "byte_count": 9963591,
+      "provenance": "local_original",
+      "metadata": {
+        "company": "Microsoft Corporation",
+        "accession": "0000950170-23-035122",
+        "form": "10-K",
+        "filing_date": "2023-07-27",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm"
+      }
+    },
+    {
+      "name": "msft-10k_20220630.htm",
+      "path": "artifacts/phase03/originals/msft-10k_20220630.htm.gz",
+      "archive_sha256": "1123ad34ecfcd578770f03608cb5fe1965c6b4f4529ee1c1107bb151ca8f8511",
+      "source_hash": "d8c69513cd820ecdfa3b22decf2672591ced88996188c218d3ffa1439b6b528f",
+      "byte_count": 6215855,
+      "provenance": "local_original",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/789019/000156459022026876/msft-10k_20220630.htm",
+      "filing_index_url": "https://www.sec.gov/Archives/edgar/data/789019/000156459022026876/0001564590-22-026876-index.htm",
+      "report_end": "2022-06-30",
+      "metadata": {
+        "company": "Microsoft Corporation",
+        "accession": "0001564590-22-026876",
+        "form": "10-K",
+        "filing_date": "2022-07-28",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000156459022026876/msft-10k_20220630.htm"
+      }
+    },
+    {
+      "name": "synthetic_income.html",
+      "path": "tests/fixtures/synthetic_income.html",
+      "source_hash": "e4b39ee0010156511c401013ac480ba79ac6b1ac31fbdf448a08d4c012b09012",
+      "provenance": "synthetic",
+      "metadata": {"company": "Synthetic Example"}
+    }
+  ],
+  "expected_answers": [
+    {
+      "question": "What was Microsoft's reported consolidated revenue in FY2022?",
+      "fiscal_year": 2022,
+      "reporting_period_end": "2022-06-30",
+      "filing_date": "2023-07-27",
+      "currency": "USD",
+      "scale": 1000000,
+      "raw_amount": "198,270",
+      "normalized_amount": "198270000000",
+      "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+      "cell": {"line": 4403, "character": 5, "table": 25, "row": 12, "cell": 8, "column": 8}
+    },
+    {
+      "question": "What was Microsoft's reported consolidated revenue in FY2023?",
+      "fiscal_year": 2023,
+      "reporting_period_end": "2023-06-30",
+      "filing_date": "2023-07-27",
+      "currency": "USD",
+      "scale": 1000000,
+      "raw_amount": "211,915",
+      "normalized_amount": "211915000000",
+      "source_hash": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+      "cell": {"line": 4399, "character": 5, "table": 25, "row": 12, "cell": 4, "column": 4}
+    }
+  ]
+}

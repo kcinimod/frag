@@ -127,3 +127,13 @@ compatibility before arithmetic and returns the trace and original filing
 citations for both the calculator and the chatbot. Saved chatbot plans use
 `replay-ask`. The earlier `replay-lookup` command is an alias.
 [Growth chat acceptance](../artifacts/phase02/CHAT_GROWTH_HANDOFF.md)
+
+## Collection revenue lookup
+
+Build a content-addressed collection snapshot from a single catalogue read
+view using versioned extraction results. Keep the verified evidence and
+distinct observations linked to their original sources and parent tables.
+Resolve company, operation, and reporting period before keyword ranking and
+structured selection. Pin explicit replay to the exact recorded source set
+and validate its versions, candidate ranking, and outcome.
+[Collection handoff](../artifacts/phase03/COLLECTION_HANDOFF.md)

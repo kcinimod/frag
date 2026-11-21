@@ -6,7 +6,7 @@ from copy import deepcopy
 from importlib.resources import files
 from typing import Any
 
-from frag.revenue import extract_revenue, matches_microsoft_company
+from frag.revenue import PRIOR_LAYOUT_VERSION, extract_revenue, matches_microsoft_company
 
 REFERENCE = json.loads(
     files("frag").joinpath("microsoft-revenue-reference.json").read_text(encoding="utf-8")
@@ -117,6 +117,8 @@ def inspect_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
         *result["unresolved_requirements"], "comparison_compatibility",
     ]
     if not result["facts"]:
+        return result
+    if result["parser_version"] == PRIOR_LAYOUT_VERSION:
         return result
 
     lines = original.decode("utf-8-sig").split("\n")
