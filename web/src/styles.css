@@ -16,7 +16,7 @@ h2 { font-size: 1.15rem; }
 h3 { font-size: 1rem; }
 .workspace { display: grid; grid-template-columns: minmax(17rem, 1fr) minmax(0, 1.7fr); gap: 1rem; align-items: start; }
 .collection { margin-bottom: 1rem; }
-.collection form { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+.collection form { grid-template-columns: minmax(0, 1fr) auto auto; align-items: end; }
 aside, form, .download, .filing-results { display: grid; gap: 1rem; }
 .panel { min-width: 0; padding: 1.25rem; background: white; border: 1px solid #b9cbc7; border-radius: .65rem; }
 form { margin-top: 1rem; }

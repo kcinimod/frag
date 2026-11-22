@@ -45,3 +45,7 @@ Phase 2 calculator and its offline results.
   baseline reproduced 6.88% for Microsoft FY2022 to FY2023 and retained
   partial, incompatible, and zero-baseline runs.
   [Growth baseline](../artifacts/phase03/GROWTH_BASELINE.md)
+- Issue #15 adds bounded fiscal-year recovery. A controlled first pass
+  omitted FY2022, and bounded retrieval recovered it and replayed the
+  6.88% answer offline with the original citations.
+  [Bounded recovery](../artifacts/phase03/BOUNDED_RECOVERY.md)

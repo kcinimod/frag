@@ -34,7 +34,7 @@ def audit_network(event: str, args: tuple[Any, ...]) -> None:
         assert args[0] in {"127.0.0.1", "::1", "localhost"}, "External DNS blocked."
 
 
-def replay(work: Path, *, growth_baseline: Path | None = None, freeze: bool = False) -> None:
+def replay(work: Path, *, growth_baseline: Path | None = None, freeze: bool = False, bounded: bool = False) -> None:
     store = work / "store"
     manifest = json.loads(MANIFEST.read_bytes())
 
@@ -102,6 +102,40 @@ def replay(work: Path, *, growth_baseline: Path | None = None, freeze: bool = Fa
     print("Clarification and unsupported cases passed. Ordinary questions left the store unchanged.")
     if growth_baseline is not None:
         replay_growth(invoke, work, growth_baseline, freeze=freeze)
+    if bounded:
+        replay_bounded(invoke, work)
+
+
+def replay_bounded(invoke: Callable[..., dict[str, Any]], work: Path) -> None:
+    def run(case: str, question: str, *options: str) -> tuple[dict[str, Any], dict[str, Any]]:
+        record = work / f"recovery-{case}.json"
+        answer = invoke("ask-collection", question, "--record", str(record), *options)
+        assert answer == invoke("replay-collection", str(record))
+        print(f'{case}: {answer["status"]} ({answer["stop_reason"]}). Offline replay matched.')
+        return answer, json.loads(record.read_bytes())
+
+    window = ("--initial-fact-limit", "1")
+    bounded = ("--mode", "bounded", *window)
+    baseline, baseline_run = run("one-pass", GROWTH_QUESTION, *window)
+    assert baseline["stop_reason"] == "missing_fiscal_year" and baseline["issues"][0]["fiscal_year"] == 2022
+    assert [item["fact"]["raw_amount"] for item in baseline["observations"]] == ["211,915"]
+    recovered, recovery_run = run("recovered", GROWTH_QUESTION, *bounded)
+    assert recovered["snapshot_id"] == baseline["snapshot_id"]
+    assert recovery_run["initial_evidence_ids"] == baseline_run["selected_evidence_ids"]
+    assert recovered["stop_reason"] == "sufficient_evidence"
+    assert recovered["percent"] == {"unit": "percent", "value": "6.88"}
+    assert [citation["locator"]["line"] for citation in recovered["citations"][:2]] == [4403, 4399]
+    assert [action["operation"] for action in recovery_run["actions"]] == ["search", "calculate"]
+
+    missing, missing_run = run("missing", "How did Microsoft revenue change from FY2021 to FY2023?", *bounded)
+    assert missing["stop_reason"] == "no_progress" and missing["issues"][0]["fiscal_year"] == 2021
+    assert [item["fact"]["raw_amount"] for item in missing["observations"]] == ["211,915"]
+    assert missing_run["actions"][0]["result"]["fact_ids"] == []
+
+    for limit, options, calls in (("calls", ("--max-calls", "1"), 1), ("time", ("--max-seconds", "0"), 0)):
+        partial, validation = run(limit, GROWTH_QUESTION, *bounded, *options)
+        assert partial["stop_reason"] == "budget_exhausted" and partial["budget_limit"] == limit
+        assert partial["percent"] is None and len(validation["actions"]) == calls
 
 
 def replay_growth(
@@ -214,7 +248,7 @@ def replay_growth(
             assert client.get(citations["current"]["href"]).text.endswith("\n12\n")
 
 
-def smoke_browser(work: Path) -> None:
+def smoke_browser(work: Path, *, bounded: bool = False) -> None:
     from os import environ
 
     from playwright.sync_api import expect, sync_playwright
@@ -266,6 +300,8 @@ def smoke_browser(work: Path) -> None:
                         finally:
                             excerpt.close()
                     question.fill(GROWTH_QUESTION)
+                    if bounded:
+                        search.get_by_label("Retrieval mode").select_option("bounded")
                     submit.click()
                     expect(search.get_by_text("6.88%", exact=True)).to_be_visible()
                     with context.expect_page() as new_page:
@@ -287,6 +323,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-dir", type=Path, help="Keep the store and validation records in this new directory.")
     parser.add_argument("--browser", action="store_true", help="Open the original cells using Chromium and Playwright.")
+    parser.add_argument("--bounded", action="store_true", help="Save and replay bounded recovery validation records.")
     growth = parser.add_mutually_exclusive_group()
     growth.add_argument("--growth", action="store_true", help="Check the retained one-pass growth baseline.")
     growth.add_argument("--freeze-growth", type=Path, help="Write growth baseline records to a new directory.")
@@ -295,9 +332,9 @@ def main() -> None:
 
     def validate(work: Path) -> None:
         replay(work, growth_baseline=GROWTH_BASELINE if args.growth else args.freeze_growth,
-               freeze=args.freeze_growth is not None)
+               freeze=args.freeze_growth is not None, bounded=args.bounded)
         if args.browser:
-            smoke_browser(work)
+            smoke_browser(work, bounded=args.bounded)
 
     if args.work_dir:
         args.work_dir.mkdir(parents=True)

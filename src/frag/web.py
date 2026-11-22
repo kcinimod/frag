@@ -51,7 +51,8 @@ def create_app(store: SourceStore, assets: Path, *, planner: Planner = propose_l
         data = request.get_json(silent=True)
         if not isinstance(data, dict) or not isinstance(data.get("question"), str):
             raise SourceError("Enter a question about the preserved collection.")
-        response = jsonify(ask_collection(CollectionIndex.build(store), data["question"]))
+        response = jsonify(ask_collection(CollectionIndex.build(store), data["question"],
+                                          mode=data.get("mode", "one-pass")))
         response.headers["Cache-Control"] = "no-store"
         return response
 

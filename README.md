@@ -287,6 +287,19 @@ The same question entry point accepts reported consolidated revenue growth.
 See the [one-pass growth baseline](artifacts/phase03/GROWTH_BASELINE.md) for
 the retained offline runs and context limit.
 
+Select **Bounded recovery** in the browser or pass `--mode bounded` in
+PowerShell to search the same snapshot for a fiscal year omitted from the
+first pass. The CLI accepts `--max-calls` and `--max-seconds`. Use the
+offline harness to save and replay the same question in both modes.
+
+```powershell
+$recoveryRun = Join-Path 'build' ([guid]::NewGuid().ToString())
+.venv/Scripts/python.exe artifacts/phase03/collection-replay.py --bounded --work-dir $recoveryRun
+.venv/Scripts/frag.exe replay-collection (Join-Path $recoveryRun 'recovery-recovered.json') --store (Join-Path $recoveryRun 'store')
+```
+
+[Bounded recovery cases and budget behavior](artifacts/phase03/BOUNDED_RECOVERY.md)
+
 Omit the question argument to enter it at the prompt. The application creates
 a validation record only when you pass `--record`.
 [Corpus, expected results, and browser smoke commands](artifacts/phase03/COLLECTION_HANDOFF.md)

@@ -147,3 +147,16 @@ calculator. Keep selected verified observations and open requirements when
 coverage is incomplete. Include comparison evidence in the snapshot hash
 so replay detects changes to the basis and disclosures.
 [Growth baseline](../artifacts/phase03/GROWTH_BASELINE.md)
+
+## Bounded fiscal-year recovery
+
+Use the same first-pass selection in both retrieval modes. When one year is
+missing, filter already-ranked eligible candidates for that year within the
+pinned snapshot. Prefer evidence from the initially selected filings so the
+existing calculator can check the comparison on its original basis.
+
+Count searches and calculations against the call budget. Check elapsed
+time before and after each action and discard results that arrive past the
+limit. Reuse the recorded elapsed checkpoints on offline replay so machine
+speed cannot change the replayed stop reason.
+[Bounded recovery validation](../artifacts/phase03/BOUNDED_RECOVERY.md)

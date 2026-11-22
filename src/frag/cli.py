@@ -9,7 +9,10 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Sequence
 
-from frag.collection import GROWTH_CONTEXT_LIMIT, CollectionIndex, ask_collection, replay_collection
+from frag.collection import (
+    DEFAULT_MAX_CALLS, DEFAULT_MAX_SECONDS, GROWTH_CONTEXT_LIMIT,
+    CollectionIndex, RecoveryBudget, ask_collection, replay_collection,
+)
 from frag.growth import calculate_growth
 from frag.local_model import propose_lookup
 from frag.lookup import ask_revenue, replay_revenue
@@ -79,6 +82,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     collection.add_argument("--record", type=Path, help="Save the candidates and outcome to a new JSON file")
     collection.add_argument("--context-limit", type=int, default=GROWTH_CONTEXT_LIMIT,
                             help="Maximum evidence records selected for a growth question")
+    collection.add_argument("--initial-fact-limit", type=int, help="Limit facts retained on the first pass")
+    collection.add_argument("--mode", choices=("one-pass", "bounded"), default="one-pass")
+    collection.add_argument("--max-calls", type=int, default=DEFAULT_MAX_CALLS,
+                            help="Maximum search and calculation calls in bounded mode")
+    collection.add_argument("--max-seconds", type=float, default=DEFAULT_MAX_SECONDS,
+                            help="Elapsed time limit for bounded question actions")
     collection_replay = commands.add_parser("replay-collection", help="Reproduce a saved collection run offline")
     collection_replay.add_argument("record", type=Path)
     collection_replay.add_argument("--store", type=Path, required=True)
@@ -126,7 +135,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 raise SourceError("Choose a new validation record path.")
             question = _read_question(args.question)
             result = ask_collection(CollectionIndex.build(store), question, record=collection_record,
-                                    context_limit=args.context_limit)
+                                    context_limit=args.context_limit, initial_fact_limit=args.initial_fact_limit,
+                                    mode=args.mode, budget=RecoveryBudget(args.max_calls, args.max_seconds))
             if args.record and collection_record is not None:
                 _write_validation_record(args.record, collection_record)
         elif args.command == "replay-collection":

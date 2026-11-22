@@ -298,6 +298,7 @@ type CollectionResult =
       alternatives: { fact: RevenueFact; citation: CollectionCitation }[] }
   | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline'; request: { company: string } })
   | { status: 'clarify' | 'evidence_unavailable'; message: string;
+      budget_limit?: 'time' | 'calls';
       observations?: { fact: RevenueFact & { basis: string }; citation: CollectionCitation }[];
       issues?: { detail: string; requirements?: string[] }[]; citations?: CollectionCitation[] };
 
@@ -308,7 +309,9 @@ function CollectionLookup() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const question = new FormData(event.currentTarget).get('question');
+    const fields = new FormData(event.currentTarget);
+    const question = fields.get('question');
+    const mode = fields.get('mode');
     setPending(true);
     setResult(undefined);
     setError('');
@@ -316,7 +319,7 @@ function CollectionLookup() {
       setResult(await api<CollectionResult>('/api/collection/lookup', {
         method: 'POST',
         headers: { 'X-Frag-Ask': '1', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, mode }),
       }));
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'Collection search failed.');
@@ -333,6 +336,13 @@ function CollectionLookup() {
           Question about annual company revenue or growth
           <input name="question" placeholder="What was Microsoft's revenue in FY2023?"
             autoComplete="off" required maxLength={300} disabled={pending} />
+        </label>
+        <label>
+          Retrieval mode
+          <select name="mode" disabled={pending}>
+            <option value="one-pass">One pass</option>
+            <option value="bounded">Bounded recovery</option>
+          </select>
         </label>
         <button className="primary" type="submit" disabled={pending}>Search collection</button>
       </form>
@@ -357,6 +367,7 @@ function CollectionLookup() {
         {result && 'message' in result && <p>{result.message}</p>}
         {result?.status === 'evidence_unavailable' && (
           <>
+            {result.budget_limit && <p>Recovery reached its {result.budget_limit === 'calls' ? 'call' : 'time'} limit.</p>}
             {result.issues?.map((issue, index) => (
               <p key={index}>{issue.detail}{issue.requirements?.length
                 ? ` Missing evidence · ${issue.requirements.join(', ')}.` : ''}</p>
