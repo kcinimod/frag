@@ -160,3 +160,14 @@ time before and after each action and discard results that arrive past the
 limit. Reuse the recorded elapsed checkpoints on offline replay so machine
 speed cannot change the replayed stop reason.
 [Bounded recovery validation](../artifacts/phase03/BOUNDED_RECOVERY.md)
+
+## Bounded filing context recovery
+
+Use a shared final context limit and allow explicit replay to constrain what
+the first pass sees. Bounded retrieval follows table and disclosure references
+from eligible observations in the pinned snapshot. It checks the locators
+against the preserved original and counts each follow-up against the existing
+budget. The calculator uses the facts and comparison evidence selected for the
+answer. Keep the earlier retrieval versions replayable so the original
+validation records remain reproducible.
+[Phase 3 handoff](../artifacts/phase03/HANDOFF.md)

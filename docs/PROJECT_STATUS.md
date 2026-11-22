@@ -49,3 +49,7 @@ Phase 2 calculator and its offline results.
   omitted FY2022, and bounded retrieval recovered it and replayed the
   6.88% answer offline with the original citations.
   [Bounded recovery](../artifacts/phase03/BOUNDED_RECOVERY.md)
+- Issue #16 adds bounded recovery of original statement and disclosure context.
+  The paired Phase 3 comparison replayed 11 cases in both modes, with offline
+  citation validation and Windows resource measurements.
+  [Phase 3 handoff](../artifacts/phase03/HANDOFF.md)

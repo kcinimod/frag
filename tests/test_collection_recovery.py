@@ -13,6 +13,7 @@ from frag.cli import main
 from frag.revenue import PRIOR_ACCESSION, extract_revenue
 from frag.store import SourceMetadata, SourceStore
 from frag.verification import inspect_revenue
+from frag.web import create_app
 
 
 def _preserve_anchor(tmp_path: Path) -> tuple[str, str]:
@@ -22,6 +23,76 @@ def _preserve_anchor(tmp_path: Path) -> tuple[str, str]:
     success("ingest", str(filing), "--provenance", "local_original", *store)
     filing.unlink()
     return store
+
+
+def test_bounded_question_recovers_parent_and_disclosures_with_offline_citations(tmp_path: Path) -> None:
+    store = _preserve_anchor(tmp_path)
+    options = ("--initial-context-limit", "2", *store)
+    baseline = success("ask-collection", GROWTH_QUESTION, *options)
+    assert baseline["stop_reason"] == "missing_context"
+    assert "note-8" in baseline["issues"][0]["requirements"]
+    assert len(baseline["observations"]) == 2
+
+    record = tmp_path / "context.json"
+    answer = success("ask-collection", GROWTH_QUESTION, "--mode", "bounded", "--record", str(record), *options)
+    assert answer["percent"] == {"unit": "percent", "value": "6.88"}
+    run = json.loads(record.read_bytes())
+    assert [action["operation"] for action in run["actions"]] == ["get_parent", "get_source", "calculate"]
+    assert any(item["kind"] == "parent" for item in run["selected_context"])
+    assert "note-8" in {item["id"] for item in run["selected_context"]}
+    assert answer == success("replay-collection", str(record), *store)
+    client = create_app(SourceStore(Path(store[1])), tmp_path).test_client()
+    note = next(citation for citation in answer["citations"] if citation["id"] == "note-8")
+    assert "On March 4, 2022" in client.get(note["href"]).text
+    table = next(citation for citation in answer["citations"] if citation["id"] == "statement-table-25")
+    table_excerpt = client.get(table["href"]).text
+    assert "income statements" in table_excerpt.casefold()
+    assert "(In millions, except per share amounts)" in table_excerpt
+
+    run["actions"][0]["arguments"]["parent_id"] = "table-999"
+    record.write_text(json.dumps(run), encoding="utf-8")
+    rejected = invoke("replay-collection", str(record), *store)
+    assert rejected.returncode == 1
+    assert "does not match the replayed run" in rejected.stderr
+
+
+def test_failed_context_recovery_stops_before_following_another_filing(tmp_path: Path) -> None:
+    store = SourceStore(tmp_path / "store")
+    fixture = (ROOT / "tests/fixtures/synthetic_growth_zero.html").read_bytes()
+    question = "Synthetic Zero Example revenue growth from FY2022 to FY2023"
+    for broken in (True, False):
+        original = fixture if broken else fixture + b"\n<!-- Second preserved fixture -->\n"
+
+        def verify_fixture(payload: bytes, source: dict[str, Any]) -> dict[str, Any]:
+            result = extract_revenue(payload, source | {"provenance": {"kind": "synthetic"}})
+            version = "synthetic-context-stop-v1"
+            for fact in result["facts"]:
+                fact.update(status="verified", evidence_version=version, applicable_notes=[{
+                    "number": 1, "title": "Synthetic note", "interpretation": question if broken else "Basis",
+                    "locator": {"start": {"line": 12, "character": 1},
+                                "end_exclusive": {"line": 999 if broken else 14, "character": 1}},
+                }])
+            return result | {"evidence_version": version, "comparison": {
+                "status": "compatible", "basis": "same_consolidated_basis", "evidence": [],
+            }}
+
+        with patch("frag.store.inspect_revenue", verify_fixture):
+            store.ingest_bytes(original, provenance="local_original",
+                               metadata=SourceMetadata(company="Synthetic Zero Example"))
+        if broken:
+            for mode in ("one-pass", "bounded"):
+                answer = success("ask-collection", question, "--mode", mode, "--store", str(store.root))
+                assert answer["status"] == "evidence_unavailable"
+                assert answer["issues"][0]["requirements"] == ["note-1"]
+                assert {item["fact"]["raw_amount"] for item in answer["observations"]} == {"0", "12"}
+
+    record = tmp_path / "two-pairs.json"
+    answer = success("ask-collection", question, "--mode", "bounded", "--initial-context-limit", "4",
+                     "--store", str(store.root), "--record", str(record))
+    assert answer["stop_reason"] == "no_progress"
+    actions = json.loads(record.read_bytes())["actions"]
+    assert [action["operation"] for action in actions] == ["get_parent", "get_source"]
+    assert actions[-1]["result"]["context_ids"] == []
 
 
 def test_bounded_question_recovers_omitted_year_and_replays(tmp_path: Path) -> None:

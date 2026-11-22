@@ -83,9 +83,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     collection.add_argument("--context-limit", type=int, default=GROWTH_CONTEXT_LIMIT,
                             help="Maximum evidence records selected for a growth question")
     collection.add_argument("--initial-fact-limit", type=int, help="Limit facts retained on the first pass")
+    collection.add_argument("--initial-context-limit", type=int,
+                            help="Maximum evidence records available to the first pass")
     collection.add_argument("--mode", choices=("one-pass", "bounded"), default="one-pass")
     collection.add_argument("--max-calls", type=int, default=DEFAULT_MAX_CALLS,
-                            help="Maximum search and calculation calls in bounded mode")
+                            help="Maximum follow-up and calculation calls in bounded mode")
     collection.add_argument("--max-seconds", type=float, default=DEFAULT_MAX_SECONDS,
                             help="Elapsed time limit for bounded question actions")
     collection_replay = commands.add_parser("replay-collection", help="Reproduce a saved collection run offline")
@@ -136,6 +138,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             question = _read_question(args.question)
             result = ask_collection(CollectionIndex.build(store), question, record=collection_record,
                                     context_limit=args.context_limit, initial_fact_limit=args.initial_fact_limit,
+                                    initial_context_limit=args.initial_context_limit,
                                     mode=args.mode, budget=RecoveryBudget(args.max_calls, args.max_seconds))
             if args.record and collection_record is not None:
                 _write_validation_record(args.record, collection_record)

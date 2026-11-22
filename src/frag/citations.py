@@ -4,6 +4,7 @@ import re
 from html.parser import HTMLParser
 from typing import Any
 
+from frag.income_html import is_statement_heading
 from frag.store import SourceError
 from frag.verification import REFERENCE
 
@@ -62,9 +63,24 @@ class _ExcerptText(HTMLParser):
 
 
 def citation_text(original: bytes, source_hash: str, citation: dict[str, Any]) -> str:
-    lines = original.decode("utf-8-sig").split("\n")
+    return citation_lines(original.decode("utf-8-sig").split("\n"), source_hash, citation)
+
+
+def citation_lines(lines: list[str], source_hash: str, citation: dict[str, Any]) -> str:
     locator = citation["locator"]
     heading = f'{citation["title"]}\nSource SHA-256 · {source_hash}\n'
+    if "table_locators" in citation:
+        table = _fragment_at(lines, locator)
+        context = citation["table_locators"]
+        statement = _visible_text(_fragment_at(lines, context["statement_heading"]))
+        if (not re.match(r"<table[\s>]", table, re.IGNORECASE)
+                or not is_statement_heading(statement)
+                or not all(context[key]["table"] == locator["table"] for key in ("annual_header", "unit_header"))):
+            raise SourceError("The statement table cannot be opened at its verified locators.")
+        annual, unit = (_cell_text(lines, context[key]) for key in ("annual_header", "unit_header"))
+        if not annual or not unit:
+            raise SourceError("The statement table headers are unavailable.")
+        return f"{heading}{_position(locator)} · table {locator['table']}\n\n{statement}\n{annual}\n{unit}\n"
     if "context_locators" in citation:
         excerpt = "\n".join(
             _cell_text(lines, position)
@@ -77,14 +93,17 @@ def citation_text(original: bytes, source_hash: str, citation: dict[str, Any]) -
         )
         return f"{heading}{_position(locator)} · {coordinates}\n\n{excerpt}\n"
     start, end = locator["start"], locator["end_exclusive"]
-    first_line, last_line = start["line"] - 1, end["line"] - 1
     # The current verification reference uses whole-line disclosure ranges.
-    if start["character"] != 1 or end["character"] != 1:
+    if (start.get("character") != 1 or end.get("character") != 1
+            or type(start.get("line")) is not int or type(end.get("line")) is not int
+            or not 1 <= start["line"] < end["line"] <= len(lines) + 1):
         raise SourceError("Unsupported disclosure locator.")
     if source_hash == REFERENCE["identity"]["source_hash"]:
         for line in REFERENCE["citation_heading_lines"].get(citation["id"], []):
             heading += f"{_visible_text(lines[line - 1])} · HTML line {line}\n"
-    excerpt = _visible_text("\n".join(lines[first_line:last_line]))
+    excerpt = _visible_text("\n".join(lines[start["line"] - 1:end["line"] - 1]))
+    if not excerpt:
+        raise SourceError("The disclosure has no visible text at its verified locator.")
     return f"{heading}{_position(start)} to {_position(end)} (exclusive)\n\n{excerpt}\n"
 
 
@@ -92,10 +111,17 @@ def _position(locator: dict[str, int]) -> str:
     return f'HTML line {locator["line"]}, character {locator["character"]}'
 
 
+def _fragment_at(lines: list[str], locator: dict[str, int]) -> str:
+    line, character = locator.get("line"), locator.get("character")
+    if (type(line) is not int or type(character) is not int
+            or not 1 <= line <= len(lines) or not 1 <= character <= len(lines[line - 1])):
+        raise SourceError("The citation position is outside the preserved original.")
+    return lines[line - 1][character - 1:]
+
+
 def _cell_text(lines: list[str], locator: dict[str, int]) -> str:
-    line, offset = locator["line"] - 1, locator["character"] - 1
     # The verified statement cells in the retained filing close on the same line.
-    fragment = lines[line][offset:]
+    fragment = _fragment_at(lines, locator)
     end = CELL_END.search(fragment)
     if not end or not fragment.startswith(("<td", "<th")):
         raise SourceError("The statement cell cannot be opened at its verified locator.")

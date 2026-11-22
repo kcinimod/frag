@@ -1,0 +1,534 @@
+{
+  "snapshot_id": "sha256:f48249aba61fceaf05ab9049ce55a1fab31101f0494d0e6dc7329e3aee78a0ff",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14",
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU, 596.56",
+  "model": null,
+  "prompt": null,
+  "warm_runs_per_question_and_mode": 3,
+  "device_vram_mib": {
+    "interval_ms": 100,
+    "samples": 88,
+    "peak": 0
+  },
+  "totals": {
+    "one-pass": {
+      "questions": 11,
+      "fact_hits": 18,
+      "available_facts": 19,
+      "complete_context": 1,
+      "supported": 1,
+      "correct_partials": 9,
+      "valid_citations": 28,
+      "citations": 28,
+      "abstentions": 10,
+      "clarifications": 1,
+      "calls": 0,
+      "median_cold_process_ms": 295.013,
+      "median_warm_cli_ms": 15.004,
+      "peak_working_set_bytes": 74092544
+    },
+    "bounded": {
+      "questions": 11,
+      "fact_hits": 19,
+      "available_facts": 19,
+      "complete_context": 5,
+      "supported": 4,
+      "correct_partials": 6,
+      "valid_citations": 56,
+      "citations": 56,
+      "abstentions": 7,
+      "clarifications": 1,
+      "calls": 15,
+      "median_cold_process_ms": 296.553,
+      "median_warm_cli_ms": 15.947,
+      "peak_working_set_bytes": 74526720
+    }
+  },
+  "questions": {
+    "complete": {
+      "one-pass": {
+        "cold_process_ms": 365.66,
+        "cold_cli_ms": 73.622,
+        "warm_cli_ms": [
+          75.624,
+          72.577,
+          71.292
+        ],
+        "cold_peak_working_set_bytes": 73375744,
+        "peak_working_set_bytes": 74092544,
+        "record": "paired-complete-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": true,
+        "category": "supported",
+        "status": "calculated",
+        "stop_reason": "sufficient_evidence",
+        "valid_citations": 10,
+        "citations": 10,
+        "calls": 0
+      },
+      "bounded": {
+        "cold_process_ms": 326.27,
+        "cold_cli_ms": 61.032,
+        "warm_cli_ms": [
+          62.374,
+          61.141,
+          60.041
+        ],
+        "cold_peak_working_set_bytes": 73166848,
+        "peak_working_set_bytes": 74276864,
+        "record": "paired-complete-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": true,
+        "category": "supported",
+        "status": "calculated",
+        "stop_reason": "sufficient_evidence",
+        "valid_citations": 10,
+        "citations": 10,
+        "calls": 1
+      }
+    },
+    "recover-year": {
+      "bounded": {
+        "cold_process_ms": 343.047,
+        "cold_cli_ms": 75.826,
+        "warm_cli_ms": [
+          63.764,
+          59.25,
+          62.272
+        ],
+        "cold_peak_working_set_bytes": 73371648,
+        "peak_working_set_bytes": 74080256,
+        "record": "paired-recover-year-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": true,
+        "category": "supported",
+        "status": "calculated",
+        "stop_reason": "sufficient_evidence",
+        "valid_citations": 10,
+        "citations": 10,
+        "calls": 2
+      },
+      "one-pass": {
+        "cold_process_ms": 295.013,
+        "cold_cli_ms": 17.463,
+        "warm_cli_ms": [
+          14.984,
+          15.614,
+          14.661
+        ],
+        "cold_peak_working_set_bytes": 51474432,
+        "peak_working_set_bytes": 52064256,
+        "record": "paired-recover-year-one-pass.json",
+        "fact_hits": 1,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_fiscal_year",
+        "valid_citations": 1,
+        "citations": 1,
+        "calls": 0
+      }
+    },
+    "recover-context": {
+      "one-pass": {
+        "cold_process_ms": 324.368,
+        "cold_cli_ms": 16.598,
+        "warm_cli_ms": [
+          14.771,
+          15.772,
+          15.236
+        ],
+        "cold_peak_working_set_bytes": 51503104,
+        "peak_working_set_bytes": 52326400,
+        "record": "paired-recover-context-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_context",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      },
+      "bounded": {
+        "cold_process_ms": 330.654,
+        "cold_cli_ms": 57.862,
+        "warm_cli_ms": [
+          56.353,
+          61.84,
+          66.383
+        ],
+        "cold_peak_working_set_bytes": 73379840,
+        "peak_working_set_bytes": 74526720,
+        "record": "paired-recover-context-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": true,
+        "category": "supported",
+        "status": "calculated",
+        "stop_reason": "sufficient_evidence",
+        "valid_citations": 10,
+        "citations": 10,
+        "calls": 3
+      }
+    },
+    "absent-year": {
+      "bounded": {
+        "cold_process_ms": 288.807,
+        "cold_cli_ms": 15.272,
+        "warm_cli_ms": [
+          13.818,
+          14.516,
+          14.688
+        ],
+        "cold_peak_working_set_bytes": 51556352,
+        "peak_working_set_bytes": 52137984,
+        "record": "paired-absent-year-bounded.json",
+        "fact_hits": 1,
+        "available_facts": 1,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "no_progress",
+        "valid_citations": 1,
+        "citations": 1,
+        "calls": 1
+      },
+      "one-pass": {
+        "cold_process_ms": 290.267,
+        "cold_cli_ms": 16.935,
+        "warm_cli_ms": [
+          15.706,
+          14.129,
+          15.978
+        ],
+        "cold_peak_working_set_bytes": 51646464,
+        "peak_working_set_bytes": 52105216,
+        "record": "paired-absent-year-one-pass.json",
+        "fact_hits": 1,
+        "available_facts": 1,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_fiscal_year",
+        "valid_citations": 1,
+        "citations": 1,
+        "calls": 0
+      }
+    },
+    "unopenable-disclosure": {
+      "one-pass": {
+        "cold_process_ms": 290.83,
+        "cold_cli_ms": 17.062,
+        "warm_cli_ms": [
+          15.551,
+          15.004,
+          14.784
+        ],
+        "cold_peak_working_set_bytes": 51449856,
+        "peak_working_set_bytes": 51978240,
+        "record": "paired-unopenable-disclosure-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_context",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      },
+      "bounded": {
+        "cold_process_ms": 296.553,
+        "cold_cli_ms": 16.408,
+        "warm_cli_ms": [
+          17.446,
+          14.778,
+          14.291
+        ],
+        "cold_peak_working_set_bytes": 51515392,
+        "peak_working_set_bytes": 52232192,
+        "record": "paired-unopenable-disclosure-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "no_progress",
+        "valid_citations": 3,
+        "citations": 3,
+        "calls": 2
+      }
+    },
+    "incompatible": {
+      "bounded": {
+        "cold_process_ms": 309.37,
+        "cold_cli_ms": 18.907,
+        "warm_cli_ms": [
+          16.096,
+          15.742,
+          15.36
+        ],
+        "cold_peak_working_set_bytes": 51605504,
+        "peak_working_set_bytes": 52207616,
+        "record": "paired-incompatible-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "no_progress",
+        "valid_citations": 4,
+        "citations": 4,
+        "calls": 1
+      },
+      "one-pass": {
+        "cold_process_ms": 291.189,
+        "cold_cli_ms": 16.381,
+        "warm_cli_ms": [
+          15.428,
+          15.556,
+          15.126
+        ],
+        "cold_peak_working_set_bytes": 51515392,
+        "peak_working_set_bytes": 52088832,
+        "record": "paired-incompatible-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "incompatible",
+        "valid_citations": 4,
+        "citations": 4,
+        "calls": 0
+      }
+    },
+    "zero-and-instructions": {
+      "one-pass": {
+        "cold_process_ms": 280.015,
+        "cold_cli_ms": 15.937,
+        "warm_cli_ms": [
+          14.579,
+          14.741,
+          20.557
+        ],
+        "cold_peak_working_set_bytes": 51539968,
+        "peak_working_set_bytes": 52080640,
+        "record": "paired-zero-and-instructions-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_context",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      },
+      "bounded": {
+        "cold_process_ms": 285.668,
+        "cold_cli_ms": 17.802,
+        "warm_cli_ms": [
+          16.498,
+          15.947,
+          15.028
+        ],
+        "cold_peak_working_set_bytes": 51453952,
+        "peak_working_set_bytes": 52297728,
+        "record": "paired-zero-and-instructions-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": true,
+        "category": "supported",
+        "status": "undefined_zero_baseline",
+        "stop_reason": "sufficient_evidence",
+        "valid_citations": 4,
+        "citations": 4,
+        "calls": 3
+      }
+    },
+    "ambiguous": {
+      "bounded": {
+        "cold_process_ms": 284.75,
+        "cold_cli_ms": 15.625,
+        "warm_cli_ms": [
+          14.318,
+          19.461,
+          14.619
+        ],
+        "cold_peak_working_set_bytes": 51601408,
+        "peak_working_set_bytes": 52088832,
+        "record": "paired-ambiguous-bounded.json",
+        "fact_hits": 0,
+        "available_facts": 0,
+        "complete_context": false,
+        "category": "clarify",
+        "status": "clarify",
+        "stop_reason": "clarify",
+        "valid_citations": 0,
+        "citations": 0,
+        "calls": 0
+      },
+      "one-pass": {
+        "cold_process_ms": 308.745,
+        "cold_cli_ms": 16.487,
+        "warm_cli_ms": [
+          14.08,
+          14.763,
+          12.911
+        ],
+        "cold_peak_working_set_bytes": 51585024,
+        "peak_working_set_bytes": 51986432,
+        "record": "paired-ambiguous-one-pass.json",
+        "fact_hits": 0,
+        "available_facts": 0,
+        "complete_context": false,
+        "category": "clarify",
+        "status": "clarify",
+        "stop_reason": "clarify",
+        "valid_citations": 0,
+        "citations": 0,
+        "calls": 0
+      }
+    },
+    "no-context-space": {
+      "one-pass": {
+        "cold_process_ms": 301.019,
+        "cold_cli_ms": 16.221,
+        "warm_cli_ms": [
+          14.287,
+          14.272,
+          15.178
+        ],
+        "cold_peak_working_set_bytes": 51642368,
+        "peak_working_set_bytes": 52355072,
+        "record": "paired-no-context-space-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_context",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      },
+      "bounded": {
+        "cold_process_ms": 283.474,
+        "cold_cli_ms": 15.909,
+        "warm_cli_ms": [
+          15.026,
+          14.015,
+          15.722
+        ],
+        "cold_peak_working_set_bytes": 51470336,
+        "peak_working_set_bytes": 52154368,
+        "record": "paired-no-context-space-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "no_progress",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      }
+    },
+    "call-limit": {
+      "bounded": {
+        "cold_process_ms": 334.817,
+        "cold_cli_ms": 60.697,
+        "warm_cli_ms": [
+          62.722,
+          61.491,
+          61.633
+        ],
+        "cold_peak_working_set_bytes": 73322496,
+        "peak_working_set_bytes": 73822208,
+        "record": "paired-call-limit-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": true,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "budget_exhausted",
+        "valid_citations": 10,
+        "citations": 10,
+        "calls": 2
+      },
+      "one-pass": {
+        "cold_process_ms": 292.973,
+        "cold_cli_ms": 17.172,
+        "warm_cli_ms": [
+          15.099,
+          14.229,
+          14.596
+        ],
+        "cold_peak_working_set_bytes": 51654656,
+        "peak_working_set_bytes": 52322304,
+        "record": "paired-call-limit-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_context",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      }
+    },
+    "time-limit": {
+      "one-pass": {
+        "cold_process_ms": 301.07,
+        "cold_cli_ms": 16.3,
+        "warm_cli_ms": [
+          14.622,
+          14.119,
+          15.126
+        ],
+        "cold_peak_working_set_bytes": 51785728,
+        "peak_working_set_bytes": 52457472,
+        "record": "paired-time-limit-one-pass.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "missing_context",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      },
+      "bounded": {
+        "cold_process_ms": 281.095,
+        "cold_cli_ms": 15.41,
+        "warm_cli_ms": [
+          14.88,
+          14.116,
+          13.644
+        ],
+        "cold_peak_working_set_bytes": 51511296,
+        "peak_working_set_bytes": 52133888,
+        "record": "paired-time-limit-bounded.json",
+        "fact_hits": 2,
+        "available_facts": 2,
+        "complete_context": false,
+        "category": "partial",
+        "status": "evidence_unavailable",
+        "stop_reason": "budget_exhausted",
+        "valid_citations": 2,
+        "citations": 2,
+        "calls": 0
+      }
+    }
+  }
+}

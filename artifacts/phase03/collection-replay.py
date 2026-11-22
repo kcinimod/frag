@@ -34,7 +34,10 @@ def audit_network(event: str, args: tuple[Any, ...]) -> None:
         assert args[0] in {"127.0.0.1", "::1", "localhost"}, "External DNS blocked."
 
 
-def replay(work: Path, *, growth_baseline: Path | None = None, freeze: bool = False, bounded: bool = False) -> None:
+def replay(
+    work: Path, *, growth_baseline: Path | None = None, freeze: bool = False,
+    bounded: bool = False, paired: bool = False,
+) -> None:
     store = work / "store"
     manifest = json.loads(MANIFEST.read_bytes())
 
@@ -104,6 +107,10 @@ def replay(work: Path, *, growth_baseline: Path | None = None, freeze: bool = Fa
         replay_growth(invoke, work, growth_baseline, freeze=freeze)
     if bounded:
         replay_bounded(invoke, work)
+    if paired:
+        from paired_comparison import compare
+
+        compare(work, invoke, Path(__file__).resolve())
 
 
 def replay_bounded(invoke: Callable[..., dict[str, Any]], work: Path) -> None:
@@ -158,9 +165,11 @@ def replay_growth(
             with saved.open("x", encoding="utf-8", newline="\n") as output:
                 json.dump(validation, output, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
                 output.write("\n")
-        assert validation == json.loads(saved.read_bytes())
+        saved_validation = json.loads(saved.read_bytes())
+        if validation["search_version"] == saved_validation["search_version"]:
+            assert validation == saved_validation
         started = perf_counter()
-        assert answer == invoke("replay-collection", str(saved), *store_options)
+        assert saved_validation["outcome"] == invoke("replay-collection", str(saved), *store_options)
         replay_ms = (perf_counter() - started) * 1000
         print(f'{case}: {answer["status"]} ({answer["stop_reason"]}). '
               f'Offline record matched. Ask {ask_ms:.1f} ms, replay {replay_ms:.1f} ms.')
@@ -320,19 +329,25 @@ def smoke_browser(work: Path, *, bounded: bool = False) -> None:
 
 
 def main() -> None:
+    sys.addaudithook(audit_network)
+    if sys.argv[1:2] == ["--comparison-worker"]:
+        from paired_comparison import worker
+
+        worker(sys.argv[2:])
+        return
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-dir", type=Path, help="Keep the store and validation records in this new directory.")
     parser.add_argument("--browser", action="store_true", help="Open the original cells using Chromium and Playwright.")
     parser.add_argument("--bounded", action="store_true", help="Save and replay bounded recovery validation records.")
+    parser.add_argument("--paired", action="store_true", help="Measure both modes on the frozen Windows corpus.")
     growth = parser.add_mutually_exclusive_group()
     growth.add_argument("--growth", action="store_true", help="Check the retained one-pass growth baseline.")
     growth.add_argument("--freeze-growth", type=Path, help="Write growth baseline records to a new directory.")
     args = parser.parse_args()
-    sys.addaudithook(audit_network)
 
     def validate(work: Path) -> None:
         replay(work, growth_baseline=GROWTH_BASELINE if args.growth else args.freeze_growth,
-               freeze=args.freeze_growth is not None, bounded=args.bounded)
+               freeze=args.freeze_growth is not None, bounded=args.bounded, paired=args.paired)
         if args.browser:
             smoke_browser(work, bounded=args.bounded)
 

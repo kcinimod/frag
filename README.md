@@ -300,6 +300,17 @@ $recoveryRun = Join-Path 'build' ([guid]::NewGuid().ToString())
 
 [Bounded recovery cases and budget behavior](artifacts/phase03/BOUNDED_RECOVERY.md)
 
+To reproduce the paired Phase 3 comparison on Windows, make sure
+`nvidia-smi` is on PATH and run the harness with a new output directory.
+It uses the preserved corpus, records both modes for each question, and
+reopens the cited evidence offline.
+
+```powershell
+.venv/Scripts/python.exe artifacts/phase03/collection-replay.py --paired --work-dir .venv/phase03-paired
+```
+
+[Phase 3 handoff and measured results](artifacts/phase03/HANDOFF.md)
+
 Omit the question argument to enter it at the prompt. The application creates
 a validation record only when you pass `--record`.
 [Corpus, expected results, and browser smoke commands](artifacts/phase03/COLLECTION_HANDOFF.md)
