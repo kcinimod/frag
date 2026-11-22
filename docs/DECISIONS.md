@@ -137,3 +137,13 @@ Resolve company, operation, and reporting period before keyword ranking and
 structured selection. Pin explicit replay to the exact recorded source set
 and validate its versions, candidate ranking, and outcome.
 [Collection handoff](../artifacts/phase03/COLLECTION_HANDOFF.md)
+
+## One-pass collection revenue growth
+
+Apply the context limit to revenue observations and separately selected
+comparison records and disclosures. Require a verified comparative and
+current pair from one filing and route that pair through the deterministic
+calculator. Keep selected verified observations and open requirements when
+coverage is incomplete. Include comparison evidence in the snapshot hash
+so replay detects changes to the basis and disclosures.
+[Growth baseline](../artifacts/phase03/GROWTH_BASELINE.md)

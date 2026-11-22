@@ -9,6 +9,46 @@ from frag.cli import main
 ROOT = Path(__file__).resolve().parents[1]
 ANCHOR = ROOT / "artifacts/phase01/originals/msft-20230630.htm.gz"
 PRIOR = ROOT / "artifacts/phase03/originals/msft-10k_20220630.htm.gz"
+GROWTH_QUESTION = "What was Microsoft's reported consolidated revenue growth from FY2022 to FY2023?"
+
+
+def test_collection_growth_cli_uses_selected_verified_pair(tmp_path: Path) -> None:
+    from test_source_workflow import success
+
+    filing = tmp_path / "filing.html"
+    filing.write_bytes(gzip.decompress(ANCHOR.read_bytes()))
+    store_args = ("--store", str(tmp_path / "store"))
+    source = success("ingest", str(filing), "--provenance", "local_original", *store_args)
+    filing.unlink()
+    record = tmp_path / "growth.json"
+    result = success("ask-collection", GROWTH_QUESTION, "--record", str(record), *store_args)
+    assert result["status"] == "calculated"
+    assert result["percent"] == {"unit": "percent", "value": "6.88"}
+    assert result["trace"][0]["result"] == "13645000000"
+    assert [citation["locator"]["line"] for citation in result["citations"][:2]] == [4403, 4399]
+    assert result["scope_caveats"]
+    assert all(citation["source_hash"] == source["source_hash"] for citation in result["citations"])
+    assert result == success("replay-collection", str(record), *store_args)
+    validation = json.loads(record.read_bytes())
+    assert set(validation["selected_evidence_ids"]) == {fact["fact_id"] for fact in result["operands"]}
+    assert "note-8" in {item["id"] for item in validation["selected_context"]}
+
+
+def test_collection_growth_reports_context_missing_from_actual_selection(tmp_path: Path) -> None:
+    from test_source_workflow import success
+
+    filing = tmp_path / "filing.html"
+    filing.write_bytes(gzip.decompress(ANCHOR.read_bytes()))
+    store_args = ("--store", str(tmp_path / "store"))
+    success("ingest", str(filing), "--provenance", "local_original", *store_args)
+    result = success("ask-collection", GROWTH_QUESTION, "--context-limit", "2", *store_args)
+    assert result["status"] == "evidence_unavailable"
+    assert result["percent"] is None
+    assert result["stop_reason"] == "missing_context"
+    assert "note-8" in result["issues"][0]["requirements"]
+    assert {item["fact"]["normalized_amount"] for item in result["observations"]} == {
+        "198270000000", "211915000000",
+    }
 
 
 def test_collection_cli_returns_verified_reporting_periods(
@@ -108,3 +148,13 @@ def test_collection_browser_api_opens_original_cell(tmp_path: Path) -> None:
     assert source["source_hash"] in body
     assert body.endswith("Total revenue\n2023\n(In millions, except per share amounts)\n211,915\n")
     assert client.get(href.rsplit("/", 1)[0] + "/stale-version").status_code == 404
+
+    growth = client.post(path, json={"question": GROWTH_QUESTION}, headers={"X-Frag-Ask": "1"}).get_json()
+    assert growth["percent"]["value"] == "6.88"
+    for citation in growth["citations"]:
+        excerpt = client.get(citation["href"])
+        assert excerpt.status_code == 200
+        assert source["source_hash"] in excerpt.text
+        if citation["id"] == "note-8":
+            assert "On March 4, 2022" in excerpt.text
+            assert client.get(citation["href"].rsplit("/", 1)[0] + "/stale-disclosure").status_code == 404

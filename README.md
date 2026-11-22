@@ -277,6 +277,16 @@ $collectionRecord = Join-Path $collectionRun 'manual-lookup.json'
 .venv/Scripts/frag.exe replay-collection $collectionRecord --store $collectionStore
 ```
 
+The same question entry point accepts reported consolidated revenue growth.
+
+```powershell
+.venv/Scripts/frag.exe ask-collection "What was Microsoft's reported consolidated revenue growth from FY2022 to FY2023?" --store $collectionStore
+.venv/Scripts/python.exe artifacts/phase03/collection-replay.py --growth
+```
+
+See the [one-pass growth baseline](artifacts/phase03/GROWTH_BASELINE.md) for
+the retained offline runs and context limit.
+
 Omit the question argument to enter it at the prompt. The application creates
 a validation record only when you pass `--record`.
 [Corpus, expected results, and browser smoke commands](artifacts/phase03/COLLECTION_HANDOFF.md)

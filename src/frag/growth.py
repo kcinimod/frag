@@ -108,21 +108,25 @@ def _comparison_issue(
 
 
 def _citations(operands: list[dict[str, Any]], comparison: dict[str, Any]) -> list[dict[str, Any]]:
-    citations: dict[str, dict[str, Any]] = {}
-    for fact in operands:
-        citations[fact["role"]] = revenue_cell_citation(fact, fact["role"])
-    for fact in operands:
-        for note in fact["applicable_notes"]:
-            number = note["number"]
-            citation_id = f"note-{number}"
-            citations[citation_id] = {
-                "id": citation_id, "title": f'Note {number} · {note["title"]}', "locator": note["locator"],
-            }
-    for disclosure in comparison.get("evidence", []):
-        citation_id = disclosure["id"]
-        citations[citation_id] = {
-            "id": citation_id,
-            "title": disclosure["id"].replace("_", " ").capitalize(),
-            "locator": disclosure["locator"],
+    return [
+        *(revenue_cell_citation(fact, fact["role"]) for fact in operands),
+        *disclosure_citations(operands, comparison).values(),
+    ]
+
+
+def disclosure_citations(facts: list[dict[str, Any]], comparison: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        note_citation_id(note): {
+            "id": note_citation_id(note), "title": f'Note {note["number"]} · {note["title"]}',
+            "locator": note["locator"],
         }
-    return list(citations.values())
+        for fact in facts for note in fact["applicable_notes"]
+    } | {
+        item["id"]: {"id": item["id"], "title": item["id"].replace("_", " ").capitalize(),
+                     "locator": item["locator"]}
+        for item in comparison.get("evidence", [])
+    }
+
+
+def note_citation_id(note: dict[str, Any]) -> str:
+    return f'note-{note["number"]}'

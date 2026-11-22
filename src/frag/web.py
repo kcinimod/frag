@@ -56,9 +56,13 @@ def create_app(store: SourceStore, assets: Path, *, planner: Planner = propose_l
         return response
 
     @app.get("/api/collection/citations/<source_id>/<fact_id>/<fingerprint>")
-    def collection_citation(source_id: str, fact_id: str, fingerprint: str) -> Response:
+    @app.get("/api/collection/citations/<source_id>/<fact_id>/<fingerprint>/<citation_id>/<citation_hash>")
+    def collection_citation(
+        source_id: str, fact_id: str, fingerprint: str,
+        citation_id: str | None = None, citation_hash: str | None = None,
+    ) -> Response:
         return Response(
-            collection_excerpt(store, source_id, fact_id, fingerprint),
+            collection_excerpt(store, source_id, fact_id, fingerprint, citation_id, citation_hash),
             mimetype="text/plain",
             headers={"X-Content-Type-Options": "nosniff"},
         )

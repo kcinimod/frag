@@ -9,7 +9,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Sequence
 
-from frag.collection import CollectionIndex, ask_collection, replay_collection
+from frag.collection import GROWTH_CONTEXT_LIMIT, CollectionIndex, ask_collection, replay_collection
 from frag.growth import calculate_growth
 from frag.local_model import propose_lookup
 from frag.lookup import ask_revenue, replay_revenue
@@ -73,10 +73,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     replay.add_argument("--store", type=Path, required=True)
     collection_index = commands.add_parser("index-collection", help="Build and show the validated local index snapshot")
     collection_index.add_argument("--store", type=Path, required=True)
-    collection = commands.add_parser("ask-collection", help="Search preserved filings for verified annual revenue")
+    collection = commands.add_parser("ask-collection", help="Search preserved filings for annual revenue and growth")
     collection.add_argument("question", nargs="?", help="Question text. Omit to read from standard input.")
     collection.add_argument("--store", type=Path, required=True)
     collection.add_argument("--record", type=Path, help="Save the candidates and outcome to a new JSON file")
+    collection.add_argument("--context-limit", type=int, default=GROWTH_CONTEXT_LIMIT,
+                            help="Maximum evidence records selected for a growth question")
     collection_replay = commands.add_parser("replay-collection", help="Reproduce a saved collection run offline")
     collection_replay.add_argument("record", type=Path)
     collection_replay.add_argument("--store", type=Path, required=True)
@@ -123,7 +125,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.record and args.record.exists():
                 raise SourceError("Choose a new validation record path.")
             question = _read_question(args.question)
-            result = ask_collection(CollectionIndex.build(store), question, record=collection_record)
+            result = ask_collection(CollectionIndex.build(store), question, record=collection_record,
+                                    context_limit=args.context_limit)
             if args.record and collection_record is not None:
                 _write_validation_record(args.record, collection_record)
         elif args.command == "replay-collection":

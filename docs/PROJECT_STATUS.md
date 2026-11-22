@@ -41,3 +41,7 @@ Phase 2 calculator and its offline results.
   The offline corpus reproduced Microsoft FY2022 and FY2023 revenue and
   Chrome opened both original cells.
   [Collection handoff](../artifacts/phase03/COLLECTION_HANDOFF.md)
+- Issue #14 adds one-pass revenue growth across the collection. The offline
+  baseline reproduced 6.88% for Microsoft FY2022 to FY2023 and retained
+  partial, incompatible, and zero-baseline runs.
+  [Growth baseline](../artifacts/phase03/GROWTH_BASELINE.md)

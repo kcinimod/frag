@@ -110,7 +110,7 @@ type GrowthResult = {
   operands: (RevenueFact & { role: 'prior' | 'current' })[];
   issues: GrowthIssue[];
   trace: { operation: string; inputs: string[]; result: string }[];
-  citations: { id: string; title: string }[];
+  citations: { id: string; title: string; href?: string }[];
   comparison_basis: string | null;
   scope_caveats: string[];
   evidence_version: string | null;
@@ -175,7 +175,7 @@ function GrowthCalculator({ source }: { source: Source }) {
   );
 }
 
-function GrowthAnswer({ result, path }: { result: GrowthResult; path: string }) {
+function GrowthAnswer({ result, path }: { result: GrowthResult; path?: string }) {
   const citationQuery = new URLSearchParams({
     prior: String(result.prior_year), current: String(result.current_year),
   });
@@ -212,7 +212,7 @@ function GrowthAnswer({ result, path }: { result: GrowthResult; path: string }) 
           <h4>Original filing evidence</h4>
           <ul>{result.citations.map(citation => (
             <li key={citation.id}>
-              <a href={`${path}/citations/${encodeURIComponent(citation.id)}?${citationQuery}`}
+              <a href={citation.href ?? `${path}/citations/${encodeURIComponent(citation.id)}?${citationQuery}`}
                 target="_blank" rel="noopener noreferrer">{citation.title}</a>
             </li>
           ))}</ul>
@@ -296,7 +296,10 @@ type CollectionResult =
       citations: CollectionCitation[] }
   | { status: 'conflicting_evidence'; message: string;
       alternatives: { fact: RevenueFact; citation: CollectionCitation }[] }
-  | { status: 'clarify' | 'evidence_unavailable'; message: string };
+  | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline'; request: { company: string } })
+  | { status: 'clarify' | 'evidence_unavailable'; message: string;
+      observations?: { fact: RevenueFact & { basis: string }; citation: CollectionCitation }[];
+      issues?: { detail: string; requirements?: string[] }[]; citations?: CollectionCitation[] };
 
 function CollectionLookup() {
   const [result, setResult] = useState<CollectionResult>();
@@ -327,7 +330,7 @@ function CollectionLookup() {
       <h2 id="collection-title">Ask the collection</h2>
       <form onSubmit={submit} onChange={() => { setResult(undefined); setError(''); }}>
         <label>
-          Question about annual company revenue
+          Question about annual company revenue or growth
           <input name="question" placeholder="What was Microsoft's revenue in FY2023?"
             autoComplete="off" required maxLength={300} disabled={pending} />
         </label>
@@ -345,7 +348,32 @@ function CollectionLookup() {
             ))}
           </>
         )}
+        {(result?.status === 'calculated' || result?.status === 'undefined_zero_baseline') && (
+          <>
+            <p><strong>{result.request.company} reported consolidated revenue growth</strong></p>
+            <GrowthAnswer result={result} />
+          </>
+        )}
         {result && 'message' in result && <p>{result.message}</p>}
+        {result?.status === 'evidence_unavailable' && (
+          <>
+            {result.issues?.map((issue, index) => (
+              <p key={index}>{issue.detail}{issue.requirements?.length
+                ? ` Missing evidence · ${issue.requirements.join(', ')}.` : ''}</p>
+            ))}
+            {!!result.observations?.length && (
+              <ul>{result.observations.map(({ fact, citation }) => (
+                <li key={fact.fact_id}>
+                  {revenueAmount(fact)} · {fact.basis}{' '}
+                  <a href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
+                </li>
+              ))}</ul>
+            )}
+            {result.citations?.map(citation => (
+              <a key={citation.href} href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
+            ))}
+          </>
+        )}
         {result?.status === 'conflicting_evidence' && (
           <ul>{result.alternatives.map(({ fact, citation }) => (
             <li key={fact.fact_id}>{revenueAmount(fact)} ·{' '}
