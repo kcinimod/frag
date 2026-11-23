@@ -326,3 +326,7 @@ result summary.
 ```
 
 [PowerShell commands for pinned input acquisition and a fresh dev run](artifacts/phase04/FINQA_DIAGNOSTIC.md)
+
+Use the [offline scoring parity commands](artifacts/phase04/FINQA_DIAGNOSTIC.md#offline-scoring-parity)
+to check execution and program matches against the pinned FinQA evaluator
+and account for every question in the saved dev cohort.

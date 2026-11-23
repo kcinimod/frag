@@ -63,3 +63,7 @@ Phase 2 calculator and its offline results.
   questions. The run retains the split audit, delivered planner inputs,
   attempted plans, and deterministic outcomes for offline replay.
   [FinQA dev diagnostic](../artifacts/phase04/FINQA_DIAGNOSTIC.md)
+- Issue #19 replayed and scored all 13 dev cases with the pinned upstream
+  evaluator. Execution and program matches were both 2/13, including ten
+  invalid plans in the denominator.
+  [FinQA score report](../artifacts/phase04/finqa-dev-score.json)

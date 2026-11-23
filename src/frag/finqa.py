@@ -12,6 +12,7 @@ from time import perf_counter
 from typing import Any, Sequence
 
 from frag.finqa_program import ARITHMETIC, CONSTANTS, MAX_STEPS, REDUCTIONS, Excerpt, evaluate_proposal
+from frag.finqa_scoring import score_cases
 from frag.local_model import (
     MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable, propose_lookup,
 )
@@ -60,17 +61,18 @@ def _provenance() -> dict[str, Any]:
 
 
 def _load_splits(cache: Path) -> dict[str, dict[str, dict[str, Any]]]:
-    splits: dict[str, dict[str, dict[str, Any]]] = {}
-    for name, expected in INPUT_HASHES.items():
-        raw = (cache / name).read_bytes()
-        if sha256(raw).hexdigest() != expected:
-            raise ValueError(f"{name} does not match the pinned SHA-256")
-        rows = json.loads(raw)
-        split = {row["id"]: row for row in rows}
-        if len(split) != len(rows):
-            raise ValueError(f"{name} has duplicate question IDs")
-        splits[Path(name).stem] = split
-    return splits
+    return {Path(name).stem: _load_split(cache, name) for name in INPUT_HASHES}
+
+
+def _load_split(cache: Path, name: str) -> dict[str, dict[str, Any]]:
+    raw = (cache / name).read_bytes()
+    if sha256(raw).hexdigest() != INPUT_HASHES[name]:
+        raise ValueError(f"{name} does not match the pinned SHA-256")
+    rows = json.loads(raw)
+    split = {row["id"]: row for row in rows}
+    if len(split) != len(rows):
+        raise ValueError(f"{name} has duplicate question IDs")
+    return split
 
 
 def _overlap(splits: dict[str, dict[str, dict[str, Any]]]) -> dict[str, Any]:
@@ -239,6 +241,40 @@ def _replay(record: dict[str, Any]) -> dict[str, Any]:
     return {"replayed": len(ids), "summary": summary}
 
 
+def _score_record(cache: Path, record: dict[str, Any], cohort: Any) -> dict[str, Any]:
+    if (not isinstance(cohort, list) or not cohort
+            or not all(isinstance(item, str) and item for item in cohort)
+            or len(set(cohort)) != len(cohort)):
+        raise ValueError("The cohort must contain unique question IDs")
+    cases = record["cases"]
+    ids = [case["id"] for case in cases]
+    if len(set(ids)) != len(ids):
+        raise ValueError("The record has duplicate outcome IDs")
+    missing = sorted(set(cohort) - set(ids))
+    unexpected = sorted(set(ids) - set(cohort))
+    if missing or unexpected:
+        raise ValueError(f"Outcomes differ from cohort: missing IDs {missing}, unexpected IDs {unexpected}")
+    _replay(record)
+    dev = _load_split(cache, "dev.json")
+    for case in cases:
+        case_id = case["id"]
+        if case_id not in dev:
+            raise ValueError(f"{case_id} is absent from the pinned dev split")
+        row = dev[case_id]
+        qa = row["qa"]
+        reference = {"execution_answer": qa["exe_ans"], "program": qa["program"]}
+        excerpts = [asdict(excerpt) for excerpt in _annotated_excerpts(row)]
+        if (case["reference"] != reference or case["question"] != qa["question"]
+                or _digest(case["source_excerpts"]) != _digest(excerpts)):
+            raise ValueError(f"{case_id} differs from the pinned question, references or excerpts")
+    return {
+        "version": 1, "mode": record["mode"], "split": record["split"], "upstream": _provenance(),
+        "cohort_ids": cohort, "diagnostic_digest": _digest(record),
+        **score_cases(cache / "evaluate.py", SCORER_SHA256, {case["id"]: case for case in cases},
+                      [dev[case_id] for case_id in cohort]),
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m frag.finqa")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -250,6 +286,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     cohort.add_argument("--cohort", type=Path, help="JSON array of dev IDs")
     replay = commands.add_parser("replay", help="Replay the saved prompt, proposal and outcome offline")
     replay.add_argument("record", type=Path)
+    score = commands.add_parser("score", help="Score a replayable dev cohort with the pinned FinQA evaluator")
+    score.add_argument("cache", type=Path)
+    score.add_argument("record", type=Path)
+    score.add_argument("report", type=Path, help="New JSON report with upstream predictions and per-ID results")
+    score.add_argument("--cohort", type=Path, required=True, help="Independent JSON array of expected dev IDs")
     args = parser.parse_args(argv)
     try:
         if args.command == "run":
@@ -262,8 +303,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             with args.record.open("x", encoding="utf-8", newline="\n") as output:
                 output.write(json.dumps(record, indent=2) + "\n")
             result = record["summary"]
-        else:
+        elif args.command == "replay":
             result = _replay(json.loads(args.record.read_bytes()))
+        else:
+            if args.report.exists():
+                raise ValueError("Choose a new scoring report path")
+            report = _score_record(args.cache, json.loads(args.record.read_bytes()),
+                                   json.loads(args.cohort.read_bytes()))
+            with args.report.open("x", encoding="utf-8", newline="\n") as output:
+                output.write(json.dumps(report, indent=2, allow_nan=False) + "\n")
+            result = report["summary"]
     except (OSError, ValueError, KeyError, IndexError, TypeError) as exc:
         print(json.dumps({"error": str(exc)}), file=sys.stderr)
         return 1

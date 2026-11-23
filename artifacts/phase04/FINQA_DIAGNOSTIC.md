@@ -11,8 +11,10 @@ execution answer. One averaged a table row when the question required a
 division. Validation rejected the other ten plans for unsupported operands
 or invalid table references. All 13 outcomes replayed after the local
 server stopped, with every selected excerpt fitting the context budget.
-The `2/13` result is an internal answer-match count for this coverage
-sample. Upstream scoring parity and public-test evaluation are pending.
+The pinned upstream scorer reproduced 2/13 execution matches and returned
+2/13 symbolic program matches. The [saved score report](finqa-dev-score.json)
+accounts for all 13 selected dev IDs. These are internal coverage-sample
+results. Public-test evaluation is pending.
 
 The [saved run](finqa-dev-run.json) records the upstream revision and hashes,
 the overlap audit, the model identity, and one record per question. Inspect
@@ -52,8 +54,7 @@ Use the pinned files from the [FinQA upstream revision](https://github.com/czyss
 The download step fetches the files once. If downloads are unavailable, place
 the same bytes in `build/finqa`. Running the diagnostic checks the hashes of
 the three split files before reading question IDs or calling the planner.
-The pinned upstream evaluator is retained in the download cache for future
-scoring parity work.
+The download also caches the pinned upstream evaluator for offline scoring.
 
 ```powershell
 $ErrorActionPreference = 'Stop'
@@ -94,5 +95,34 @@ Run the diagnostic's synthetic CLI checks and repository type check.
 .venv/Scripts/python.exe -m pytest -q tests/test_finqa_workflow.py
 .venv/Scripts/python.exe -m mypy
 ```
+
+## Offline scoring parity
+
+From the repository root in PowerShell, install the locked scorer dependencies
+in a separate environment. The scoring command reads the pinned `dev.json`
+and `evaluate.py` from the download cache and replays the saved diagnostic.
+
+```powershell
+$env:UV_PROJECT_ENVIRONMENT = 'build/finqa-venv'
+uv sync --group finqa-scoring --locked
+$report = Join-Path 'build' ("finqa-score-" + [guid]::NewGuid().ToString() + ".json")
+build/finqa-venv/Scripts/python.exe -m frag.finqa score build/finqa artifacts/phase04/finqa-dev-run.json $report --cohort artifacts/phase04/finqa-dev-cohort.json
+Get-Content $report
+build/finqa-venv/Scripts/python.exe -m pytest -q tests/test_finqa_scoring.py
+```
+
+The cohort manifest supplies the expected IDs independently of the saved run.
+Missing, unexpected, and duplicate IDs cause scoring to fail. The JSON
+`predictions` array is the upstream prediction format. Each invalid plan,
+execution failure, or abstention contributes an `["EOF"]` prediction and
+keeps its original status in `cases`. The scorer receives one prediction
+for every cohort ID.
+
+Inspect `cases` for replay and upstream values, execution matches, symbolic
+program matches, and per-question discrepancies. The top-level
+`discrepancies` and `upstream_log` retain aggregate scorer details.
+Ambiguous upstream table row labels can prevent translation. The synthetic
+parity tests cover this case and verify that the report keeps the original
+denominator and marks parity unresolved.
 
 The retained FinQA excerpts carry the [upstream MIT license](FINQA_LICENSE.txt).

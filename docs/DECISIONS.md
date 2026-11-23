@@ -193,5 +193,11 @@ exact request sent to the planner.
 FinQA program validation limits numeric literals to the question and
 delivered excerpts, permits the upstream constant vocabulary, and requires
 table reductions to name a delivered data row. Record operand locations in
-the execution trace. The dev run reports internal answer matches while
-upstream scoring parity is pending.
+the execution trace. The dev coverage sample reports internal scores.
+
+Use a separate cohort manifest to check that every expected ID has one
+outcome before scoring. Submit every ID to the pinned scorer in its
+prediction format, with an EOF-only prediction when no executable program
+is available. Compare each translated execution with replay and reconcile
+per-question matches with the upstream aggregate. Record discrepancies
+when the upstream row-label syntax cannot represent a selected table row.

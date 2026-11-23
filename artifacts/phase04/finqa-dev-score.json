@@ -1,0 +1,486 @@
+{
+  "version": 1,
+  "mode": "annotated_evidence",
+  "split": "dev",
+  "upstream": {
+    "repository": "https://github.com/czyssrs/FinQA",
+    "revision": "0f16e2867befa6840783e58be38c9efb9229d742",
+    "split_sha256": {
+      "train.json": "49f237eb9779b569473b26b08048867d04635a7cc39ad6a7a5664c55bb428db6",
+      "dev.json": "a847fb7e0d61a3125a1e2909852df6b89f1ee64d2c5ff1bf689e332214deee51",
+      "test.json": "831dbfb2e785dbc227f895ce3f24046433467aec67b09db2bd6ac7692a8a30dc"
+    },
+    "scorer_path": "code/evaluate/evaluate.py",
+    "scorer_sha256": "845cd131cab843eceff256cf6d392978cc470a7da4a80107beb56027fdca5c13"
+  },
+  "cohort_ids": [
+    "ETR/2011/page_341.pdf-3",
+    "PM/2017/page_38.pdf-1",
+    "V/2008/page_17.pdf-1",
+    "AMT/2010/page_34.pdf-2",
+    "PNC/2009/page_46.pdf-3",
+    "UNP/2011/page_76.pdf-2",
+    "AES/2016/page_191.pdf-3",
+    "GS/2014/page_136.pdf-1",
+    "AON/2009/page_46.pdf-2",
+    "ABMD/2009/page_56.pdf-1",
+    "DVN/2007/page_58.pdf-2",
+    "STT/2008/page_83.pdf-2",
+    "APD/2018/page_59.pdf-1"
+  ],
+  "diagnostic_digest": "94c5a900648b38aa042550c39cffbce2a3822581aca9a17b85c48dd8cd256b2b",
+  "summary": {
+    "score_label": "internal",
+    "parity": "verified",
+    "denominator": 13,
+    "statuses": {
+      "invalid_plan": 10,
+      "executed": 3
+    },
+    "execution_matches": 2,
+    "program_matches": 2,
+    "upstream_execution_accuracy": 0.15384615384615385,
+    "upstream_program_accuracy": 0.15384615384615385
+  },
+  "predictions": [
+    {
+      "id": "ETR/2011/page_341.pdf-3",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "PM/2017/page_38.pdf-1",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "V/2008/page_17.pdf-1",
+      "predicted": [
+        "table_average(",
+        "american express",
+        "none",
+        ")",
+        "EOF"
+      ]
+    },
+    {
+      "id": "AMT/2010/page_34.pdf-2",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "PNC/2009/page_46.pdf-3",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "UNP/2011/page_76.pdf-2",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "AES/2016/page_191.pdf-3",
+      "predicted": [
+        "table_average(",
+        "settlements",
+        "none",
+        ")",
+        "EOF"
+      ]
+    },
+    {
+      "id": "GS/2014/page_136.pdf-1",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "AON/2009/page_46.pdf-2",
+      "predicted": [
+        "table_min(",
+        "segment operating income",
+        "none",
+        ")",
+        "EOF"
+      ]
+    },
+    {
+      "id": "ABMD/2009/page_56.pdf-1",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "DVN/2007/page_58.pdf-2",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "STT/2008/page_83.pdf-2",
+      "predicted": [
+        "EOF"
+      ]
+    },
+    {
+      "id": "APD/2018/page_59.pdf-1",
+      "predicted": [
+        "EOF"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "ETR/2011/page_341.pdf-3",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 has an unsupported operand 'table_2'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 19.2,
+        "program": "add(18.9, 0.3)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "PM/2017/page_38.pdf-1",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 2 has an unsupported operand '6.4% ( 6.4 % )'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 688.0,
+        "program": "subtract(11503, 10815)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "V/2008/page_17.pdf-1",
+      "status": "executed",
+      "outcome": {
+        "status": "executed",
+        "program": [
+          [
+            "table_average",
+            "table_3",
+            "none"
+          ]
+        ],
+        "trace": [
+          {
+            "step": 0,
+            "instruction": [
+              "table_average",
+              "table_3",
+              "none"
+            ],
+            "sources": [
+              [
+                "table_3"
+              ],
+              []
+            ],
+            "operands": [
+              637.0,
+              647.0,
+              5.0,
+              86.0
+            ],
+            "result": 343.75
+          }
+        ],
+        "value": 343.75
+      },
+      "reference": {
+        "execution_answer": 127.4,
+        "program": "divide(637, const_5)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": 343.75,
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "AMT/2010/page_34.pdf-2",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 22556579533.35,
+        "program": "multiply(397612895, 56.73)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "PNC/2009/page_46.pdf-3",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 1 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": "no",
+        "program": "greater(14, 19)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "UNP/2011/page_76.pdf-2",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 2 has an unsupported operand 'result_1'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": "yes",
+        "program": "greater(284, 197)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "AES/2016/page_191.pdf-3",
+      "status": "executed",
+      "outcome": {
+        "status": "executed",
+        "program": [
+          [
+            "table_average",
+            "table_6",
+            "none"
+          ]
+        ],
+        "trace": [
+          {
+            "step": 0,
+            "instruction": [
+              "table_average",
+              "table_6",
+              "none"
+            ],
+            "sources": [
+              [
+                "table_6"
+              ],
+              []
+            ],
+            "operands": [
+              -13.0,
+              -19.0,
+              -2.0
+            ],
+            "result": -11.333333333333334
+          }
+        ],
+        "value": -11.33333
+      },
+      "reference": {
+        "execution_answer": -11.33333,
+        "program": "table_average(settlements, none)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": -11.33333,
+        "execution_match": true,
+        "program_match": true
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "GS/2014/page_136.pdf-1",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 has an unsupported operand 'table_2_source'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 6999.0,
+        "program": "table_max(hedged borrowings and bank deposits, none)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "AON/2009/page_46.pdf-2",
+      "status": "executed",
+      "outcome": {
+        "status": "executed",
+        "program": [
+          [
+            "table_min",
+            "table_2",
+            "none"
+          ]
+        ],
+        "trace": [
+          {
+            "step": 0,
+            "instruction": [
+              "table_min",
+              "table_2",
+              "none"
+            ],
+            "sources": [
+              [
+                "table_2"
+              ],
+              []
+            ],
+            "operands": [
+              900.0,
+              846.0,
+              954.0
+            ],
+            "result": 846.0
+          }
+        ],
+        "value": 846.0
+      },
+      "reference": {
+        "execution_answer": 846.0,
+        "program": "table_min(segment operating income, none)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": 846.0,
+        "execution_match": true,
+        "program_match": true
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "ABMD/2009/page_56.pdf-1",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 1 has an unsupported operand '$ 20147'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 40294.0,
+        "program": "table_sum(total obligations, none)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "DVN/2007/page_58.pdf-2",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 24.69136,
+        "program": "divide(60, 243), multiply(#0, const_100)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "STT/2008/page_83.pdf-2",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 1 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 1.25,
+        "program": "add(1.1, 1.4), divide(#0, const_2)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    },
+    {
+      "id": "APD/2018/page_59.pdf-1",
+      "status": "invalid_plan",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 has an unsupported operand '$4409.2'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 4302.67611,
+        "program": "divide(6.9%, const_100), add(const_1, #0), exp(#1, 10), multiply(4273.1, #2)"
+      },
+      "upstream": {
+        "invalid_flag": 0,
+        "value": "n/a",
+        "execution_match": false,
+        "program_match": false
+      },
+      "discrepancies": []
+    }
+  ],
+  "discrepancies": [],
+  "upstream_log": "All:  13\nExe acc:  0.15384615384615385\nProg acc:  0.15384615384615385\n"
+}
