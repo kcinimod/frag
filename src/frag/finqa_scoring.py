@@ -93,6 +93,8 @@ def score_cases(
                 discrepancies.append("Upstream execution differs from the replayed result")
             if upstream["execution_match"] != case["internal_answer_match"]:
                 discrepancies.append("Upstream execution match differs from the internal answer match")
+            if upstream["program_match"] and upstream["value"] != case["reference"]["execution_answer"]:
+                discrepancies.append("Upstream symbolic match returned a different reference value")
             execution_matches += upstream["execution_match"]
             program_matches += upstream["program_match"]
         comparisons.append({

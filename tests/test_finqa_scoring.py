@@ -42,6 +42,8 @@ def diagnostic(
     } for case_id, _, reference, answer, _ in CASES]
     if getattr(request, "param", None) == "ambiguous-row":
         next(row for row in rows if row["id"] == "max")["table"].append(["Net sales", "4", "1"])
+    if getattr(request, "param", None) == "inconsistent-reference":
+        next(row for row in rows if row["id"] == "add")["qa"]["exe_ans"] = 20
     hashes = {}
     for name, data in {"train.json": [], "test.json": [], "dev.json": rows}.items():
         raw = json.dumps(data).encode()
@@ -121,6 +123,24 @@ def test_ambiguous_upstream_table_label_is_recorded_as_a_parity_discrepancy(
     assert case["outcome"]["value"] == 12
     assert not case["upstream"]["execution_match"]
     assert any("cannot uniquely address" in reason for reason in case["discrepancies"])
+
+
+@pytest.mark.parametrize("diagnostic", ["inconsistent-reference"], indirect=True)
+def test_score_identifies_the_id_that_caused_the_upstream_consistency_assertion(
+    diagnostic: tuple[Path, Path, Path, Path], pinned_scorer: bytes,
+) -> None:
+    cache, record, report, cohort = diagnostic
+    (cache / "evaluate.py").write_bytes(pinned_scorer)
+    assert finqa.main(["score", str(cache), str(record), str(report), "--cohort", str(cohort)]) == 0
+    result = json.loads(report.read_bytes())
+    assert result["summary"]["parity"] == "unresolved"
+    assert result["summary"]["denominator"] == 14
+    assert result["summary"]["upstream_program_accuracy"] is None
+    case = result["cases"][0]
+    assert case["id"] == "add"
+    assert case["upstream"]["program_match"] is True
+    assert case["upstream"]["execution_match"] is False
+    assert case["discrepancies"] == ["Upstream symbolic match returned a different reference value"]
 
 
 def test_score_rejects_an_evaluator_whose_hash_differs(
