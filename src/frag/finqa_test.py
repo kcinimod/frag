@@ -84,7 +84,8 @@ def _summary(protocol: dict[str, Any], modes: dict[str, list[dict[str, Any]]]) -
 def _snapshot(connection: sqlite3.Connection, protocol: dict[str, Any]) -> dict[str, Any]:
     saved: dict[str, dict[str, Any]] = {mode: {} for mode in comparison.MODES}
     ids = set(protocol["cohort_ids"])
-    for mode, case_id, payload in connection.execute("SELECT mode, question_id, payload FROM outcome"):
+    outcomes = connection.execute("SELECT mode, question_id, payload FROM outcome").fetchall()
+    for mode, case_id, payload in outcomes:
         case = json.loads(payload)
         if mode not in saved or case_id not in ids or case["id"] != case_id:
             raise ValueError("Checkpoint contains an outcome outside the pinned protocol")
@@ -105,7 +106,7 @@ def run(
     rows = finqa._load_split(cache, "test.json")
     protocol = _protocol(rows, model_directory is not None)
     identity = finqa._digest(protocol)
-    with closing(sqlite3.connect(checkpoint, timeout=0)) as connection:
+    with closing(sqlite3.connect(checkpoint, timeout=30)) as connection:
         with connection:
             connection.execute("BEGIN IMMEDIATE")
             connection.execute("CREATE TABLE IF NOT EXISTS protocol (id INTEGER PRIMARY KEY CHECK (id = 1), "

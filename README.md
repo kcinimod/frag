@@ -340,5 +340,20 @@ include the measured results and the protocol frozen for public test.
 ## FinQA public test
 
 Run or resume the same pinned public test cohort in both evidence modes.
-The [Windows commands](artifacts/phase04/FINQA_PUBLIC_TEST.md) cover the
-checkpoint, progress inspection, offline scoring, and replay.
+Use the [pinned input and runtime setup](artifacts/phase04/FINQA_PUBLIC_TEST.md#run-resume-and-inspect-on-windows).
+Run these commands from the repository root in Windows PowerShell.
+
+```powershell
+$env:TEMP = (Resolve-Path build).Path
+$env:TMP = $env:TEMP
+$cache = 'build/finqa'
+$checkpoint = Join-Path $cache 'public-test.sqlite'
+$report = 'artifacts/phase04/finqa-public-test-report.json.gz'
+build/finqa-venv/Scripts/python.exe -m frag.finqa_test run $cache $checkpoint
+build/finqa-venv/Scripts/python.exe -m frag.finqa_test status $cache $checkpoint
+build/finqa-venv/Scripts/python.exe -m frag.finqa_test score $cache $checkpoint $report
+build/finqa-venv/Scripts/python.exe -m frag.finqa_test replay $cache $report
+```
+
+Use the same checkpoint to resume. The status command can also run in a
+second window during inference.
