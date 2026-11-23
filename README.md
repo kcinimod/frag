@@ -336,3 +336,9 @@ and account for every question in the saved dev cohort.
 The paired dev evaluation compares annotated excerpts with keyword retrieval
 on the same questions. The [Windows run and offline replay instructions](artifacts/phase04/FINQA_COMPARISON.md)
 include the measured results and the protocol frozen for public test.
+
+## FinQA public test
+
+Run or resume the same pinned public test cohort in both evidence modes.
+The [Windows commands](artifacts/phase04/FINQA_PUBLIC_TEST.md) cover the
+checkpoint, progress inspection, offline scoring, and replay.

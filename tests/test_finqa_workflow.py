@@ -9,6 +9,47 @@ import pytest
 from frag import finqa, finqa_comparison
 
 
+def test_synthetic_public_test_resumes_by_id(
+    synthetic_cache: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from frag import finqa_test
+
+    test_path = synthetic_cache / "test.json"
+    row = json.loads((synthetic_cache / "dev.json").read_bytes())[0]
+    test_path.write_text(json.dumps([
+        {**row, "id": "synthetic-public-a"}, {**row, "id": "synthetic-public-b"},
+    ]), encoding="utf-8")
+    monkeypatch.setitem(finqa.INPUT_HASHES, "test.json", sha256(test_path.read_bytes()).hexdigest())
+    checkpoint = synthetic_cache / "checkpoint.sqlite"
+    calls = 0
+
+    def interrupted(payload: dict[str, Any]) -> str:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise KeyboardInterrupt
+        return '{"program":[]}'
+
+    with pytest.raises(KeyboardInterrupt):
+        finqa_test.run(synthetic_cache, checkpoint, planner=interrupted)
+
+    def resumed(payload: dict[str, Any]) -> str:
+        return '{"program":[["subtract","12","7"]]}'
+
+    record = finqa_test.run(synthetic_cache, checkpoint, planner=resumed)
+    assert record["cohort_ids"] == ["synthetic-public-a", "synthetic-public-b"]
+    assert record["summary"]["coverage"] == {
+        "annotated_evidence": {"completed": 2, "expected": 2},
+        "retrieved_evidence": {"completed": 2, "expected": 2},
+    }
+    assert record["summary"]["answer_transitions"] == {"retrieval_improvement": 1, "both_correct": 1}
+    assert finqa_test.run(synthetic_cache, checkpoint, planner=interrupted) == record
+
+    monkeypatch.setattr(finqa, "CONTEXT_BYTES", 2000)
+    with pytest.raises(ValueError, match="frozen"):
+        finqa_test.run(synthetic_cache, checkpoint, planner=resumed)
+
+
 @pytest.fixture
 def synthetic_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     row = {

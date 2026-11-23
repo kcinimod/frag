@@ -212,3 +212,14 @@ the same 2,800-byte evidence budget in both
 modes. Keep the frozen settings and full coverage as the public test
 acceptance criteria and use no numeric accuracy threshold.
 [Measured dev comparison and frozen protocol](../artifacts/phase04/FINQA_COMPARISON.md)
+
+## FinQA public test checkpoints
+
+Use the pinned test split's question order and a SQLite checkpoint keyed by
+evidence mode and question ID. Commit each completed outcome in one
+transaction. Compare the checkpoint's cohort, upstream hashes, and
+configuration with the frozen protocol before resuming. A scored report
+uses the full denominator in both modes. Keep counts internal unless the
+pinned evaluator agrees with replay and the per-question and aggregate
+scores reconcile in both modes.
+[FinQA public test run and replay](../artifacts/phase04/FINQA_PUBLIC_TEST.md)

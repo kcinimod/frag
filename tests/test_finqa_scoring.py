@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from frag import finqa
+from frag import finqa, finqa_test
 
 
 # Synthetic examples with independently worked answers. Only the evaluator is upstream.
@@ -104,6 +104,44 @@ def test_pinned_evaluator_scores_all_benchmark_operations_and_counts_failures(
         assert case["discrepancies"] == []
     assert result["predictions"][2]["predicted"] == ["multiply(", "25%", "12", ")", "EOF"]
     assert result["predictions"][7]["predicted"] == ["table_max(", "Net sales", "none", ")", "EOF"]
+
+
+def test_public_test_scores_complete_checkpoint_and_replays_both_modes(
+    diagnostic: tuple[Path, Path, Path, Path], pinned_scorer: bytes,
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    cache, _, report, _ = diagnostic
+    (cache / "evaluate.py").write_bytes(pinned_scorer)
+    raw = (cache / "dev.json").read_bytes()
+    (cache / "test.json").write_bytes(raw)
+    monkeypatch.setitem(finqa.INPUT_HASHES, "test.json", sha256(raw).hexdigest())
+    checkpoint = cache / "test.sqlite"
+
+    def stopped(payload: dict[str, Any]) -> str:
+        raise KeyboardInterrupt
+
+    with pytest.raises(KeyboardInterrupt):
+        finqa_test.run(cache, checkpoint, planner=stopped)
+    score = ["score", str(cache), str(checkpoint), str(report)]
+    assert finqa_test.main(score) == 1
+    assert "one outcome per public test ID" in capsys.readouterr().err
+    assert not report.exists()
+
+    finqa_test.run(cache, checkpoint, planner=lambda payload: '{"program":[]}')
+    assert finqa_test.main(score) == 0
+    saved = json.loads(report.read_bytes())
+    for mode, result in saved["scores"].items():
+        assert result["summary"]["parity"] == "verified"
+        assert result["summary"]["score_label"] == "internal"
+        assert result["summary"]["denominator"] == 14
+        assert result["summary"]["statuses"] == {"abstained": 14}
+        assert [case["id"] for case in saved["modes"][mode]] == saved["cohort_ids"]
+    replay = ["replay", str(cache), str(report)]
+    assert finqa_test.main(replay) == 0
+    saved["modes"]["retrieved_evidence"][1] = saved["modes"]["retrieved_evidence"][0]
+    report.write_text(json.dumps(saved), encoding="utf-8")
+    assert finqa_test.main(replay) == 1
+    assert "one outcome per public test ID" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("diagnostic", ["ambiguous-row"], indirect=True)
