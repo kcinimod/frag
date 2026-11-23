@@ -201,3 +201,13 @@ prediction format, with an EOF-only prediction when no executable program
 is available. Compare each translated execution with replay and reconcile
 per-question matches with the upstream aggregate. Record discrepancies
 when the upstream row-label syntax cannot represent a selected table row.
+
+## Frozen FinQA evidence comparison
+
+Use Qwen2.5-1.5B-Instruct Q4_K_M with four CPU threads and no GPU offload
+for both modes. Keep zero demonstrations and one planner attempt per
+question. Rank retrieved passages and table rows by distinct question
+keyword overlap and apply the same 2,800-byte evidence budget in both
+modes. Keep the frozen settings and full coverage as the public test
+acceptance criteria and use no numeric accuracy threshold.
+[Measured dev comparison and frozen protocol](../artifacts/phase04/FINQA_COMPARISON.md)

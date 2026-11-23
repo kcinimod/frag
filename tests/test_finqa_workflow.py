@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from frag import finqa
+from frag import finqa, finqa_comparison, local_model
 
 
 @pytest.fixture
@@ -101,3 +101,53 @@ def test_synthetic_diagnostic_keeps_plan_failures_in_the_replayed_cohort(
     assert finqa.main(["replay", str(output)]) == 0
     summary = json.loads(capsys.readouterr().out)["summary"]
     assert summary == {"cases": 1, "score_label": "internal", "statuses": {status: 1}, "answer_matches": 0}
+
+
+def test_synthetic_comparison_traces_ranking_and_replays_both_modes(
+    synthetic_cache: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    delivered: list[dict[str, Any]] = []
+
+    def planner(payload: dict[str, Any]) -> str:
+        delivered.append(payload)
+        return '{"program":[["subtract","12","7"]]}'
+
+    record = finqa_comparison.run(synthetic_cache, ["synthetic-dev"], planner=planner)
+    annotated = record["modes"]["annotated_evidence"][0]
+    retrieved = record["modes"]["retrieved_evidence"][0]
+    assert delivered == [annotated["planner_input"], retrieved["planner_input"]]
+    assert delivered[0]["messages"][0] == delivered[1]["messages"][0]
+    assert {key: value for key, value in delivered[0].items() if key != "messages"} == {
+        key: value for key, value in delivered[1].items() if key != "messages"
+    }
+    assert [item["id"] for item in retrieved["ranking"]] == ["text_0", "table_1", "text_1", "text_2"]
+    assert retrieved["annotated_evidence_omitted"] == {"ranking": ["text_2"], "context": []}
+    assert annotated["outcome"]["value"] == retrieved["outcome"]["value"] == 5.0
+    assert "REFERENCE" not in json.dumps(delivered)
+    assert "ANNOTATION VALUE" not in json.dumps(delivered)
+    monkeypatch.setattr(local_model, "propose_lookup", lambda *args, **kwargs: pytest.fail("Replay called the planner"))
+    saved = synthetic_cache / "comparison.json"
+    saved.write_text(json.dumps(record), encoding="utf-8")
+    assert finqa_comparison.main(["replay", str(synthetic_cache), str(saved)]) == 0
+    assert json.loads(capsys.readouterr().out)["answer_transitions"] == {"both_correct": 1}
+
+
+def test_synthetic_comparison_distinguishes_budget_omissions_from_ranking_omissions(
+    synthetic_cache: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = synthetic_cache / "dev.json"
+    rows = json.loads(path.read_bytes())
+    rows[0]["pre_text"][0] += " Long passage." * 300
+    path.write_text(json.dumps(rows), encoding="utf-8")
+    monkeypatch.setitem(finqa.INPUT_HASHES, "dev.json", sha256(path.read_bytes()).hexdigest())
+    record = finqa_comparison.run(synthetic_cache, ["synthetic-dev"], planner=lambda payload: '{"program":[]}')
+    cases = record["modes"]
+    assert cases["annotated_evidence"][0]["annotated_evidence_omitted"] == {"ranking": [], "context": ["text_0"]}
+    retrieved = cases["retrieved_evidence"][0]
+    assert retrieved["annotated_evidence_omitted"] == {"ranking": ["text_2"], "context": ["text_0"]}
+    assert [item["id"] for item in json.loads(retrieved["planner_input"]["messages"][1]["content"])["excerpts"]] == [
+        "table_0", "table_1",
+    ]
+    retrieved["ranking"].reverse()
+    with pytest.raises(ValueError, match="differs from the pinned question, evidence or references"):
+        finqa_comparison.replay(synthetic_cache, record)

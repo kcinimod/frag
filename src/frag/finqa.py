@@ -9,7 +9,7 @@ from hashlib import sha256
 from itertools import combinations
 from pathlib import Path
 from time import perf_counter
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 from frag.finqa_program import ARITHMETIC, CONSTANTS, MAX_STEPS, REDUCTIONS, Excerpt, evaluate_proposal
 from frag.finqa_scoring import score_cases
@@ -157,15 +157,19 @@ def _score(outcome: dict[str, Any], reference: dict[str, Any]) -> bool:
     return outcome["status"] == "executed" and bool(outcome["value"] == reference["execution_answer"])
 
 
-def _run_case(row: dict[str, Any]) -> dict[str, Any]:
+def _run_case(
+    row: dict[str, Any], excerpts: list[Excerpt] | None = None, *,
+    model: str = MODEL_ALIAS, planner: Callable[[dict[str, Any]], str] | None = None,
+) -> dict[str, Any]:
     qa = row["qa"]
     question = qa["question"]
-    excerpts = _annotated_excerpts(row)
-    payload, selected, omitted = _planner_input(question, excerpts, MODEL_ALIAS)
+    if excerpts is None:
+        excerpts = _annotated_excerpts(row)
+    payload, selected, omitted = _planner_input(question, excerpts, model)
     proposal = None
     started = perf_counter()
     try:
-        proposal = propose_lookup(payload)
+        proposal = (planner or propose_lookup)(payload)
         outcome = evaluate_proposal(proposal, question, selected)
     except (TimeoutError, ModelUnavailable, InvalidModelResponse) as exc:
         outcome = {"status": PLANNER_FAILURES[type(exc)], "trace": []}
@@ -221,24 +225,28 @@ def _replay(record: dict[str, Any]) -> dict[str, Any]:
             Excerpt(item["id"], tuple(item["source"]) if isinstance(item["source"], list) else item["source"])
             for item in case["source_excerpts"]
         ]
-        question = case["question"]
-        payload, selected, omitted = _planner_input(question, excerpts, record["model_alias"])
-        if payload != case["planner_input"] or omitted != case["omitted_excerpt_ids"]:
-            raise ValueError(f"{case['id']} planner input differs from the recorded input")
-        proposal = case["proposal"]
-        saved = case["outcome"]
-        if proposal is None and saved["status"] in PLANNER_FAILURES.values():
-            outcome = {"status": saved["status"], "trace": []}
-        elif isinstance(proposal, str):
-            outcome = evaluate_proposal(proposal, question, selected)
-        else:
-            raise ValueError(f"{case['id']} has an invalid proposal record")
-        if outcome != saved or _score(outcome, case["reference"]) != case["internal_answer_match"]:
-            raise ValueError(f"{case['id']} does not reproduce its recorded outcome")
+        _replay_case(case, excerpts, record["model_alias"])
     summary = _summary(cases)
     if summary != record["summary"]:
         raise ValueError("FinQA recorded summary differs from replay")
     return {"replayed": len(ids), "summary": summary}
+
+
+def _replay_case(case: dict[str, Any], excerpts: list[Excerpt], model: str) -> None:
+    question = case["question"]
+    payload, selected, omitted = _planner_input(question, excerpts, model)
+    if payload != case["planner_input"] or omitted != case["omitted_excerpt_ids"]:
+        raise ValueError(f"{case['id']} planner input differs from the recorded input")
+    proposal = case["proposal"]
+    saved = case["outcome"]
+    if proposal is None and saved["status"] in PLANNER_FAILURES.values():
+        outcome = {"status": saved["status"], "trace": []}
+    elif isinstance(proposal, str):
+        outcome = evaluate_proposal(proposal, question, selected)
+    else:
+        raise ValueError(f"{case['id']} has an invalid proposal record")
+    if outcome != saved or _score(outcome, case["reference"]) != case["internal_answer_match"]:
+        raise ValueError(f"{case['id']} does not reproduce its recorded outcome")
 
 
 def _score_record(cache: Path, record: dict[str, Any], cohort: Any) -> dict[str, Any]:

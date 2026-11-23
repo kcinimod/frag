@@ -31,8 +31,10 @@ class InvalidModelResponse(Exception):
     pass
 
 
-def propose_lookup(payload: dict[str, Any]) -> str:
-    connection = http.client.HTTPConnection(HOST, PORT, timeout=TIMEOUT_SECONDS)
+def propose_lookup(
+    payload: dict[str, Any], *, expected_model: str | None = None, port: int | None = None,
+) -> str:
+    connection = http.client.HTTPConnection(HOST, PORT if port is None else port, timeout=TIMEOUT_SECONDS)
     try:
         connection.request(
             "POST", "/v1/chat/completions", json.dumps(payload),
@@ -53,7 +55,8 @@ def propose_lookup(payload: dict[str, Any]) -> str:
         if len(body) > 64 * 1024:
             raise ValueError
         decoded = json.loads(body)
-        if decoded["model"] != MODEL_ALIAS or decoded["system_fingerprint"] != RUNTIME_FINGERPRINT:
+        if (decoded["model"] != (expected_model or MODEL_ALIAS)
+                or decoded["system_fingerprint"] != RUNTIME_FINGERPRINT):
             raise ModelUnavailable
         choice = decoded["choices"][0]
         proposal = choice["message"]["content"]

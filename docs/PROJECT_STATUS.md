@@ -67,3 +67,7 @@ Phase 2 calculator and its offline results.
   evaluator. Execution and program matches were both 2/13, including ten
   invalid plans in the denominator.
   [FinQA score report](../artifacts/phase04/finqa-dev-score.json)
+- Issue #20 compares both FinQA evidence modes on the same 13 dev questions,
+  records ranking and context losses, measures the local Windows runtime,
+  and freezes the settings for the public test evaluation.
+  [FinQA evidence comparison](../artifacts/phase04/FINQA_COMPARISON.md)

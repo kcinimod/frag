@@ -330,3 +330,9 @@ result summary.
 Use the [offline scoring parity commands](artifacts/phase04/FINQA_DIAGNOSTIC.md#offline-scoring-parity)
 to check execution and program matches against the pinned FinQA evaluator
 and account for every question in the saved dev cohort.
+
+## FinQA evidence comparison
+
+The paired dev evaluation compares annotated excerpts with keyword retrieval
+on the same questions. The [Windows run and offline replay instructions](artifacts/phase04/FINQA_COMPARISON.md)
+include the measured results and the protocol frozen for public test.
