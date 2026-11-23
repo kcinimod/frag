@@ -1,0 +1,1280 @@
+{
+  "version": 1,
+  "mode": "annotated_evidence",
+  "split": "dev",
+  "cohort_ids": [
+    "ETR/2011/page_341.pdf-3",
+    "PM/2017/page_38.pdf-1",
+    "V/2008/page_17.pdf-1",
+    "AMT/2010/page_34.pdf-2",
+    "PNC/2009/page_46.pdf-3",
+    "UNP/2011/page_76.pdf-2",
+    "AES/2016/page_191.pdf-3",
+    "GS/2014/page_136.pdf-1",
+    "AON/2009/page_46.pdf-2",
+    "ABMD/2009/page_56.pdf-1",
+    "DVN/2007/page_58.pdf-2",
+    "STT/2008/page_83.pdf-2",
+    "APD/2018/page_59.pdf-1"
+  ],
+  "upstream": {
+    "repository": "https://github.com/czyssrs/FinQA",
+    "revision": "0f16e2867befa6840783e58be38c9efb9229d742",
+    "split_sha256": {
+      "train.json": "49f237eb9779b569473b26b08048867d04635a7cc39ad6a7a5664c55bb428db6",
+      "dev.json": "a847fb7e0d61a3125a1e2909852df6b89f1ee64d2c5ff1bf689e332214deee51",
+      "test.json": "831dbfb2e785dbc227f895ce3f24046433467aec67b09db2bd6ac7692a8a30dc"
+    },
+    "scorer_path": "code/evaluate/evaluate.py",
+    "scorer_sha256": "845cd131cab843eceff256cf6d392978cc470a7da4a80107beb56027fdca5c13"
+  },
+  "overlap_audit": {
+    "split_sizes": {
+      "train": 6251,
+      "dev": 883,
+      "test": 1147
+    },
+    "shared_keys": {
+      "train/dev": {
+        "question_ids": 0,
+        "source_pages": 0,
+        "issuer_years": 197,
+        "normalized_questions": 16,
+        "exact_source_content": 0
+      },
+      "train/test": {
+        "question_ids": 0,
+        "source_pages": 0,
+        "issuer_years": 243,
+        "normalized_questions": 7,
+        "exact_source_content": 0
+      },
+      "dev/test": {
+        "question_ids": 0,
+        "source_pages": 0,
+        "issuer_years": 93,
+        "normalized_questions": 2,
+        "exact_source_content": 0
+      }
+    }
+  },
+  "demonstration_ids": [],
+  "model_alias": "frag-qwen25-15b-q4km",
+  "model_settings": {
+    "runtime": "llama.cpp b6500-a7a98e0f",
+    "weights": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+    "revision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+    "quantization": "Q4_K_M",
+    "context_size": 4096,
+    "threads": 4,
+    "gpu_layers": 0,
+    "parallel": 1,
+    "offline": true,
+    "timeout_seconds": 30
+  },
+  "context_bytes": 2800,
+  "cases": [
+    {
+      "id": "ETR/2011/page_341.pdf-3",
+      "source_page": "ETR/2011/page_341.pdf",
+      "question": "in 2010 what was the net change in net revenue in millions",
+      "annotated_ids": [
+        "table_2",
+        "table_3"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "",
+            "amount ( in millions )"
+          ]
+        },
+        {
+          "id": "table_2",
+          "source": [
+            "volume/weather",
+            "18.9"
+          ]
+        },
+        {
+          "id": "table_3",
+          "source": [
+            "other",
+            "-0.3 ( 0.3 )"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"in 2010 what was the net change in net revenue in millions\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"\",\"amount ( in millions )\"]},{\"id\":\"table_2\",\"source\":[\"volume/weather\",\"18.9\"]},{\"id\":\"table_3\",\"source\":[\"other\",\"-0.3 ( 0.3 )\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"subtract\",\"table_2\",\"table_3\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 has an unsupported operand 'table_2'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 19.2,
+        "program": "add(18.9, 0.3)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 2.357
+    },
+    {
+      "id": "PM/2017/page_38.pdf-1",
+      "source_page": "PM/2017/page_38.pdf",
+      "question": "what was the change in millions of operating income from 2016 to 2017?",
+      "annotated_ids": [
+        "table_3"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "( in millions )",
+            "for the years ended december 31 , 2017",
+            "for the years ended december 31 , 2016",
+            "for the years ended december 31 , $",
+            "% (  % )"
+          ]
+        },
+        {
+          "id": "table_3",
+          "source": [
+            "operating income",
+            "11503",
+            "10815",
+            "688",
+            "6.4% ( 6.4 % )"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"what was the change in millions of operating income from 2016 to 2017?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"( in millions )\",\"for the years ended december 31 , 2017\",\"for the years ended december 31 , 2016\",\"for the years ended december 31 , $\",\"% (  % )\"]},{\"id\":\"table_3\",\"source\":[\"operating income\",\"11503\",\"10815\",\"688\",\"6.4% ( 6.4 % )\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"subtract\",\"11503\",\"10815\"],[\"divide\",\"#0\",\"688\"],[\"multiply\",\"#1\",\"6.4% ( 6.4 % )\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 2 has an unsupported operand '6.4% ( 6.4 % )'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 688.0,
+        "program": "subtract(11503, 10815)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.896
+    },
+    {
+      "id": "V/2008/page_17.pdf-1",
+      "source_page": "V/2008/page_17.pdf",
+      "question": "what is the average payment volume per transaction for american express?",
+      "annotated_ids": [
+        "table_3"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "company",
+            "payments volume ( billions )",
+            "total volume ( billions )",
+            "total transactions ( billions )",
+            "cards ( millions )"
+          ]
+        },
+        {
+          "id": "table_3",
+          "source": [
+            "american express",
+            "637",
+            "647",
+            "5.0",
+            "86"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"what is the average payment volume per transaction for american express?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"company\",\"payments volume ( billions )\",\"total volume ( billions )\",\"total transactions ( billions )\",\"cards ( millions )\"]},{\"id\":\"table_3\",\"source\":[\"american express\",\"637\",\"647\",\"5.0\",\"86\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_average\",\"table_3\",\"none\"]]}",
+      "outcome": {
+        "status": "executed",
+        "program": [
+          [
+            "table_average",
+            "table_3",
+            "none"
+          ]
+        ],
+        "trace": [
+          {
+            "step": 0,
+            "instruction": [
+              "table_average",
+              "table_3",
+              "none"
+            ],
+            "sources": [
+              [
+                "table_3"
+              ],
+              []
+            ],
+            "operands": [
+              637.0,
+              647.0,
+              5.0,
+              86.0
+            ],
+            "result": 343.75
+          }
+        ],
+        "value": 343.75
+      },
+      "reference": {
+        "execution_answer": 127.4,
+        "program": "divide(637, const_5)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 4.389
+    },
+    {
+      "id": "AMT/2010/page_34.pdf-2",
+      "source_page": "AMT/2010/page_34.pdf",
+      "question": "on february 112011 what was the market capitalization",
+      "annotated_ids": [
+        "text_2",
+        "text_3"
+      ],
+      "source_excerpts": [
+        {
+          "id": "text_2",
+          "source": "on february 11 , 2011 , the closing price of our common stock was $ 56.73 per share as reported on the nyse ."
+        },
+        {
+          "id": "text_3",
+          "source": "as of february 11 , 2011 , we had 397612895 outstanding shares of common stock and 463 registered holders ."
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"on february 112011 what was the market capitalization\",\"excerpts\":[{\"id\":\"text_2\",\"source\":\"on february 11 , 2011 , the closing price of our common stock was $ 56.73 per share as reported on the nyse .\"},{\"id\":\"text_3\",\"source\":\"as of february 11 , 2011 , we had 397612895 outstanding shares of common stock and 463 registered holders .\"}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_sum\",\"table_1\",\"none\"], [\"divide\",\"#1\",\"const_1000000\"], [\"subtract\",\"#0\",\"const_1000000\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 22556579533.35,
+        "program": "multiply(397612895, 56.73)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.793
+    },
+    {
+      "id": "PNC/2009/page_46.pdf-3",
+      "source_page": "PNC/2009/page_46.pdf",
+      "question": "did the share of securities rated aaa/aaa increase between 2008 and 2009?",
+      "annotated_ids": [
+        "table_1"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "",
+            "december 31 2009",
+            "december 312008"
+          ]
+        },
+        {
+          "id": "table_1",
+          "source": [
+            "aaa/aaa",
+            "14% ( 14 % )",
+            "19% ( 19 % )"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"did the share of securities rated aaa/aaa increase between 2008 and 2009?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"\",\"december 31 2009\",\"december 312008\"]},{\"id\":\"table_1\",\"source\":[\"aaa/aaa\",\"14% ( 14 % )\",\"19% ( 19 % )\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_max\",\"table_1\",\"none\"], [\"table_min\",\"table_0\",\"none\"], [\"subtract\",\"none\",\"1\"], [\"greater\",\"none\",\"1\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 1 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": "no",
+        "program": "greater(14, 19)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.206
+    },
+    {
+      "id": "UNP/2011/page_76.pdf-2",
+      "source_page": "UNP/2011/page_76.pdf",
+      "question": "in 2011 , did the company distribute more to shareholders than debtholders?",
+      "annotated_ids": [
+        "table_4",
+        "table_6"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "millions",
+            "dec . 31 2011",
+            "dec . 31 2010"
+          ]
+        },
+        {
+          "id": "table_4",
+          "source": [
+            "dividends payable",
+            "284",
+            "183"
+          ]
+        },
+        {
+          "id": "table_6",
+          "source": [
+            "interest payable",
+            "197",
+            "200"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"in 2011 , did the company distribute more to shareholders than debtholders?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"millions\",\"dec . 31 2011\",\"dec . 31 2010\"]},{\"id\":\"table_4\",\"source\":[\"dividends payable\",\"284\",\"183\"]},{\"id\":\"table_6\",\"source\":[\"interest payable\",\"197\",\"200\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_max\",\"table_4\",\"none\"], [\"table_max\",\"table_6\",\"none\"], [\"subtract\",\"result_1\",\"result_2\"], [\"greater\",\"result_1\",\"result_2\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 2 has an unsupported operand 'result_1'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": "yes",
+        "program": "greater(284, 197)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.507
+    },
+    {
+      "id": "AES/2016/page_191.pdf-3",
+      "source_page": "AES/2016/page_191.pdf",
+      "question": "for the period ending in 2016 , what was the average amount of settlements , in millions?",
+      "annotated_ids": [
+        "table_6"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "december 31,",
+            "2016",
+            "2015",
+            "2014"
+          ]
+        },
+        {
+          "id": "table_6",
+          "source": [
+            "settlements",
+            "-13 ( 13 )",
+            "-19 ( 19 )",
+            "-2 ( 2 )"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"for the period ending in 2016 , what was the average amount of settlements , in millions?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"december 31,\",\"2016\",\"2015\",\"2014\"]},{\"id\":\"table_6\",\"source\":[\"settlements\",\"-13 ( 13 )\",\"-19 ( 19 )\",\"-2 ( 2 )\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_average\",\"table_6\",\"none\"]]}",
+      "outcome": {
+        "status": "executed",
+        "program": [
+          [
+            "table_average",
+            "table_6",
+            "none"
+          ]
+        ],
+        "trace": [
+          {
+            "step": 0,
+            "instruction": [
+              "table_average",
+              "table_6",
+              "none"
+            ],
+            "sources": [
+              [
+                "table_6"
+              ],
+              []
+            ],
+            "operands": [
+              -13.0,
+              -19.0,
+              -2.0
+            ],
+            "result": -11.333333333333334
+          }
+        ],
+        "value": -11.33333
+      },
+      "reference": {
+        "execution_answer": -11.33333,
+        "program": "table_average(settlements, none)"
+      },
+      "internal_answer_match": true,
+      "elapsed_seconds": 4.323
+    },
+    {
+      "id": "GS/2014/page_136.pdf-1",
+      "source_page": "GS/2014/page_136.pdf",
+      "question": "in millions in 2014 , 2013 , and 2012 , what was the greatest amount of hedged borrowings and bank deposits?",
+      "annotated_ids": [
+        "table_2"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "$ in millions",
+            "year ended december 2014",
+            "year ended december 2013",
+            "year ended december 2012"
+          ]
+        },
+        {
+          "id": "table_2",
+          "source": [
+            "hedged borrowings and bank deposits",
+            "-2451 ( 2451 )",
+            "6999",
+            "665"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"in millions in 2014 , 2013 , and 2012 , what was the greatest amount of hedged borrowings and bank deposits?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"$ in millions\",\"year ended december 2014\",\"year ended december 2013\",\"year ended december 2012\"]},{\"id\":\"table_2\",\"source\":[\"hedged borrowings and bank deposits\",\"-2451 ( 2451 )\",\"6999\",\"665\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"subtract\",\"table_2_source\",\"table_0_source\"], [\"greater\",\"table_2_source\",\"table_0_source\"], [\"greater\",\"table_2_source\",\"table_0_source\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 has an unsupported operand 'table_2_source'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 6999.0,
+        "program": "table_max(hedged borrowings and bank deposits, none)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.73
+    },
+    {
+      "id": "AON/2009/page_46.pdf-2",
+      "source_page": "AON/2009/page_46.pdf",
+      "question": "what is the lowest segment operating income?",
+      "annotated_ids": [
+        "table_2"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "years ended december 31,",
+            "2009",
+            "2008",
+            "2007"
+          ]
+        },
+        {
+          "id": "table_2",
+          "source": [
+            "segment operating income",
+            "900",
+            "846",
+            "954"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"what is the lowest segment operating income?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"years ended december 31,\",\"2009\",\"2008\",\"2007\"]},{\"id\":\"table_2\",\"source\":[\"segment operating income\",\"900\",\"846\",\"954\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_min\",\"table_2\",\"none\"]]}",
+      "outcome": {
+        "status": "executed",
+        "program": [
+          [
+            "table_min",
+            "table_2",
+            "none"
+          ]
+        ],
+        "trace": [
+          {
+            "step": 0,
+            "instruction": [
+              "table_min",
+              "table_2",
+              "none"
+            ],
+            "sources": [
+              [
+                "table_2"
+              ],
+              []
+            ],
+            "operands": [
+              900.0,
+              846.0,
+              954.0
+            ],
+            "result": 846.0
+          }
+        ],
+        "value": 846.0
+      },
+      "reference": {
+        "execution_answer": 846.0,
+        "program": "table_min(segment operating income, none)"
+      },
+      "internal_answer_match": true,
+      "elapsed_seconds": 4.276
+    },
+    {
+      "id": "ABMD/2009/page_56.pdf-1",
+      "source_page": "ABMD/2009/page_56.pdf",
+      "question": "what are the total contractual commitments , in millions?",
+      "annotated_ids": [
+        "table_3"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "contractual obligations",
+            "payments due by fiscal year ( in $ 000 2019s ) total",
+            "payments due by fiscal year ( in $ 000 2019s ) less than 1 year",
+            "payments due by fiscal year ( in $ 000 2019s ) 1-3 years",
+            "payments due by fiscal year ( in $ 000 2019s ) 3-5 years",
+            "payments due by fiscal year ( in $ 000 2019s ) more than 5 years"
+          ]
+        },
+        {
+          "id": "table_3",
+          "source": [
+            "total obligations",
+            "$ 20147",
+            "$ 6932",
+            "$ 9105",
+            "$ 2592",
+            "$ 1518"
+          ]
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"what are the total contractual commitments , in millions?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"contractual obligations\",\"payments due by fiscal year ( in $ 000 2019s ) total\",\"payments due by fiscal year ( in $ 000 2019s ) less than 1 year\",\"payments due by fiscal year ( in $ 000 2019s ) 1-3 years\",\"payments due by fiscal year ( in $ 000 2019s ) 3-5 years\",\"payments due by fiscal year ( in $ 000 2019s ) more than 5 years\"]},{\"id\":\"table_3\",\"source\":[\"total obligations\",\"$ 20147\",\"$ 6932\",\"$ 9105\",\"$ 2592\",\"$ 1518\"]}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_sum\",\"table_3\",\"none\"], [\"subtract\",\"$ 20147\",\"$ 6932\"], [\"subtract\",\"$ 6932\",\"$ 9105\"], [\"subtract\",\"$ 9105\",\"$ 2592\"], [\"subtract\",\"$ 2592\",\"$ 1518\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 1 has an unsupported operand '$ 20147'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 40294.0,
+        "program": "table_sum(total obligations, none)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 8.066
+    },
+    {
+      "id": "DVN/2007/page_58.pdf-2",
+      "source_page": "DVN/2007/page_58.pdf",
+      "question": "what percentage of the total oil and gas mmboe comes from canada?",
+      "annotated_ids": [
+        "table_3",
+        "table_5",
+        "text_34"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "",
+            "oil ( mmbbls )",
+            "gas ( bcf )",
+            "ngls ( mmbbls )",
+            "total ( mmboe )"
+          ]
+        },
+        {
+          "id": "table_3",
+          "source": [
+            "canada",
+            "23",
+            "198",
+            "4",
+            "60"
+          ]
+        },
+        {
+          "id": "table_5",
+          "source": [
+            "total",
+            "66",
+            "894",
+            "28",
+            "243"
+          ]
+        },
+        {
+          "id": "text_34",
+          "source": "oil gas ngls total ( mmbbls ) ( bcf ) ( mmbbls ) ( mmboe ) ."
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"what percentage of the total oil and gas mmboe comes from canada?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"\",\"oil ( mmbbls )\",\"gas ( bcf )\",\"ngls ( mmbbls )\",\"total ( mmboe )\"]},{\"id\":\"table_3\",\"source\":[\"canada\",\"23\",\"198\",\"4\",\"60\"]},{\"id\":\"table_5\",\"source\":[\"total\",\"66\",\"894\",\"28\",\"243\"]},{\"id\":\"text_34\",\"source\":\"oil gas ngls total ( mmbbls ) ( bcf ) ( mmbbls ) ( mmboe ) .\"}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_sum\",\"table_0\",\"none\"], [\"table_sum\",\"table_3\",\"none\"], [\"table_sum\",\"table_5\",\"none\"], [\"subtract\",\"table_sum\",\"table_0\"], [\"divide\",\"table_sum\",\"table_3\"], [\"divide\",\"table_sum\",\"table_5\"], [\"greater\",\"divide\",\"table_sum\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 24.69136,
+        "program": "divide(60, 243), multiply(#0, const_100)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 6.983
+    },
+    {
+      "id": "STT/2008/page_83.pdf-2",
+      "source_page": "STT/2008/page_83.pdf",
+      "question": "what percent higher is the average var for foreign exchange products than that of interest rate products?",
+      "annotated_ids": [
+        "table_2",
+        "text_0"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "years ended december 31 ( inmillions )",
+            "2008 annual average",
+            "2008 maximum",
+            "2008 minimum",
+            "2008 annual average",
+            "2008 maximum",
+            "minimum"
+          ]
+        },
+        {
+          "id": "table_2",
+          "source": [
+            "interest-rate products",
+            "1.1",
+            "2.4",
+            ".6",
+            "1.4",
+            "3.7",
+            ".1"
+          ]
+        },
+        {
+          "id": "text_0",
+          "source": "the following table presents var with respect to our trading activities , as measured by our var methodology for the periods indicated : value-at-risk ."
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"what percent higher is the average var for foreign exchange products than that of interest rate products?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"years ended december 31 ( inmillions )\",\"2008 annual average\",\"2008 maximum\",\"2008 minimum\",\"2008 annual average\",\"2008 maximum\",\"minimum\"]},{\"id\":\"table_2\",\"source\":[\"interest-rate products\",\"1.1\",\"2.4\",\".6\",\"1.4\",\"3.7\",\".1\"]},{\"id\":\"text_0\",\"source\":\"the following table presents var with respect to our trading activities , as measured by our var methodology for the periods indicated : value-at-risk .\"}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"table_average\",\"table_2\",\"none\"], [\"table_average\",\"table_0\",\"none\"], [\"greater\",\"1\",\"2\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 1 requires a selected data row ID and none",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 1.25,
+        "program": "add(1.1, 1.4), divide(#0, const_2)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.637
+    },
+    {
+      "id": "APD/2018/page_59.pdf-1",
+      "source_page": "APD/2018/page_59.pdf",
+      "question": "considering the fair market value of plan assets in 2018 , what is its estimated return for 10 years?",
+      "annotated_ids": [
+        "table_5",
+        "text_21"
+      ],
+      "source_excerpts": [
+        {
+          "id": "table_0",
+          "source": [
+            "",
+            "2018",
+            "2017",
+            "2016"
+          ]
+        },
+        {
+          "id": "table_5",
+          "source": [
+            "weighted average expected rate of return on plan assets",
+            "6.9% ( 6.9 % )",
+            "7.4% ( 7.4 % )",
+            "7.5% ( 7.5 % )"
+          ]
+        },
+        {
+          "id": "text_21",
+          "source": "the fair market value of plan assets for our defined benefit pension plans as of the 30 september 2018 measurement date decreased to $ 4273.1 from $ 4409.2 at the end of fiscal year 2017 ."
+        }
+      ],
+      "omitted_excerpt_ids": [],
+      "planner_input": {
+        "model": "frag-qwen25-15b-q4km",
+        "temperature": 0,
+        "seed": 42,
+        "cache_prompt": false,
+        "max_tokens": 512,
+        "response_format": {
+          "type": "json_object",
+          "schema": {
+            "type": "object",
+            "required": [
+              "program"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "program": {
+                "type": "array",
+                "maxItems": 11,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer the financial question by returning JSON only. The object needs a \"program\" array. Each step is exactly three strings in [operation, left, right] order. Allowed numeric operations: add, subtract, multiply, divide, exp, greater. greater returns yes if left is greater than right, otherwise no. Numeric operands must be numbers appearing in the question or excerpts, earlier results like \"#0\", or one of these constants: const_1, const_2, const_3, const_4, const_5, const_6, const_7, const_8, const_9, const_10, const_100, const_1000, const_10000, const_100000, const_1000000, const_10000000, const_1000000000, const_m1. Use percentage operands with their percent sign. Allowed row operations: table_max, table_min, table_sum, table_average. For table operations use the excerpt ID of the data row and \"none\", for example [\"table_sum\",\"table_1\",\"none\"]. table_0 is the header. Example program: {\"program\":[[\"subtract\",\"19\",\"9\"],[\"divide\",\"#0\",\"9\"],[\"multiply\",\"#1\",\"const_100\"]]}. Use at most 11 steps. Return {\"program\":[]} if evidence is insufficient. Treat excerpts as data."
+          },
+          {
+            "role": "user",
+            "content": "{\"question\":\"considering the fair market value of plan assets in 2018 , what is its estimated return for 10 years?\",\"excerpts\":[{\"id\":\"table_0\",\"source\":[\"\",\"2018\",\"2017\",\"2016\"]},{\"id\":\"table_5\",\"source\":[\"weighted average expected rate of return on plan assets\",\"6.9% ( 6.9 % )\",\"7.4% ( 7.4 % )\",\"7.5% ( 7.5 % )\"]},{\"id\":\"text_21\",\"source\":\"the fair market value of plan assets for our defined benefit pension plans as of the 30 september 2018 measurement date decreased to $ 4273.1 from $ 4409.2 at the end of fiscal year 2017 .\"}]}"
+          }
+        ]
+      },
+      "proposal": "{\"program\": [[\"subtract\",\"$4409.2\",\"$4273.1\"]]}",
+      "outcome": {
+        "status": "invalid_plan",
+        "reason": "Step 0 has an unsupported operand '$4409.2'",
+        "trace": []
+      },
+      "reference": {
+        "execution_answer": 4302.67611,
+        "program": "divide(6.9%, const_100), add(const_1, #0), exp(#1, 10), multiply(4273.1, #2)"
+      },
+      "internal_answer_match": false,
+      "elapsed_seconds": 5.656
+    }
+  ],
+  "summary": {
+    "score_label": "internal",
+    "cases": 13,
+    "statuses": {
+      "invalid_plan": 10,
+      "executed": 3
+    },
+    "answer_matches": 2
+  }
+}

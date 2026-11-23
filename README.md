@@ -314,3 +314,15 @@ reopens the cited evidence offline.
 Omit the question argument to enter it at the prompt. The application creates
 a validation record only when you pass `--record`.
 [Corpus, expected results, and browser smoke commands](artifacts/phase03/COLLECTION_HANDOFF.md)
+
+## FinQA annotated-evidence diagnostic
+
+Replay the saved dev outcomes without starting the planner or downloading
+FinQA. The command prints the number of replayed questions and the internal
+result summary.
+
+```powershell
+.venv/Scripts/python.exe -m frag.finqa replay artifacts/phase04/finqa-dev-run.json
+```
+
+[PowerShell commands for pinned input acquisition and a fresh dev run](artifacts/phase04/FINQA_DIAGNOSTIC.md)

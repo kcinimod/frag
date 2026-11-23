@@ -59,3 +59,7 @@ Phase 2 calculator and its offline results.
   retrieval can also recover a verified pair when first-pass observations
   come from different filings.
   [Phase 3 handoff](../artifacts/phase03/HANDOFF.md)
+- Issue #18 runs the FinQA annotated-evidence diagnostic on 13 official dev
+  questions. The run retains the split audit, delivered planner inputs,
+  attempted plans, and deterministic outcomes for offline replay.
+  [FinQA dev diagnostic](../artifacts/phase04/FINQA_DIAGNOSTIC.md)

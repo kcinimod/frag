@@ -182,3 +182,16 @@ When first-pass evidence covers the requested years across separate filings,
 reuse ranked candidates to check for a verified pair from the same filing.
 If the calculation is deferred, return caveats supported by the selected
 comparison evidence. Link applicable notes from annual revenue lookups.
+
+## FinQA dev diagnostic records
+
+Resolve annotation locators against the report's text and table. Include the
+table header with selected data rows and record excerpts omitted by the
+context budget. Keep reference labels in the scorer inputs and record the
+exact request sent to the planner.
+
+FinQA program validation limits numeric literals to the question and
+delivered excerpts, permits the upstream constant vocabulary, and requires
+table reductions to name a delivered data row. Record operand locations in
+the execution trace. The dev run reports internal answer matches while
+upstream scoring parity is pending.
