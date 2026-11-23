@@ -88,8 +88,8 @@ per-ID execution and program matches, and parity discrepancies.
   modes' actual requests. Use the pinned upstream evaluator and report
   execution and symbolic program accuracy alongside replay parity,
   full-cohort coverage, and the paired failure stages. Set no numeric
-  quality target for this coverage-oriented validation. Public test runs
-  follow in the next milestone.
+  quality target for this coverage-oriented validation.
+  [Full public test comparison](FINQA_PUBLIC_TEST.md)
 
 ## Run and replay on Windows
 

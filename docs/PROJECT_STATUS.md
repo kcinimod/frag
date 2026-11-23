@@ -71,8 +71,8 @@ Phase 2 calculator and its offline results.
   records ranking and context losses, measures the local Windows runtime,
   and freezes the settings for the public test evaluation.
   [FinQA evidence comparison](../artifacts/phase04/FINQA_COMPARISON.md)
-- Issue #21 starts the frozen FinQA comparison on all 1,147 public test
-  questions per mode. The evaluation checkpoints by question ID and
-  checks both modes for full coverage and scoring parity before reporting
-  official accuracy.
-  [FinQA public test run and replay](../artifacts/phase04/FINQA_PUBLIC_TEST.md)
+- Issue #21 completed and replayed the frozen FinQA public test comparison,
+  with 1,147 outcomes per mode. Internal execution matched 30 answers for
+  the annotated-evidence diagnostic and 14 for retrieved evidence.
+  Scorer parity remains unresolved in both modes.
+  [FinQA public test results](../artifacts/phase04/FINQA_PUBLIC_TEST.md)
