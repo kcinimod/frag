@@ -223,3 +223,13 @@ uses the full denominator in both modes. Keep counts internal unless the
 pinned evaluator agrees with replay and the per-question and aggregate
 scores reconcile in both modes.
 [FinQA public test run and replay](../artifacts/phase04/FINQA_PUBLIC_TEST.md)
+
+## SEC development issuers and fiscal periods
+
+Use Microsoft and Apple as development issuers. Exclude their filing families
+from the reserved SEC evaluation. For statements with independently dated
+columns, compare year-ends with the inline XBRL duration context and the
+applicable fiscal-calendar disclosure. Pin the original hash and exact note
+spans before publishing a verified lookup. Evaluate compatibility separately
+before using those observations for growth.
+[Development evidence](../artifacts/phase04/development/README.md)

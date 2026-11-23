@@ -4,7 +4,7 @@ import re
 from html.parser import HTMLParser
 from typing import Any
 
-from frag.income_html import is_statement_heading
+from frag.income_html import is_statement_heading, original_span
 from frag.store import SourceError
 from frag.verification import REFERENCE
 
@@ -20,13 +20,16 @@ def has_citable_amount(fact: dict[str, Any]) -> bool:
 
 def revenue_cell_citation(fact: dict[str, Any], citation_id: str) -> dict[str, Any]:
     year = fact["reporting_period"]["fiscal_year"]
+    locators = fact["locators"]
+    keys: tuple[str, ...] = ("metric_label", "year_header", "unit_header")
+    if "currency_symbol" in locators:
+        keys = ("statement_heading", "metric_label", "annual_header", "year_header",
+                "unit_header", "currency_symbol", "currency_measure")
     return {
         "id": citation_id,
         "title": f'FY{year} {fact["metric_label"]} cell',
         "locator": fact["locators"]["value"],
-        "context_locators": {
-            key: fact["locators"][key] for key in ("metric_label", "year_header", "unit_header")
-        },
+        "context_locators": {key: locators[key] for key in keys},
     }
 
 
@@ -77,15 +80,16 @@ def citation_lines(lines: list[str], source_hash: str, citation: dict[str, Any])
                 or not is_statement_heading(statement)
                 or not all(context[key]["table"] == locator["table"] for key in ("annual_header", "unit_header"))):
             raise SourceError("The statement table cannot be opened at its verified locators.")
-        annual, unit = (_cell_text(lines, context[key]) for key in ("annual_header", "unit_header"))
+        annual, unit = (_context_text(lines, key, context[key]) for key in ("annual_header", "unit_header"))
         if not annual or not unit:
             raise SourceError("The statement table headers are unavailable.")
         return f"{heading}{_position(locator)} · table {locator['table']}\n\n{statement}\n{annual}\n{unit}\n"
     if "context_locators" in citation:
-        excerpt = "\n".join(
-            _cell_text(lines, position)
-            for position in (*citation["context_locators"].values(), locator) if position
-        )
+        context = citation["context_locators"]
+        excerpt = "\n".join([
+            *(_context_text(lines, key, position) for key, position in context.items() if position),
+            _cell_text(lines, locator),
+        ])
         coordinates = ", ".join(
             f"{key} {locator[key]}"
             for key in ("table", "row", "cell", "column")
@@ -93,15 +97,13 @@ def citation_lines(lines: list[str], source_hash: str, citation: dict[str, Any])
         )
         return f"{heading}{_position(locator)} · {coordinates}\n\n{excerpt}\n"
     start, end = locator["start"], locator["end_exclusive"]
-    # The current verification reference uses whole-line disclosure ranges.
-    if (start.get("character") != 1 or end.get("character") != 1
-            or type(start.get("line")) is not int or type(end.get("line")) is not int
-            or not 1 <= start["line"] < end["line"] <= len(lines) + 1):
-        raise SourceError("Unsupported disclosure locator.")
+    try:
+        excerpt = _visible_text(original_span(lines, start, end))
+    except ValueError as exc:
+        raise SourceError("Unsupported disclosure locator.") from exc
     if source_hash == REFERENCE["identity"]["source_hash"]:
         for line in REFERENCE["citation_heading_lines"].get(citation["id"], []):
             heading += f"{_visible_text(lines[line - 1])} · HTML line {line}\n"
-    excerpt = _visible_text("\n".join(lines[start["line"] - 1:end["line"] - 1]))
     if not excerpt:
         raise SourceError("The disclosure has no visible text at its verified locator.")
     return f"{heading}{_position(start)} to {_position(end)} (exclusive)\n\n{excerpt}\n"
@@ -120,11 +122,22 @@ def _fragment_at(lines: list[str], locator: dict[str, int]) -> str:
 
 
 def _cell_text(lines: list[str], locator: dict[str, int]) -> str:
-    # The verified statement cells in the retained filing close on the same line.
     fragment = _fragment_at(lines, locator)
     end = CELL_END.search(fragment)
     if not end or not fragment.startswith(("<td", "<th")):
         raise SourceError("The statement cell cannot be opened at its verified locator.")
+    return _visible_text(fragment[:end.end()])
+
+
+def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
+    if "cell" in locator:
+        return _cell_text(lines, locator)
+    fragment = _fragment_at(lines, locator)
+    tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]"
+    start = re.match(rf"<({tags})[\s>]", fragment, re.IGNORECASE)
+    end = re.search(rf"</{start[1]}\s*>", fragment, re.IGNORECASE) if start else None
+    if not end:
+        raise SourceError("The statement context cannot be opened at its verified locator.")
     return _visible_text(fragment[:end.end()])
 
 

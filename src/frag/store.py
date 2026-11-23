@@ -9,10 +9,16 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
 
+from frag import dated_revenue
 from frag.revenue import PARSER_VERSION, PRIOR_LAYOUT_VERSION
 from frag.verification import EVIDENCE_VERSION, inspect_revenue
 
 RESULT_VERSION = f"{PARSER_VERSION}:{PRIOR_LAYOUT_VERSION}:{EVIDENCE_VERSION}"
+
+
+def _extraction_cache_version() -> str:
+    # Collection snapshots already pin each source's parser and evidence versions.
+    return f"{RESULT_VERSION}:{dated_revenue.PARSER_VERSION}:{dated_revenue.EVIDENCE_VERSION}"
 
 
 class SourceError(ValueError):
@@ -153,7 +159,7 @@ class SourceStore:
                 result = inspect_revenue(original, record)
                 connection.execute(
                     "INSERT INTO extractions VALUES (?, ?, ?)",
-                    (source_id, RESULT_VERSION, json.dumps(result, sort_keys=True)),
+                    (source_id, _extraction_cache_version(), json.dumps(result, sort_keys=True)),
                 )
         return record | result
 
@@ -230,9 +236,18 @@ class SourceStore:
             "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'extractions'"
         ).fetchone() is None:
             return None
-        row = connection.execute(
+        legacy_row = connection.execute(
             "SELECT result FROM extractions WHERE source_id = ? AND parser_version = ?",
             (source_id, RESULT_VERSION),
+        ).fetchone()
+        if legacy_row is not None:
+            legacy: dict[str, Any] = json.loads(legacy_row[0])
+            if legacy["facts"]:
+                return legacy
+        # Previously unsupported inputs can now resolve under the dated layout.
+        row = connection.execute(
+            "SELECT result FROM extractions WHERE source_id = ? AND parser_version = ?",
+            (source_id, _extraction_cache_version()),
         ).fetchone()
         result: dict[str, Any] | None = json.loads(row[0]) if row else None
         return result

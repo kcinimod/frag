@@ -6,8 +6,9 @@ from collections.abc import Callable
 from time import perf_counter
 from typing import Any, Literal, TypedDict
 
+from frag import dated_revenue
 from frag.citations import has_citable_amount, revenue_cell_citation
-from frag.growth import calculate_growth
+from frag.growth import calculate_growth, disclosure_citations
 from frag.local_model import MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable
 from frag.store import SourceError
 
@@ -82,7 +83,16 @@ def _facts_for_year(facts: list[dict[str, Any]], year: int) -> list[dict[str, An
 
 def lookup_citation(source: dict[str, Any], year: int, citation_id: str) -> dict[str, Any] | None:
     facts = _facts_for_year(_eligible_facts(source), year)
-    return revenue_cell_citation(facts[0], "revenue") if len(facts) == 1 and citation_id == "revenue" else None
+    if len(facts) != 1:
+        return None
+    return next((item for item in _lookup_citations(facts[0]) if item["id"] == citation_id), None)
+
+
+def _lookup_citations(fact: dict[str, Any]) -> list[dict[str, Any]]:
+    citations = [revenue_cell_citation(fact, "revenue")]
+    if fact["parser_version"] == dated_revenue.PARSER_VERSION:
+        citations.extend(disclosure_citations([fact], {}).values())
+    return citations
 
 
 def _evidence(facts: list[dict[str, Any]], year: int) -> list[dict[str, Any]]:
@@ -158,10 +168,12 @@ def _growth_payload(request: ResolvedGrowth, evidence: list[dict[str, Any]]) -> 
 
 
 def _planner_input(
-    facts: list[dict[str, Any]], request: ResolvedRequest,
+    source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if request["operation"] == "lookup":
         year = request["fiscal_year"]
+        if source.get("parser_version") == dated_revenue.PARSER_VERSION:
+            facts = _facts_for_year(facts, year)
         evidence = _evidence(facts, year)
         return evidence, _lookup_payload(year, evidence)
     evidence = _evidence(facts, request["current_year"])
@@ -200,7 +212,7 @@ def _execute_lookup(facts: list[dict[str, Any]], year: int, plan: Any) -> dict[s
         "status": "answered",
         "fiscal_year": year,
         "fact": fact,
-        "citations": [revenue_cell_citation(fact, "revenue")],
+        "citations": _lookup_citations(fact),
         "trace": [{
             "operation": "lookup",
             "fact_id": fact["fact_id"],
@@ -253,6 +265,22 @@ def _identity(source: dict[str, Any]) -> dict[str, Any]:
     return {key: source.get(key) for key in ("source_id", "source_hash", "parser_version", "evidence_version")}
 
 
+def _dated_lookup_gap(
+    source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
+) -> dict[str, Any] | None:
+    if request["operation"] != "lookup" or source.get("parser_version") != dated_revenue.PARSER_VERSION:
+        return None
+    year = request["fiscal_year"]
+    if len(_facts_for_year(facts, year)) == 1:
+        return None
+    reasons = [item["message"] for item in source["diagnostics"] if item.get("fiscal_year", year) == year]
+    for fact in _facts_for_year(source["facts"], year):
+        reasons.extend(fact["unresolved_requirements"])
+    if not reasons:
+        reasons.append("No unique annual revenue observation was found for the requested fiscal year.")
+    return {"status": "evidence_unavailable", "message": f"FY{year} revenue evidence gap. " + " ".join(reasons)}
+
+
 def ask_revenue(
     source: dict[str, Any], question: str, planner: Planner, *, record: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -264,21 +292,26 @@ def ask_revenue(
         return {"status": "clarify", "message": CLARIFICATION}
 
     facts = _eligible_facts(source)
-    evidence, payload = _planner_input(facts, request)
-    model_start = perf_counter()
+    evidence, payload = _planner_input(source, facts, request)
     proposal = None
-    execution_start = None
-    try:
-        proposal = planner(payload)
-    except ModelUnavailable:
-        outcome = {"status": "model_unavailable", "message": "Start the local planner and try again."}
-    except TimeoutError:
-        outcome = {"status": "model_timeout", "message": "The local planner timed out."}
-    except InvalidModelResponse:
-        outcome = {"status": "invalid_plan", "message": "The local planner returned an invalid response."}
-    else:
-        execution_start = perf_counter()
-        outcome = _execute(source, facts, request, proposal)
+    model_ms = None
+    execution_start: float | None = perf_counter()
+    outcome = _dated_lookup_gap(source, facts, request)
+    if outcome is None:
+        execution_start = None
+        model_start = perf_counter()
+        try:
+            proposal = planner(payload)
+        except ModelUnavailable:
+            outcome = {"status": "model_unavailable", "message": "Start the local planner and try again."}
+        except TimeoutError:
+            outcome = {"status": "model_timeout", "message": "The local planner timed out."}
+        except InvalidModelResponse:
+            outcome = {"status": "invalid_plan", "message": "The local planner returned an invalid response."}
+        else:
+            execution_start = perf_counter()
+            outcome = _execute(source, facts, request, proposal)
+        model_ms = round(((execution_start or perf_counter()) - model_start) * 1000, 3)
     end = perf_counter()
     result = {**_identity(source), **outcome}
     if record is not None:
@@ -289,12 +322,12 @@ def ask_revenue(
             "source": _identity(source),
             "evidence": evidence,
             "model_settings": {"expected_server_configuration": MODEL_SETTINGS},
-            "model_request": payload,
+            "model_request": payload if model_ms is not None else None,
             "proposed_plan": proposal,
             "validation_status": outcome["status"],
             "result": result,
             "timings_ms": {
-                "model": round(((execution_start if execution_start is not None else end) - model_start) * 1000, 3),
+                "model": model_ms,
                 "validation_and_execution": round((end - execution_start) * 1000, 3)
                 if execution_start is not None else None,
                 "total": round((end - start) * 1000, 3),
@@ -305,22 +338,30 @@ def ask_revenue(
 
 def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
     question, proposal = record.get("question"), record.get("proposed_plan")
-    if record.get("version") != RECORD_VERSION or not isinstance(question, str) or not isinstance(proposal, str):
-        raise SourceError("The validation record must contain a supported saved proposal.")
+    if record.get("version") != RECORD_VERSION or not isinstance(question, str):
+        raise SourceError("The validation record must contain a supported saved question.")
     request = resolve_request(question)
     if request is None or record.get("resolved_request") != request:
         raise SourceError("The saved request does not match its question.")
     facts = _eligible_facts(source)
-    evidence, expected_payload = _planner_input(facts, request)
+    evidence, expected_payload = _planner_input(source, facts, request)
     identity = _identity(source)
+    if record.get("source") != identity or record.get("evidence") != evidence:
+        raise SourceError("The saved source or evidence does not match the current filing evidence.")
     saved_payload = record.get("model_request")
+    gap = _dated_lookup_gap(source, facts, request)
+    if gap is not None:
+        if "proposed_plan" not in record or proposal is not None or "model_request" not in record or saved_payload is not None:
+            raise SourceError("The saved evidence gap must record that no model request was made.")
+        return {**identity, **gap}
     if not isinstance(saved_payload, dict) or not isinstance(saved_payload.get("model"), str):
         raise SourceError("The validation record must contain its original model request.")
     # The alias identifies the original planner. Replay validates the proposal with no model loaded.
     expected_payload["model"] = saved_payload["model"]
-    if (record.get("source") != identity or record.get("evidence") != evidence
-            or saved_payload != expected_payload):
+    if saved_payload != expected_payload:
         raise SourceError("The saved source or evidence does not match the current filing evidence.")
+    if not isinstance(proposal, str):
+        raise SourceError("The validation record must contain a supported saved proposal.")
     return {**identity, **_execute(source, facts, request, proposal)}
 
 

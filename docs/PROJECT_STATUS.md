@@ -76,3 +76,7 @@ Phase 2 calculator and its offline results.
   the annotated-evidence diagnostic and 14 for retrieved evidence.
   Scorer parity remains unresolved in both modes.
   [FinQA public test results](../artifacts/phase04/FINQA_PUBLIC_TEST.md)
+- Issue #22 verifies annual revenue lookup on the Microsoft and Apple
+  development 10-Ks. The filing workspace opens Apple's original statement
+  cells and applicable disclosures offline.
+  [Development evidence and replay](../artifacts/phase04/development/README.md)

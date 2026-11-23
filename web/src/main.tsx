@@ -466,11 +466,14 @@ function formatRequirements(requirements: string[]) {
 function DisclosureDetail({ disclosure, title }: { disclosure: Disclosure; title?: string }) {
   const { start, end_exclusive } = disclosure.locator;
   const lastLine = end_exclusive.line - 1;
+  const range = start.line === end_exclusive.line
+    ? `line ${start.line}, characters ${start.character}–${end_exclusive.character - 1}`
+    : lastLine === start.line ? `line ${start.line}` : `lines ${start.line}–${lastLine}`;
   return (
     <p>
       {title && <strong>{title} · </strong>}
       {disclosure.interpretation}{' '}
-      <span className="muted">HTML {lastLine === start.line ? `line ${start.line}` : `lines ${start.line}–${lastLine}`}</span>
+      <span className="muted">HTML {range}</span>
     </p>
   );
 }
@@ -478,7 +481,8 @@ function DisclosureDetail({ disclosure, title }: { disclosure: Disclosure; title
 const locatorLabels: Record<string, string> = {
   table: 'Statement table', statement_heading: 'Statement heading', metric_label: 'Metric label',
   annual_header: 'Annual period header', year_header: 'Fiscal year header', value: 'Revenue cell',
-  unit_header: 'Scale disclosure', currency_measure: 'Currency measure', inline_context: 'Inline XBRL context',
+  unit_header: 'Scale disclosure', currency_symbol: 'Statement currency marker',
+  currency_measure: 'Currency measure', inline_context: 'Inline XBRL context', inline_fact: 'Inline XBRL fact',
 };
 
 function revenueAmount(fact: RevenueFact) {

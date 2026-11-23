@@ -1,0 +1,69 @@
+{
+  "evidence_version": "dated-annual-revenue-evidence-v1",
+  "identity": {
+    "company": "Apple Inc.",
+    "cik": "0000320193",
+    "form": "10-K",
+    "report_end": "2023-09-30",
+    "accession": "0000320193-23-000106",
+    "filing_date": "2023-11-03",
+    "source_hash": "bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019323000106/aapl-20230930.htm",
+    "reviewed_copy_url": "https://edgar-mirror.sec-api.io/320193/000032019323000106/aapl-20230930.htm"
+  },
+  "period_weeks": {
+    "2021": 52,
+    "2022": 52,
+    "2023": 53
+  },
+  "notes": [
+    {
+      "number": 1,
+      "title": "Summary of Significant Accounting Policies",
+      "interpretation": "The consolidation includes Apple and its wholly owned subsidiaries. Revenue excludes taxes remitted to governmental authorities. FY2023 had 53 weeks, while FY2022 and FY2021 had 52 weeks.",
+      "locator": {
+        "start": {
+          "line": 4,
+          "character": 737420
+        },
+        "end_exclusive": {
+          "line": 4,
+          "character": 745622
+        }
+      },
+      "sha256": "1b400a0e93b4a741c42b1fe27dc05d91b1049b5ac450523dc34dd45b940d60ef"
+    },
+    {
+      "number": 2,
+      "title": "Revenue",
+      "interpretation": "Revenue is recognized as control of products or services transfers. Product net sales reflect estimates of returns, price protection and other incentives.",
+      "locator": {
+        "start": {
+          "line": 4,
+          "character": 745622
+        },
+        "end_exclusive": {
+          "line": 4,
+          "character": 773743
+        }
+      },
+      "sha256": "01168d9a797519c9124409e7a28658d92d402d38b2699ef91cbefed9f9c11c5c"
+    },
+    {
+      "number": 13,
+      "title": "Segment Information and Geographic Data",
+      "interpretation": "Geographic segment net sales are supplemental disaggregation of reported consolidated net sales.",
+      "locator": {
+        "start": {
+          "line": 4,
+          "character": 1306706
+        },
+        "end_exclusive": {
+          "line": 4,
+          "character": 1376312
+        }
+      },
+      "sha256": "b0e6fed110472c22f5f17a87a1ba9a8e3f764bc5281862aced87e202bf008d93"
+    }
+  ]
+}

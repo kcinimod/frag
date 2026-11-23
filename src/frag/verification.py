@@ -6,6 +6,8 @@ from copy import deepcopy
 from importlib.resources import files
 from typing import Any
 
+from frag.dated_revenue import applies_to, inspect_dated_revenue
+from frag.income_html import StatementHTML, original_span
 from frag.revenue import PRIOR_LAYOUT_VERSION, extract_revenue, matches_microsoft_company
 
 REFERENCE = json.loads(
@@ -28,11 +30,11 @@ def _matches_anchor(lines: list[str], anchor: dict[str, Any]) -> bool:
 
 def _matches_span(lines: list[str], span: dict[str, Any]) -> bool:
     locator = span["locator"]
-    start = locator["start"]["line"] - 1
-    end = locator["end_exclusive"]["line"] - 1
-    return end < len(lines) and _matches_digest(
-        "\n".join(lines[start:end]) + "\n", span["sha256"],
-    )
+    try:
+        text = original_span(lines, locator["start"], locator["end_exclusive"])
+    except ValueError:
+        return False
+    return _matches_digest(text, span["sha256"])
 
 
 def _source_requirements(
@@ -106,7 +108,17 @@ def _verify_fact(
 
 def inspect_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
     """Extract revenue and report source, observation and comparison checks."""
-    result = extract_revenue(original, source)
+    document = StatementHTML()
+    try:
+        html = original.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        result = extract_revenue(original, source)
+    else:
+        document.feed(html)
+        document.close()
+        if applies_to(document):
+            return inspect_dated_revenue(document, html.split("\n"), source)
+        result = extract_revenue(original, source, document)
     comparison: dict[str, Any] = {
         "status": "unresolved", "reference_status": "unresolved",
         "basis": None, "evidence": [], "scope_caveats": [],

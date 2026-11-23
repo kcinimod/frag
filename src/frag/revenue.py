@@ -36,7 +36,9 @@ class StatementEvidence:
     unit_header: GridCell | None
 
 
-def extract_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
+def extract_revenue(
+    original: bytes, source: dict[str, Any], document: StatementHTML | None = None,
+) -> dict[str, Any]:
     """Produce versioned facts or an actionable diagnostic for the preserved source."""
     result: dict[str, Any] = {
         "parser_version": PARSER_VERSION, "facts": [], "diagnostics": [],
@@ -45,9 +47,10 @@ def extract_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
         ],
     }
     try:
-        document = StatementHTML()
-        document.feed(original.decode("utf-8-sig"))
-        document.close()
+        if document is None:
+            document = StatementHTML()
+            document.feed(original.decode("utf-8-sig"))
+            document.close()
         parser_version, target_years = PARSER_VERSION, TARGET_YEARS
         if source["provenance"]["kind"] != "synthetic":
             parser_version, target_years = _check_document(document, source)
@@ -75,7 +78,7 @@ def _check_document(document: StatementHTML, source: dict[str, Any]) -> tuple[st
         "dei:documentperiodenddate": [period_end],
         "dei:entitycentralindexkey": [MICROSOFT_CIK],
     }
-    actual = {key: [item.text for item in items] for key, items in document.cover_facts.items()}
+    actual = {key: [item.text for item in document.cover_facts.get(key, [])] for key in expected}
     if actual != expected:
         raise UnsupportedLayout(f"Expected inline cover fields for Microsoft's Form 10-K ended {period_end}.")
     if not matches_microsoft_company(source["company"]):
@@ -215,7 +218,7 @@ def _revenue_fact(
     if value and value.cell.inline_facts:
         if len(value.cell.inline_facts) != 1:
             raise UnsupportedLayout("Multiple inline XBRL observations occupy a revenue cell.")
-        inline = value.cell.inline_facts[0]
+        inline = value.cell.inline_facts[0].attrs
         if (inline.get("name") or "").casefold() != REVENUE_CONCEPT.casefold():
             raise UnsupportedLayout("The inline XBRL concept conflicts with the Total revenue label.")
         context_ref = inline.get("contextref")
@@ -246,11 +249,10 @@ def _revenue_fact(
             raise UnsupportedLayout("Inline XBRL sign conflicts with the displayed revenue amount.")
     elif source["provenance"]["kind"] != "synthetic" and _normalize(raw, 1) is not None:
         raise UnsupportedLayout("The selected filing layout requires an inline XBRL tag for numeric revenue.")
-    identity = f'{source["source_id"]}:reported_consolidated_revenue:{year}'
     heading = table.caption if table.caption and is_statement_heading(table.caption.text) else table.heading
     assert heading is not None
     return {
-        "fact_id": "fact:" + hashlib.sha256(identity.encode()).hexdigest(),
+        "fact_id": revenue_fact_id(source["source_id"], year),
         "source_id": source["source_id"],
         "company": "Microsoft Corporation" if source["provenance"]["kind"] != "synthetic"
         else source["company"],
@@ -274,6 +276,11 @@ def _revenue_fact(
         "applicable_notes": [],
         "unresolved_requirements": ["applicable_notes", "independent_evidence_verification"],
     }
+
+
+def revenue_fact_id(source_id: str, year: int) -> str:
+    identity = f"{source_id}:reported_consolidated_revenue:{year}"
+    return "fact:" + hashlib.sha256(identity.encode()).hexdigest()
 
 
 def _normalize(raw: str | None, scale: int | None) -> str | None:
