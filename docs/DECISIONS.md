@@ -171,3 +171,14 @@ budget. The calculator uses the facts and comparison evidence selected for the
 answer. Keep the earlier retrieval versions replayable so the original
 validation records remain reproducible.
 [Phase 3 handoff](../artifacts/phase03/HANDOFF.md)
+
+## Context for a supported partial growth result
+
+When a fiscal year is missing, use the available context for the supported
+observations' statement tables and applicable notes. Defer comparison
+disclosures until both years are selected. Record this selection behavior
+under a new retrieval version and preserve replay of earlier versions.
+When first-pass evidence covers the requested years across separate filings,
+reuse ranked candidates to check for a verified pair from the same filing.
+If the calculation is deferred, return caveats supported by the selected
+comparison evidence. Link applicable notes from annual revenue lookups.

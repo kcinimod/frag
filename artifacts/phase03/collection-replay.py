@@ -308,24 +308,31 @@ def smoke_browser(work: Path, *, bounded: bool = False) -> None:
                             ]
                         finally:
                             excerpt.close()
-                    question.fill(GROWTH_QUESTION)
                     if bounded:
                         search.get_by_label("Retrieval mode").select_option("bounded")
-                    submit.click()
-                    expect(search.get_by_text("6.88%", exact=True)).to_be_visible()
-                    with context.expect_page() as new_page:
-                        search.get_by_role("link", name="Note 8", exact=False).click()
-                    disclosure = new_page.value
-                    try:
-                        expect(disclosure.locator("body")).to_contain_text("On March 4, 2022")
-                    finally:
-                        disclosure.close()
+                    for growth_question, expected_text in (
+                        (GROWTH_QUESTION, ("6.88%",)),
+                        ("How did Microsoft revenue change from FY2021 to FY2023?", (
+                            "Selected evidence lacks verified FY2021 revenue.", "USD 211,915,000,000",
+                        )),
+                    ):
+                        question.fill(growth_question)
+                        submit.click()
+                        for text in expected_text:
+                            expect(search.get_by_text(text)).to_be_visible()
+                        with context.expect_page() as new_page:
+                            search.get_by_role("link", name="Note 8", exact=False).click()
+                        disclosure = new_page.value
+                        try:
+                            expect(disclosure.locator("body")).to_contain_text("On March 4, 2022")
+                        finally:
+                            disclosure.close()
                 finally:
                     browser.close()
         finally:
             server.shutdown()
             thread.join()
-    print("Offline browser smoke passed for both original revenue cells and the growth disclosure.")
+    print("Offline browser smoke passed for original revenue cells and disclosures in complete and partial results.")
 
 
 def main() -> None:

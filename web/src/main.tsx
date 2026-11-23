@@ -293,13 +293,14 @@ type CollectionCitation = { title: string; href: string };
 
 type CollectionResult =
   | { status: 'answered'; request: { company: string; fiscal_year: number }; fact: RevenueFact;
-      citations: CollectionCitation[] }
+      citations: CollectionCitation[]; unresolved_requirements?: string[] }
   | { status: 'conflicting_evidence'; message: string;
       alternatives: { fact: RevenueFact; citation: CollectionCitation }[] }
   | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline'; request: { company: string } })
   | { status: 'clarify' | 'evidence_unavailable'; message: string;
       budget_limit?: 'time' | 'calls';
       observations?: { fact: RevenueFact & { basis: string }; citation: CollectionCitation }[];
+      comparisons?: { source_id: string; scope_caveats: string[] }[];
       issues?: { detail: string; requirements?: string[] }[]; citations?: CollectionCitation[] };
 
 function CollectionLookup() {
@@ -356,6 +357,9 @@ function CollectionLookup() {
             {result.citations.map(citation => (
               <a key={citation.href} href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
             ))}
+            {!!result.unresolved_requirements?.length && (
+              <p>Unavailable disclosures · {result.unresolved_requirements.join(', ')}.</p>
+            )}
           </>
         )}
         {(result?.status === 'calculated' || result?.status === 'undefined_zero_baseline') && (
@@ -380,6 +384,9 @@ function CollectionLookup() {
                 </li>
               ))}</ul>
             )}
+            {result.comparisons?.flatMap(comparison => comparison.scope_caveats.map(caveat => (
+              <p key={`${comparison.source_id}:${caveat}`}>{caveat}</p>
+            )))}
             {result.citations?.map(citation => (
               <a key={citation.href} href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
             ))}

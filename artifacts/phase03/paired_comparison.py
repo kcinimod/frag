@@ -239,9 +239,13 @@ def score(case: Case, mode: str, run: dict[str, Any], store: SourceStore) -> dic
     assert set(case.unresolved) <= outstanding
     if case.name == "absent-year":
         assert [issue["fiscal_year"] for issue in answer["issues"]] == [2021]
+        assert "note-8" in {item["id"] for item in citations}
     if mode == "bounded" and case.name in ("call-limit", "time-limit"):
         assert answer["stop_reason"] == "budget_exhausted"
         assert answer["budget_limit"] == ("calls" if case.name == "call-limit" else "time")
+        if case.name == "call-limit":
+            comparison, = answer["comparisons"]
+            assert any("currency" in caveat.casefold() for caveat in comparison["scope_caveats"])
     if mode == "bounded" and case.name == "unopenable-disclosure":
         assert answer["stop_reason"] == "no_progress"
         source_action = next(action for action in run["actions"] if action["operation"] == "get_source")

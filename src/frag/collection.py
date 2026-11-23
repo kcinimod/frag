@@ -16,13 +16,18 @@ from frag.lookup import METRIC, resolve_request
 from frag.store import SourceError, SourceNotFound, SourceStore, StoreMissing
 
 INDEX_VERSION = "collection-index-v2"
-SEARCH_VERSION = "annual-revenue-search-v1"
+LEGACY_LOOKUP_VERSION = "annual-revenue-search-v1"
+LOOKUP_SEARCH_VERSION = "annual-revenue-search-v2"
 RECORD_VERSION = "collection-run-v1"
 LEGACY_GROWTH_VERSION = "revenue-growth-search-v1"
 LEGACY_BOUNDED_VERSION = "bounded-revenue-search-v1"
-GROWTH_SEARCH_VERSION = "revenue-growth-search-v2"
+PREVIOUS_GROWTH_VERSION = "revenue-growth-search-v2"
+PREVIOUS_BOUNDED_VERSION = "bounded-revenue-search-v2"
+GROWTH_SEARCH_VERSION = "revenue-growth-search-v3"
 GROWTH_CONTEXT_LIMIT = 16
-BOUNDED_SEARCH_VERSION = "bounded-revenue-search-v2"
+BOUNDED_SEARCH_VERSION = "bounded-revenue-search-v3"
+GROWTH_SEARCH_VERSIONS = (LEGACY_GROWTH_VERSION, PREVIOUS_GROWTH_VERSION, GROWTH_SEARCH_VERSION)
+BOUNDED_SEARCH_VERSIONS = (LEGACY_BOUNDED_VERSION, PREVIOUS_BOUNDED_VERSION, BOUNDED_SEARCH_VERSION)
 DEFAULT_MAX_CALLS = 4
 DEFAULT_MAX_SECONDS = 1.0
 LOOKUP_CLARIFICATION = "Ask for annual reported consolidated revenue for one fiscal year."
@@ -244,6 +249,14 @@ class SearchAction:
 
 
 @dataclass(frozen=True)
+class SearchPairAction:
+    snapshot_id: str
+    company_key: str
+    prior_year: int
+    current_year: int
+
+
+@dataclass(frozen=True)
 class GetParentAction:
     snapshot_id: str
     fact_id: str
@@ -338,7 +351,8 @@ class _GrowthActions:
         return self._within_time()
 
     def _finish(
-        self, operation: str, action: SearchAction | GetParentAction | GetSourceAction | CalculateAction,
+        self, operation: str,
+        action: SearchAction | SearchPairAction | GetParentAction | GetSourceAction | CalculateAction,
         result: dict[str, Any],
     ) -> bool:
         accepted = self._within_time()
@@ -361,6 +375,24 @@ class _GrowthActions:
             entry for entry in self.eligible.values()
             if entry.fact["reporting_period"]["fiscal_year"] == action.fiscal_year
         ]
+        accepted = self._finish("search", action, {"fact_ids": [entry.fact["fact_id"] for entry in matches]})
+        return matches if accepted else []
+
+    def search_pair(self, action: SearchPairAction) -> list[IndexedFact]:
+        years = (action.prior_year, action.current_year)
+        if (action.snapshot_id != self.index.manifest["snapshot_id"]
+                or action.company_key != self.request["company_key"]
+                or years != (self.request["prior_year"], self.request["current_year"])):
+            raise SourceError("The pair search does not match the pinned request.")
+        if not self._start():
+            return []
+        matches = []
+        for source_id, entries in _facts_by_source(self.eligible.values()).items():
+            verification = self.index.comparisons[source_id]
+            if (verification["comparison"]["status"] == "compatible"
+                    and {entry.fact["reporting_period"]["fiscal_year"] for entry in entries} == set(years)
+                    and {entry.fact["fact_id"] for entry in entries} == set(verification["fact_ids"])):
+                matches.extend(entries)
         accepted = self._finish("search", action, {"fact_ids": [entry.fact["fact_id"] for entry in matches]})
         return matches if accepted else []
 
@@ -459,7 +491,7 @@ def _recover_context(
 def _answer_growth(
     index: CollectionIndex, request: dict[str, Any], selected: list[IndexedFact], context_limit: int,
     actions: _GrowthActions | None = None, *, initial_context_limit: int | None = None,
-    citations: _PinnedCitations | None,
+    citations: _PinnedCitations | None, retain_partial_context: bool,
 ) -> tuple[dict[str, Any], list[str], list[dict[str, Any]]]:
     prior, current = request["prior_year"], request["current_year"]
     fact_ids = [entry.fact["fact_id"] for entry in selected]
@@ -469,6 +501,7 @@ def _answer_growth(
     observations = [{"fact": item["value"], "citation": _citation(entry)}
                     for entry, item in zip(selected, context, strict=True)]
     context_citations: list[dict[str, Any]] = []
+    supported_comparisons: list[dict[str, Any]] = []
     sources = _facts_by_source(selected)
 
     issues = [
@@ -477,14 +510,20 @@ def _answer_growth(
         for year in (prior, current)
         if not any(entry.fact["reporting_period"]["fiscal_year"] == year for entry in selected)
     ]
+    partial = bool(issues)
+    missing_years = {issue["fiscal_year"] for issue in issues}
+    recover_partial = actions is not None and partial and not any(
+        entry.fact["reporting_period"]["fiscal_year"] in missing_years
+        for entry in actions.eligible.values()
+    )
     calculations: list[tuple[str, dict[str, Any]]] = []
     deferred = False
-    if not issues:
+    if not partial or retain_partial_context:
         def has_both_years(entries: list[IndexedFact]) -> bool:
             return {entry.fact["reporting_period"]["fiscal_year"] for entry in entries} == {prior, current}
 
         pairs = [entries for entries in sources.values() if has_both_years(entries)]
-        if not pairs:
+        if not pairs and not partial:
             issues.append({"code": "incompatible", "detail": "A verified pair from one filing is required."})
         for entries in sorted(sources.values(), key=lambda entries: not has_both_years(entries)):
             entry = entries[0]
@@ -492,11 +531,11 @@ def _answer_growth(
             verification = index.comparisons[source_id]
             comparison = verification["comparison"]
             notes = {note_citation_id(note): note for operand in entries for note in operand.fact["applicable_notes"]}
-            disclosures = {item["id"]: item for item in comparison.get("evidence", [])}
+            disclosures = {} if partial else {item["id"]: item for item in comparison.get("evidence", [])}
             comparison_context = {"kind": "comparison", "id": source_id, "source_id": source_id, "value": {
                 key: value for key, value in comparison.items() if key != "evidence"
             } | {"fact_ids": verification["fact_ids"]}}
-            required = [comparison_context]
+            required = [] if partial else [comparison_context]
             parent_owners = {operand.fact["parent_table_id"]: operand for operand in entries}
             if citations is not None:
                 required.extend({"kind": "parent", "id": parent_id, "source_id": source_id,
@@ -515,7 +554,8 @@ def _answer_growth(
                     item["id"]: pointers[item["id"]] for item in retained if item["kind"] != "comparison"
                 }))
                 retained = [item for item in retained if item["kind"] == "comparison" or item["id"] in valid]
-            if actions and citations is not None and has_both_years(entries):
+            paired = has_both_years(entries)
+            if actions and citations is not None and (paired or recover_partial):
                 retained.extend(_recover_context(actions, entries, required[offered:],
                                                  context_limit - len(context) - len(retained)))
             context.extend(retained)
@@ -542,14 +582,25 @@ def _answer_growth(
                 for item in retained if item["kind"] == "parent"
             )
             context_citations.extend(selected_citations)
-            if not has_both_years(entries):
-                continue
-            if len(retained) < len(required):
+            complete_pair = (paired and len(retained) == len(required)
+                             and comparison["status"] == "compatible"
+                             and set(verification["fact_ids"]) == {operand.fact["fact_id"] for operand in entries})
+            caveats = (comparison.get("scope_caveats", []) if complete_pair else list(dict.fromkeys(
+                item["value"]["scope_caveat"] for item in retained if "scope_caveat" in item["value"]
+            )))
+            if complete_pair or caveats:
+                supported_comparisons.append({
+                    "source_id": source_id, "basis": comparison.get("basis") if complete_pair else None,
+                    "scope_caveats": caveats,
+                })
+            if (paired or partial) and len(retained) < len(required):
                 issues.append({"code": "missing_context", "source_id": source_id,
                                "requirements": [item["id"] for item in required if item["id"] not in retained_ids],
                                "detail": ("The context limit omitted required comparison evidence or applicable notes."
                                           if citations is None else
                                           "Selected evidence lacks required statement or comparison context.")})
+                continue
+            if not paired:
                 continue
             if set(verification["fact_ids"]) != {operand.fact["fact_id"] for operand in entries}:
                 issues.append({"code": "incompatible", "source_id": source_id,
@@ -597,17 +648,22 @@ def _answer_growth(
         "observations": observations,
         "citations": context_citations,
     }
+    if retain_partial_context:
+        growth["comparisons"] = supported_comparisons
     return growth, fact_ids, context
 
 
 def _answer_bounded_growth(
     index: CollectionIndex, request: dict[str, Any], initial: list[IndexedFact], context_limit: int,
     actions: _GrowthActions, *, initial_context_limit: int | None, citations: _PinnedCitations | None,
+    retain_partial_context: bool,
 ) -> tuple[dict[str, Any], list[str], list[dict[str, Any]]]:
     answer, ids, context = _answer_growth(index, request, initial, context_limit, actions,
-                                         initial_context_limit=initial_context_limit, citations=citations)
+                                         initial_context_limit=initial_context_limit, citations=citations,
+                                         retain_partial_context=retain_partial_context)
     missing = [issue["fiscal_year"] for issue in answer["issues"] if issue["code"] == "missing_fiscal_year"]
-    if len(missing) == 1 and context_limit >= 2:
+    selected: list[IndexedFact] = []
+    if len(missing) == 1 and context_limit >= 2 and not actions.context_stalled:
         action = SearchAction(index.manifest["snapshot_id"], request["company_key"], missing[0])
         matches = actions.search(action, initial)
         if matches:
@@ -620,8 +676,16 @@ def _answer_bounded_growth(
                       for entry in ranked_by_source[source_id]]
             # Preserve both fiscal years in the partial context even across different sources.
             selected = paired or [initial[0], matches[0], *initial[1:], *matches[1:]]
-            answer, ids, context = _answer_growth(index, request, selected[:context_limit], context_limit, actions,
-                                                 initial_context_limit=initial_context_limit, citations=citations)
+    elif (retain_partial_context and not actions.context_stalled and answer["stop_reason"] == "incompatible"
+          and actions.eligible.keys() - set(ids)
+          and not any(comparison["basis"] for comparison in answer["comparisons"])):
+        selected = actions.search_pair(SearchPairAction(
+            index.manifest["snapshot_id"], request["company_key"], request["prior_year"], request["current_year"],
+        ))
+    if selected:
+        answer, ids, context = _answer_growth(index, request, selected[:context_limit], context_limit, actions,
+                                             initial_context_limit=initial_context_limit, citations=citations,
+                                             retain_partial_context=retain_partial_context)
     if actions.limit:
         answer.update(stop_reason="budget_exhausted", budget_limit=actions.limit)
     elif answer["stop_reason"] != "sufficient_evidence":
@@ -646,7 +710,7 @@ def _ask_collection(
     index: CollectionIndex, question: str, record: dict[str, Any] | None,
     context_limit: int, initial_fact_limit: int | None, mode: str,
     budget: RecoveryBudget, elapsed: Callable[[], int], *,
-    initial_context_limit: int | None = None, legacy: bool = False,
+    initial_context_limit: int | None = None, search_version: str | None = None,
 ) -> dict[str, Any]:
     if type(context_limit) is not int or context_limit < 1:
         raise SourceError("The collection context limit must be a positive integer.")
@@ -669,6 +733,7 @@ def _ask_collection(
     ranked = []
     selected: list[str] = []
     context: list[dict[str, Any]] | None = None
+    lookup_notes: list[str] = []
     actions = None
     initial: list[IndexedFact] = []
     if request is None:
@@ -704,17 +769,20 @@ def _ask_collection(
         eligible = [entry for candidate, entry in ranked if not candidate["exclusions"]]
         if growth:
             pinned_citations = _PinnedCitations(index.store)
-            citations = None if legacy else pinned_citations
+            citations = None if search_version in (LEGACY_GROWTH_VERSION, LEGACY_BOUNDED_VERSION) else pinned_citations
+            retain_partial_context = search_version in (None, GROWTH_SEARCH_VERSION, BOUNDED_SEARCH_VERSION)
             initial = eligible[:min(initial_fact_limit or context_limit, initial_context_limit or context_limit)]
             if mode == "bounded":
                 actions = _GrowthActions(index, request, eligible, budget, elapsed, pinned_citations)
                 answer, selected, context = _answer_bounded_growth(
                     index, request, initial, context_limit, actions,
                     initial_context_limit=initial_context_limit, citations=citations,
+                    retain_partial_context=retain_partial_context,
                 )
             else:
                 answer, selected, context = _answer_growth(index, request, initial, context_limit,
-                                                           initial_context_limit=initial_context_limit, citations=citations)
+                                                           initial_context_limit=initial_context_limit, citations=citations,
+                                                           retain_partial_context=retain_partial_context)
             result.update(answer)
         elif not eligible:
             result.update(status="evidence_unavailable", message=(
@@ -732,19 +800,30 @@ def _ask_collection(
                 selected = [entry.fact["fact_id"]]
                 result.update(status="answered", fact=entry.fact, source=entry.source,
                               citations=[_citation(entry)])
+                if search_version in (None, LOOKUP_SEARCH_VERSION, BOUNDED_SEARCH_VERSION):
+                    notes = disclosure_citations([entry.fact], {})
+                    lookup_notes = _PinnedCitations(index.store).valid_ids(entry.source["source_id"], notes)
+                    result["citations"].extend(_citation(entry, notes[key]) for key in lookup_notes)
+                    if missing_notes := notes.keys() - set(lookup_notes):
+                        result["unresolved_requirements"] = sorted(missing_notes)
     if record is not None:
         record.update(
-            record_version=RECORD_VERSION, search_version=SEARCH_VERSION, question=question,
+            record_version=RECORD_VERSION,
+            search_version=LEGACY_LOOKUP_VERSION if search_version == LEGACY_LOOKUP_VERSION else LOOKUP_SEARCH_VERSION,
+            question=question,
             snapshot=index.manifest, ranked_candidates=[candidate for candidate, _ in ranked],
             selected_evidence_ids=selected, outcome=result,
         )
+        if lookup_notes:
+            record["selected_note_ids"] = lookup_notes
         if context is not None:
-            record.update(search_version=LEGACY_GROWTH_VERSION if legacy else GROWTH_SEARCH_VERSION, context_limit=context_limit,
-                          selected_context=context)
+            version = search_version if search_version in GROWTH_SEARCH_VERSIONS else GROWTH_SEARCH_VERSION
+            record.update(search_version=version, context_limit=context_limit, selected_context=context)
             if initial_fact_limit is not None:
                 record["initial_fact_limit"] = initial_fact_limit
         if mode == "bounded":
-            record.update(search_version=LEGACY_BOUNDED_VERSION if legacy else BOUNDED_SEARCH_VERSION,
+            version = search_version if search_version in BOUNDED_SEARCH_VERSIONS else BOUNDED_SEARCH_VERSION
+            record.update(search_version=version,
                           context_limit=context_limit,
                           initial_fact_limit=initial_fact_limit, budget=asdict(budget),
                           initial_evidence_ids=[entry.fact["fact_id"] for entry in initial],
@@ -756,8 +835,8 @@ def _ask_collection(
 
 def replay_collection(store: SourceStore, record: object) -> dict[str, Any]:
     if (not isinstance(record, dict) or record.get("record_version") != RECORD_VERSION
-            or record.get("search_version") not in (SEARCH_VERSION, GROWTH_SEARCH_VERSION, BOUNDED_SEARCH_VERSION,
-                                                    LEGACY_GROWTH_VERSION, LEGACY_BOUNDED_VERSION)
+            or record.get("search_version") not in (LEGACY_LOOKUP_VERSION, LOOKUP_SEARCH_VERSION,
+                                                    *GROWTH_SEARCH_VERSIONS, *BOUNDED_SEARCH_VERSIONS)
             or not isinstance(record.get("question"), str)):
         raise SourceError("Unsupported collection validation record.")
     limit = record.get("context_limit", GROWTH_CONTEXT_LIMIT)
@@ -770,7 +849,7 @@ def replay_collection(store: SourceStore, record: object) -> dict[str, Any]:
             raise SourceError("The collection validation record contains an invalid source identity.")
         source_ids.add(source["source_id"])
     index = CollectionIndex.build(store, source_ids)
-    if manifest.get("index_version") == "collection-index-v1" and record["search_version"] == SEARCH_VERSION:
+    if manifest.get("index_version") == "collection-index-v1" and record["search_version"] == LEGACY_LOOKUP_VERSION:
         legacy_manifest = {
             key: value for key, value in index.manifest.items() if key not in ("snapshot_id", "comparison_hash")
         }
@@ -782,8 +861,7 @@ def replay_collection(store: SourceStore, record: object) -> dict[str, Any]:
     initial_fact_limit = record.get("initial_fact_limit")
     initial_context_limit = record.get("initial_context_limit")
     version = record["search_version"]
-    legacy = version in (LEGACY_GROWTH_VERSION, LEGACY_BOUNDED_VERSION)
-    if version in (BOUNDED_SEARCH_VERSION, LEGACY_BOUNDED_VERSION):
+    if version in BOUNDED_SEARCH_VERSIONS:
         budget_data = record.get("budget")
         checkpoints = record.get("elapsed_ns")
         if (not isinstance(budget_data, dict) or set(budget_data) != {"max_calls", "max_seconds"}
@@ -802,10 +880,11 @@ def replay_collection(store: SourceStore, record: object) -> dict[str, Any]:
 
         budget = RecoveryBudget(budget_data["max_calls"], budget_data["max_seconds"])
         result = _ask_collection(index, record["question"], reproduced, limit, initial_fact_limit, "bounded", budget,
-                                 elapsed, initial_context_limit=initial_context_limit, legacy=legacy)
+                                 elapsed, initial_context_limit=initial_context_limit, search_version=version)
     else:
         result = _ask_collection(index, record["question"], reproduced, limit, initial_fact_limit, "one-pass",
-                                 RecoveryBudget(), lambda: 0, initial_context_limit=initial_context_limit, legacy=legacy)
+                                 RecoveryBudget(), lambda: 0, initial_context_limit=initial_context_limit,
+                                 search_version=version)
     if _fingerprint(reproduced) != _fingerprint(record):
         raise SourceError("The saved collection validation record does not match the replayed run.")
     return result

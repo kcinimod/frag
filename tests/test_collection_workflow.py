@@ -13,7 +13,7 @@ GROWTH_QUESTION = "What was Microsoft's reported consolidated revenue growth fro
 
 
 def test_collection_growth_cli_uses_selected_verified_pair(tmp_path: Path) -> None:
-    from test_source_workflow import success
+    from test_source_workflow import invoke, success
 
     filing = tmp_path / "filing.html"
     filing.write_bytes(gzip.decompress(ANCHOR.read_bytes()))
@@ -32,6 +32,11 @@ def test_collection_growth_cli_uses_selected_verified_pair(tmp_path: Path) -> No
     validation = json.loads(record.read_bytes())
     assert set(validation["selected_evidence_ids"]) == {fact["fact_id"] for fact in result["operands"]}
     assert "note-8" in {item["id"] for item in validation["selected_context"]}
+    validation["search_version"] = "annual-revenue-search-v1"
+    record.write_text(json.dumps(validation), encoding="utf-8")
+    rejected = invoke("replay-collection", str(record), *store_args)
+    assert rejected.returncode == 1
+    assert "does not match the replayed run" in rejected.stderr
 
 
 def test_collection_growth_reports_context_missing_from_actual_selection(tmp_path: Path) -> None:
@@ -49,6 +54,11 @@ def test_collection_growth_reports_context_missing_from_actual_selection(tmp_pat
     assert {item["fact"]["normalized_amount"] for item in result["observations"]} == {
         "198270000000", "211915000000",
     }
+    partial = success("ask-collection", GROWTH_QUESTION, "--context-limit", "8", *store_args)
+    comparison, = partial["comparisons"]
+    assert comparison["basis"] is None
+    assert any("Nuance was consolidated" in caveat for caveat in comparison["scope_caveats"])
+    assert "note-8" in {citation["id"] for citation in partial["citations"]}
 
 
 def test_collection_cli_returns_verified_reporting_periods(
@@ -147,6 +157,8 @@ def test_collection_browser_api_opens_original_cell(tmp_path: Path) -> None:
     body = excerpt.get_data(as_text=True)
     assert source["source_hash"] in body
     assert body.endswith("Total revenue\n2023\n(In millions, except per share amounts)\n211,915\n")
+    note = next(citation for citation in data["citations"] if citation["id"] == "note-8")
+    assert "On March 4, 2022" in client.get(note["href"]).text
     assert client.get(href.rsplit("/", 1)[0] + "/stale-version").status_code == 404
 
     growth = client.post(path, json={"question": GROWTH_QUESTION}, headers={"X-Frag-Ask": "1"}).get_json()

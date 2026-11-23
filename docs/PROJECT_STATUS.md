@@ -53,3 +53,9 @@ Phase 2 calculator and its offline results.
   The paired Phase 3 comparison replayed 11 cases in both modes, with offline
   citation validation and Windows resource measurements.
   [Phase 3 handoff](../artifacts/phase03/HANDOFF.md)
+- Issue #12 completes Phase 3. Partial growth results retain the statement and
+  applicable notes for the verified year. Offline Chrome opened Note 8 from
+  the Microsoft FY2023 partial result and the 6.88% growth answer. Bounded
+  retrieval can also recover a verified pair when first-pass observations
+  come from different filings.
+  [Phase 3 handoff](../artifacts/phase03/HANDOFF.md)

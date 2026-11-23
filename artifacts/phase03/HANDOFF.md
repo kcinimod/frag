@@ -1,5 +1,34 @@
 # Phase 3 collection retrieval handoff
 
+Issue #12 extends partial growth results to include the available statement
+and applicable notes for the verified year. With FY2021 unavailable, the
+workspace shows Microsoft FY2023 revenue of **USD 211,915 million**, names
+FY2021 as the missing requirement, and opens Note 8 from the preserved
+original offline. The complete FY2022–FY2023 answer still shows **6.88%**.
+Annual lookups link to applicable notes. Bounded retrieval can reuse a
+verified same-filing pair when the first pass selects the two years from
+separate filings. If it runs out of calls before calculating, it includes
+the comparison caveats supported by the context it recovered.
+[Issue #12](https://github.com/kcinimod/frag/issues/12)
+
+The Windows rerun covered 11 paired cases and matched all 22 offline
+replays. One-pass and bounded retrieval produced 1 and 4 supported answers,
+respectively. All 38 one-pass citations and 61 bounded citations opened and
+passed the excerpt checks. The table below records the original #16 run.
+
+```powershell
+$phase3Run = Join-Path 'build' ('issue12-' + [guid]::NewGuid().ToString('N'))
+.venv/Scripts/python.exe artifacts/phase03/collection-replay.py --growth --bounded --paired --work-dir $phase3Run
+npm.cmd --prefix web run build
+uv run --locked --offline --with playwright python artifacts/phase03/collection-replay.py --growth --bounded --browser
+```
+
+The paired command writes the fresh JSON transcripts and measurements to
+`$phase3Run`. The committed #16 transcripts below still replay with their
+recorded retrieval versions.
+
+## Original paired run
+
 Bounded retrieval turned three partial results into supported results across
 11 paired questions, with no outcome regressions. It recovered the Microsoft
 FY2022 observation in one case and the original statement and disclosures in

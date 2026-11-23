@@ -135,10 +135,22 @@ def test_bounded_question_reports_missing_year_and_preserves_current(tmp_path: P
     assert [item["fact"]["normalized_amount"] for item in answer["observations"]] == ["211915000000"]
     assert answer["observations"][0]["citation"]["locator"]["line"] == 4399
     assert [issue["fiscal_year"] for issue in answer["issues"]] == [2021]
-    actions = json.loads(record.read_bytes())["actions"]
+    run = json.loads(record.read_bytes())
+    note = next(item for item in answer["citations"] if item["id"] == "note-8")
+    assert any(item["id"] == "note-8" for item in run["selected_context"])
+    client = create_app(SourceStore(Path(store[1])), tmp_path).test_client()
+    assert "On March 4, 2022" in client.get(note["href"]).text
+    actions = run["actions"]
     assert len(actions) == 1
     assert actions[0]["result"]["fact_ids"] == []
     assert answer == success("replay-collection", str(record), *store)
+
+    constrained = ("--initial-context-limit", "1", *store)
+    partial = success("ask-collection", question, *constrained)
+    assert "note-8" in partial["issues"][1]["requirements"]
+    recovered = success("ask-collection", question, "--mode", "bounded", *constrained)
+    assert [issue["fiscal_year"] for issue in recovered["issues"]] == [2021]
+    assert note in recovered["citations"]
 
 
 def test_bounded_question_can_retain_a_pair_from_outside_the_first_context(tmp_path: Path) -> None:
@@ -172,6 +184,31 @@ def test_bounded_question_can_retain_a_pair_from_outside_the_first_context(tmp_p
     answer = success("ask-collection", GROWTH_QUESTION, "--mode", "bounded", *options)
     assert answer["percent"] == {"unit": "percent", "value": "6.88"}
     assert [citation["locator"]["line"] for citation in answer["citations"][:2]] == [4403, 4399]
+
+    def verify_prior(payload: bytes, source: dict[str, Any]) -> dict[str, Any]:
+        result = verify_fixture(payload, source)
+        prior, current = result["facts"]
+        prior.update(status="verified", evidence_version=current["evidence_version"],
+                     applicable_notes=current["applicable_notes"])
+        current.update(status="provisional", applicable_notes=[])
+        return result
+
+    with patch("frag.store.inspect_revenue", verify_prior):
+        store.ingest_bytes(original + b"\n<!-- Separate controlled prior year -->\n",
+                           provenance="local_original", metadata=SourceMetadata(company="Microsoft Corporation"))
+    options = ("--initial-fact-limit", "2", *store_args)
+    baseline = success("ask-collection", GROWTH_QUESTION, *options)
+    assert baseline["issues"][0]["code"] == "incompatible"
+    assert len({item["citation"]["source_id"] for item in baseline["observations"]}) == 2
+    record = tmp_path / "reselections.json"
+    answer = success("ask-collection", GROWTH_QUESTION, "--mode", "bounded", "--record", str(record), *options)
+    assert answer["percent"] == {"unit": "percent", "value": "6.88"}
+    run = json.loads(record.read_bytes())
+    assert [action["operation"] for action in run["actions"]] == ["search", "calculate"]
+    assert answer == success("replay-collection", str(record), *store_args)
+    limited = success("ask-collection", GROWTH_QUESTION, "--mode", "bounded", "--max-calls", "0", *options)
+    assert limited["stop_reason"] == "budget_exhausted"
+    assert limited["observations"] == baseline["observations"]
 
 
 def test_bounded_question_keeps_separate_filings_as_partial_evidence(tmp_path: Path) -> None:
@@ -220,6 +257,8 @@ def test_bounded_question_preserves_recovered_facts_when_calculation_exceeds_cal
     assert answer["budget_limit"] == "calls"
     assert answer["percent"] is None
     assert {item["fact"]["raw_amount"] for item in answer["observations"]} == {"211,915", "198,270"}
+    comparison, = answer["comparisons"]
+    assert "currency" in " ".join(comparison["scope_caveats"]).casefold()
     assert len(json.loads(record.read_bytes())["actions"]) == 1
     assert answer == success("replay-collection", str(record), *store)
 
