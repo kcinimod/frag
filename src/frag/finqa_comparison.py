@@ -8,13 +8,14 @@ import sys
 from collections import Counter
 from dataclasses import asdict
 from functools import partial
+from inspect import getsource
 from pathlib import Path
 from time import perf_counter
 from typing import Any, Callable, Sequence
 
 from frag import finqa, finqa_scoring, local_model
 from frag.finqa_program import Excerpt
-from frag.finqa_resources import MODEL, RUNTIME_ARGS, RUNTIME_SHA256, measure
+from frag.finqa_resources import MODEL, RUNTIME_ARCHIVE_SHA256, RUNTIME_ARGS, RUNTIME_SHA256, measure
 
 ANNOTATED = finqa.MODE
 RETRIEVED = "retrieved_evidence"
@@ -37,10 +38,12 @@ def _retrieve(question: str, passages: list[str], table: list[list[str]]) -> tup
         *(Excerpt(f"table_{index}", tuple(cells)) for index, cells in enumerate(table[1:], 1)),
     ]
     terms = _keywords(question)
+    header_terms = _keywords(" ".join(table[0])) if table else set()
     ranked = []
     for excerpt in candidates:
         source = excerpt.source
-        matched = sorted(terms & _keywords(source if isinstance(source, str) else " ".join(source)))
+        keywords = _keywords(source) if isinstance(source, str) else _keywords(" ".join(source)) | header_terms
+        matched = sorted(terms & keywords)
         ranked.append((excerpt, matched))
     # Stable sort keeps passage order, then table row order, among ties.
     ranked.sort(key=lambda entry: -len(entry[1]))
@@ -78,23 +81,25 @@ def _configuration() -> dict[str, Any]:
     request, _, _ = finqa._planner_input("", [], MODEL["alias"])
     return {
         "model": MODEL, "runtime_arguments": RUNTIME_ARGS, "runtime_sha256": RUNTIME_SHA256,
+        "runtime_archive_sha256": RUNTIME_ARCHIVE_SHA256,
         "runtime_fingerprint": local_model.RUNTIME_FINGERPRINT, "timeout_seconds": local_model.TIMEOUT_SECONDS,
         "request_template": request, "context_bytes": finqa.CONTEXT_BYTES, "demonstration_ids": [],
-        "retrieval": "distinct question keyword overlap, positive rows and passages, stable source-order ties",
+        "retrieval": "distinct question keyword overlap, rows include header terms, stable source-order ties",
         "quality_targets": None,
         "implementation_digests": {
-            name: finqa._digest(Path(__file__).with_name(name).read_text(encoding="utf-8-sig"))
-            for name in ("finqa.py", "finqa_comparison.py", "finqa_program.py", "finqa_resources.py", "finqa_scoring.py")
+            **{
+                name: finqa._digest(Path(__file__).with_name(name).read_text(encoding="utf-8-sig"))
+                for name in (
+                    "finqa.py", "finqa_comparison.py", "finqa_program.py", "finqa_resources.py", "finqa_scoring.py",
+                )
+            },
+            "local_model.propose_lookup": finqa._digest(getsource(local_model.propose_lookup)),
         },
     }
 
 
 def _dev_rows(cache: Path, ids: list[str]) -> list[dict[str, Any]]:
-    dev = finqa._load_split(cache, "dev.json")
-    if (not isinstance(ids, list) or not ids or not all(isinstance(item, str) for item in ids)
-            or len(set(ids)) != len(ids) or any(question_id not in dev for question_id in ids)):
-        raise ValueError("Provide unique question IDs from the official dev split")
-    return [dev[question_id] for question_id in ids]
+    return finqa._dev_cohort(finqa._load_split(cache, "dev.json"), ids)
 
 
 def _stage(case: dict[str, Any]) -> str:
@@ -122,6 +127,8 @@ def run(
     cache: Path, ids: list[str], *, planner: Planner | None = None, model_directory: Path | None = None,
 ) -> dict[str, Any]:
     """Compare the same dev IDs with a supplied planner or the pinned Windows runtime."""
+    if (planner is None) == (model_directory is None):
+        raise ValueError("Supply either a model directory for verified measurements or a planner for an unmeasured run")
     rows = _dev_rows(cache, ids)
     configuration = _configuration()
     modes: dict[str, list[dict[str, Any]]] = {}
@@ -134,12 +141,11 @@ def run(
         if model_directory is None:
             modes[mode] = [evaluate(row) for row in rows]
         else:
-            if planner is not None:
-                raise ValueError("Resource measurement uses the pinned planner")
             modes[mode], measurements[mode] = measure(model_directory, rows, evaluate)
     return {
         "version": 1, "split": "dev", "upstream": finqa._provenance(), "cohort_ids": ids,
         "configuration": configuration, "modes": modes, "measurements": measurements,
+        "runtime_verified": model_directory is not None,
         "summary": _summary(modes),
     }
 
@@ -171,7 +177,8 @@ def replay(cache: Path, record: dict[str, Any]) -> dict[str, Any]:
             or finqa._digest(record["configuration"]) != finqa._digest(_configuration())):
         raise ValueError("Comparison record differs from the frozen protocol")
     rows = _dev_rows(cache, record["cohort_ids"])
-    if set(record["modes"]) != set(MODES) or set(record["measurements"]) not in (set(), set(MODES)):
+    expected_measurements = set(MODES) if record["runtime_verified"] else set()
+    if set(record["modes"]) != set(MODES) or set(record["measurements"]) != expected_measurements:
         raise ValueError("Comparison record needs both evidence modes")
     for mode in MODES:
         cases = record["modes"][mode]

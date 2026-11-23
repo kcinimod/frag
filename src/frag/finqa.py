@@ -193,13 +193,18 @@ def _summary(cases: list[dict[str, Any]]) -> dict[str, Any]:
             "answer_matches": sum(case["internal_answer_match"] for case in cases)}
 
 
+def _dev_cohort(dev: dict[str, dict[str, Any]], ids: list[str]) -> list[dict[str, Any]]:
+    if (not isinstance(ids, list) or not ids or not all(isinstance(item, str) for item in ids)
+            or len(set(ids)) != len(ids) or any(question_id not in dev for question_id in ids)):
+        raise ValueError("Provide unique question IDs from the official dev split")
+    return [dev[question_id] for question_id in ids]
+
+
 def _run(cache: Path, ids: list[str]) -> dict[str, Any]:
     splits = _load_splits(cache)
-    dev = splits["dev"]
-    if not ids or len(set(ids)) != len(ids) or any(question_id not in dev for question_id in ids):
-        raise ValueError("Provide unique question IDs from the official dev split")
+    rows = _dev_cohort(splits["dev"], ids)
     audit = _overlap(splits)
-    cases = [_run_case(dev[question_id]) for question_id in ids]
+    cases = [_run_case(row) for row in rows]
     return {
         "version": 1, "mode": MODE, "split": "dev", "cohort_ids": ids,
         "upstream": _provenance(),

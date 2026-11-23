@@ -17,13 +17,10 @@ probes separately.
 
 Both modes answered the same two questions correctly and missed the other
 11. The pinned scorer reproduced the execution and program counts with
-verified parity for both modes. Retrieval omitted four annotated table
-rows across `ETR/2011/page_341.pdf-3` and `UNP/2011/page_76.pdf-2`.
-Both questions had invalid plans in both modes. The context budget
-excluded zero annotated excerpts in this cohort. On
-`PM/2017/page_38.pdf-1` and `PNC/2009/page_46.pdf-3`, retrieval had all
-annotated evidence and moved from an invalid plan to an executed wrong
-answer.
+verified parity for both modes. Ranking and context selection each omitted
+zero annotated excerpts in this cohort. With the retrieved context,
+three invalid plans became executed wrong answers and one executed wrong
+answer became an invalid plan. See the paired cases in the saved record.
 
 ## Windows workload measurements
 
@@ -32,20 +29,23 @@ and NVIDIA GeForce RTX 5060 Laptop GPU.
 
 | Measurement | Annotated | Retrieved |
 | --- | ---: | ---: |
-| Cold server startup plus first question | 3.119 s | 9.083 s |
-| Warm cohort wall time, 13 questions | 70.551 s | 116.757 s |
-| Warm median question time | 5.361 s | 8.438 s |
+| Cold server startup plus first question | 3.213 s | 7.719 s |
+| Warm cohort wall time, 13 questions | 63.375 s | 108.761 s |
+| Warm median question time | 5.030 s | 8.143 s |
 | Peak server working set through the cold question | 1,783 MiB | 1,799 MiB |
-| Peak server working set through the warm cohort | 1,799 MiB | 1,817 MiB |
+| Sampled peak server working set during the warm cohort | 1,784 MiB | 1,786 MiB |
+| Peak server working set for the full run | 1,799 MiB | 1,809 MiB |
 | Sampled peak device VRAM, cold and warm | 0 MiB | 0 MiB |
 
-The cold probe starts a fresh server after weight verification and
+The cold probe starts a fresh server after runtime and weight verification and
 answers the first cohort question in each mode. The warm pass uses
 the same process and runs the full cohort in order, including that first
-question. Cold refers to the server process. The warm RAM value is the
-process-lifetime Windows working-set high-water mark, read at the end of
-the warm cohort. NVIDIA device-wide VRAM was sampled separately during
-the cold and warm windows. Scoring and replay ran after measurement.
+question. Cold refers to the server process. Windows reports the cold and
+full-run RAM peaks as working-set high-water marks. The warm phase polls
+the current server working set independently, with 589 annotated and
+1,010 retrieved samples. NVIDIA device-wide VRAM was sampled separately
+during the cold and warm windows. Scoring and replay ran after measurement.
+[Windows process memory counters](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters)
 
 ## Inspect the evidence
 
@@ -67,8 +67,9 @@ per-ID execution and program matches, and parity discrepancies.
   validation used 13 dev questions and zero demonstrations.
 - Use the verified Qwen2.5-1.5B-Instruct Q4_K_M GGUF and llama.cpp
   b6500-a7a98e0f Windows x64 CPU server. The saved `configuration`
-  specifies weight and executable hashes, four threads, one slot, 4,096
-  context tokens, a 30-second request timeout, and no GPU offload.
+  specifies the weight, runtime archive, and executable hashes, four
+  threads, one slot, 4,096 context tokens, a 30-second request timeout,
+  and no GPU offload. The measured record has `runtime_verified: true`.
 - Use the same system prompt, JSON schema and executor in both modes.
   Use temperature zero, seed 42, up to 512 generated tokens, and disabled
   prompt caching. Allow one attempt per question. The full prompt, request
@@ -76,9 +77,10 @@ per-ID execution and program matches, and parity discrepancies.
 - Select source excerpts using the annotated locators in one mode. In
   retrieved mode, rank passages and table rows from the supplied report
   by the count of distinct shared case-folded keyword tokens, excluding
-  the fixed stopwords in the implementation. Keep positive scores with
-  ties in passage order then table order. Attach the original header for
-  table rows. Use the same 2,800-byte UTF-8 user-message limit in both
+  the fixed stopwords in the implementation. Score each table row using
+  its own cells and the original column headings. Keep positive scores
+  with ties in passage order then table order. Attach the original header
+  for table rows. Use the same 2,800-byte UTF-8 user-message limit in both
   modes, including the question and JSON formatting. Keep the reference
   answer, program, and annotation values outside the planner input.
 - For public test, require one outcome for every official ID in each mode.
@@ -91,15 +93,15 @@ per-ID execution and program matches, and parity discrepancies.
 
 ## Run and replay on Windows
 
-Use the pinned input cache, scorer environment, and the pinned runtime
-under `.frag-model/runtime`. Prepare the inputs and environment using
+Use the [local planner setup](../../README.md#ask-the-filing-for-annual-revenue)
+to install the pinned runtime. Prepare the inputs and environment using
 the [cache setup](FINQA_DIAGNOSTIC.md#fresh-run-on-windows) and
 [scorer dependency setup](FINQA_DIAGNOSTIC.md#offline-scoring-parity).
 The runner expects
 `qwen2.5-1.5b-instruct-q4_k_m.gguf` under `.frag-model`. If needed,
 retrieve the [pinned weights](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/qwen2.5-1.5b-instruct-q4_k_m.gguf)
-into that location. The runner verifies both the weights and executable
-before launching a local server.
+into that location. The runner verifies the weights, runtime archive,
+executable, and companion DLLs before launching a local server.
 
 From the repository root in PowerShell, run a fresh comparison, then
 score it from the saved record. Replay rebuilds both rankings and planner

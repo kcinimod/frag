@@ -207,7 +207,8 @@ when the upstream row-label syntax cannot represent a selected table row.
 Use Qwen2.5-1.5B-Instruct Q4_K_M with four CPU threads and no GPU offload
 for both modes. Keep zero demonstrations and one planner attempt per
 question. Rank retrieved passages and table rows by distinct question
-keyword overlap and apply the same 2,800-byte evidence budget in both
+keyword overlap, including the original column headings for rows. Apply
+the same 2,800-byte evidence budget in both
 modes. Keep the frozen settings and full coverage as the public test
 acceptance criteria and use no numeric accuracy threshold.
 [Measured dev comparison and frozen protocol](../artifacts/phase04/FINQA_COMPARISON.md)

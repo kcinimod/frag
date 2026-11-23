@@ -1,3 +1,4 @@
+import http.client
 import json
 from hashlib import sha256
 from pathlib import Path
@@ -5,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from frag import finqa, finqa_comparison, local_model
+from frag import finqa, finqa_comparison
 
 
 @pytest.fixture
@@ -113,6 +114,8 @@ def test_synthetic_comparison_traces_ranking_and_replays_both_modes(
         return '{"program":[["subtract","12","7"]]}'
 
     record = finqa_comparison.run(synthetic_cache, ["synthetic-dev"], planner=planner)
+    assert record["runtime_verified"] is False
+    assert record["measurements"] == {}
     annotated = record["modes"]["annotated_evidence"][0]
     retrieved = record["modes"]["retrieved_evidence"][0]
     assert delivered == [annotated["planner_input"], retrieved["planner_input"]]
@@ -125,7 +128,7 @@ def test_synthetic_comparison_traces_ranking_and_replays_both_modes(
     assert annotated["outcome"]["value"] == retrieved["outcome"]["value"] == 5.0
     assert "REFERENCE" not in json.dumps(delivered)
     assert "ANNOTATION VALUE" not in json.dumps(delivered)
-    monkeypatch.setattr(local_model, "propose_lookup", lambda *args, **kwargs: pytest.fail("Replay called the planner"))
+    monkeypatch.setattr(http.client, "HTTPConnection", lambda *args, **kwargs: pytest.fail("Replay called the planner"))
     saved = synthetic_cache / "comparison.json"
     saved.write_text(json.dumps(record), encoding="utf-8")
     assert finqa_comparison.main(["replay", str(synthetic_cache), str(saved)]) == 0
@@ -151,3 +154,19 @@ def test_synthetic_comparison_distinguishes_budget_omissions_from_ranking_omissi
     retrieved["ranking"].reverse()
     with pytest.raises(ValueError, match="differs from the pinned question, evidence or references"):
         finqa_comparison.replay(synthetic_cache, record)
+
+
+def test_synthetic_retrieval_matches_table_terms_in_original_headings(
+    synthetic_cache: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = synthetic_cache / "dev.json"
+    rows = json.loads(path.read_bytes())
+    rows[0]["table"] = [["", "Fair value", "Carrying value"], ["Total", "12", "7"]]
+    rows[0]["qa"]["question"] = "How much did fair value exceed carrying value?"
+    path.write_text(json.dumps(rows), encoding="utf-8")
+    monkeypatch.setitem(finqa.INPUT_HASHES, "dev.json", sha256(path.read_bytes()).hexdigest())
+    record = finqa_comparison.run(synthetic_cache, ["synthetic-dev"], planner=lambda payload: '{"program":[]}')
+    retrieved = record["modes"]["retrieved_evidence"][0]
+    assert retrieved["ranking"][0] == {"id": "table_1", "matched_terms": ["carrying", "fair", "value"]}
+    context = json.loads(retrieved["planner_input"]["messages"][1]["content"])
+    assert [item["id"] for item in context["excerpts"]] == ["table_0", "table_1"]
