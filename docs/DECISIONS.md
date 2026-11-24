@@ -260,3 +260,12 @@ run. Count evidence gaps on answerable cases as end-to-end misses. Require
 the missing year and the missing annual observation for abstention credit.
 Retain the run and offline replay separately from the FinQA benchmark.
 [SEC held-out acceptance checkpoint](../artifacts/phase04/SEC_ACCEPTANCE.md)
+
+## Keep Phase 5 development comparisons on fixed filing inputs
+
+Reuse the 15 development questions, original filing hashes, and scoring
+references from issue #27 across the Phase 5 checkpoints. Record each
+production configuration separately and report extraction and verification
+before comparing question results. Use the development CIKs to exclude the
+entire issuer families from the fresh holdout.
+[Phase 5 development baseline](../artifacts/phase05/README.md)

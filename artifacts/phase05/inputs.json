@@ -1,0 +1,201 @@
+{
+  "cohort": "sec-phase05-development-v1",
+  "sources": [
+    {
+      "issuer": "Microsoft Corporation",
+      "cik": "0000789019",
+      "source_id": "0000950170-23-035122",
+      "accession": "0000950170-23-035122",
+      "filing_date": "2023-07-27",
+      "report_end": "2023-06-30",
+      "form": "10-K",
+      "original_filename": "msft-20230630.htm",
+      "archive": "artifacts/phase01/originals/msft-20230630.htm.gz",
+      "role": "control",
+      "sha256": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+      "archive_sha256": "1b12d4d44357f1fc080749abb7d654073197dbaeabd04031bdc6ac164beeca40",
+      "byte_length": 9963591,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017023035122/msft-20230630.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/789019/000095017023035122/msft-20230630.htm"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "cik": "0000320193",
+      "source_id": "0000320193-23-000106",
+      "accession": "0000320193-23-000106",
+      "filing_date": "2023-11-03",
+      "report_end": "2023-09-30",
+      "form": "10-K",
+      "original_filename": "aapl-20230930.htm",
+      "archive": "artifacts/phase04/development/originals/aapl-20230930.htm.gz",
+      "role": "control",
+      "sha256": "bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+      "archive_sha256": "0e0947b966571266e38d64646dd393af7100f6f5811a309c2ad9b92a424525a5",
+      "byte_length": 1558924,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019323000106/aapl-20230930.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/320193/000032019323000106/aapl-20230930.htm"
+    },
+    {
+      "issuer": "Amazon.com, Inc.",
+      "cik": "0001018724",
+      "source_id": "0001018724-24-000008",
+      "accession": "0001018724-24-000008",
+      "filing_date": "2024-02-02",
+      "report_end": "2023-12-31",
+      "form": "10-K",
+      "original_filename": "amzn-20231231.htm",
+      "archive": "artifacts/phase05/originals/amzn-20231231.htm.gz",
+      "role": "development",
+      "sha256": "a469a0feca6dd5728b10c73076c2c120db58116938614c5b1b864fe13674266d",
+      "archive_sha256": "861a16d893994a7f5688eb0f0162ac4bfce1d2da4eb9e881367aa38279999558",
+      "byte_length": 1945178,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1018724/000101872424000008/amzn-20231231.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/1018724/000101872424000008/amzn-20231231.htm"
+    },
+    {
+      "issuer": "Walmart Inc.",
+      "cik": "0000104169",
+      "source_id": "0000104169-24-000056",
+      "accession": "0000104169-24-000056",
+      "filing_date": "2024-03-15",
+      "report_end": "2024-01-31",
+      "form": "10-K",
+      "original_filename": "wmt-20240131.htm",
+      "archive": "artifacts/phase05/originals/wmt-20240131.htm.gz",
+      "role": "development",
+      "sha256": "b5d34a19ec27cb80ddda8d5140ccdaa8454bb2ba5ad4720667887238c55c0e09",
+      "archive_sha256": "5c4a709824d94e46043f400767366e4d963f74add8d465a7dfdd5cf147655a46",
+      "byte_length": 2323877,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/104169/000010416924000056/wmt-20240131.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/104169/000010416924000056/wmt-20240131.htm"
+    },
+    {
+      "issuer": "Alphabet Inc.",
+      "cik": "0001652044",
+      "source_id": "0001652044-24-000022",
+      "accession": "0001652044-24-000022",
+      "filing_date": "2024-01-31",
+      "report_end": "2023-12-31",
+      "form": "10-K",
+      "original_filename": "goog-20231231.htm",
+      "archive": "artifacts/phase05/originals/goog-20231231.htm.gz",
+      "role": "development",
+      "sha256": "787dd59d770312b204d144b4c78b8de23db1e1d53aae4bf37a52d6d874e903b2",
+      "archive_sha256": "eada9740a22deb342a619d070d3942a357198a44b29e0c5e472d77f3836f3a84",
+      "byte_length": 2410403,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204424000022/goog-20231231.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/1652044/000165204424000022/goog-20231231.htm"
+    },
+    {
+      "issuer": "Intel Corporation",
+      "cik": "0000050863",
+      "source_id": "0000050863-24-000010",
+      "accession": "0000050863-24-000010",
+      "filing_date": "2024-01-26",
+      "report_end": "2023-12-30",
+      "form": "10-K",
+      "original_filename": "intc-20231230.htm",
+      "archive": "artifacts/phase05/originals/intc-20231230.htm.gz",
+      "role": "development",
+      "sha256": "3cbfebb819e981fdfaf9f4988a342aa048c924edb5c8cec2738b4883e534ee4e",
+      "archive_sha256": "36aa456f356246298c1d18898094756c90a00c7a38ce7f40850cfe73a18c3f10",
+      "byte_length": 3276073,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/50863/000005086324000010/intc-20231230.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/50863/000005086324000010/intc-20231230.htm"
+    },
+    {
+      "issuer": "Apple Inc.",
+      "cik": "0000320193",
+      "source_id": "0000320193-24-000123",
+      "accession": "0000320193-24-000123",
+      "filing_date": "2024-11-01",
+      "report_end": "2024-09-28",
+      "form": "10-K",
+      "original_filename": "aapl-20240928.htm",
+      "archive": "artifacts/phase05/originals/aapl-20240928.htm.gz",
+      "role": "verification_gap",
+      "sha256": "24a830a0f1256e371d36a1f7f72e5e85a38037d1de2f6f966eb8457db42ff6d6",
+      "archive_sha256": "6d5bfdf20a83e97c9f52132d112088c1221cd18418395880352e640c08d2c9c2",
+      "byte_length": 1503780,
+      "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/aapl-20240928.htm",
+      "retrieved_from": "https://edgar-mirror.sec-api.io/320193/000032019324000123/aapl-20240928.htm"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "msft-lookup",
+      "source_id": "0000950170-23-035122",
+      "question": "What was revenue in FY2023?"
+    },
+    {
+      "case_id": "msft-growth",
+      "source_id": "0000950170-23-035122",
+      "question": "How did reported consolidated revenue change from FY2022 to FY2023?"
+    },
+    {
+      "case_id": "aapl-lookup",
+      "source_id": "0000320193-23-000106",
+      "question": "What was revenue in FY2023?"
+    },
+    {
+      "case_id": "aapl-growth",
+      "source_id": "0000320193-23-000106",
+      "question": "How did reported consolidated revenue change from FY2022 to FY2023?"
+    },
+    {
+      "case_id": "aapl-absent",
+      "source_id": "0000320193-23-000106",
+      "question": "What was revenue growth from FY2020 to FY2023?"
+    },
+    {
+      "case_id": "amzn-lookup",
+      "source_id": "0001018724-24-000008",
+      "question": "What was revenue in FY2023?"
+    },
+    {
+      "case_id": "amzn-growth",
+      "source_id": "0001018724-24-000008",
+      "question": "How did reported consolidated revenue change from FY2022 to FY2023?"
+    },
+    {
+      "case_id": "wmt-lookup",
+      "source_id": "0000104169-24-000056",
+      "question": "What was revenue in FY2024?"
+    },
+    {
+      "case_id": "wmt-growth",
+      "source_id": "0000104169-24-000056",
+      "question": "How did reported consolidated revenue change from FY2023 to FY2024?"
+    },
+    {
+      "case_id": "goog-lookup",
+      "source_id": "0001652044-24-000022",
+      "question": "What was revenue in FY2023?"
+    },
+    {
+      "case_id": "goog-growth",
+      "source_id": "0001652044-24-000022",
+      "question": "How did reported consolidated revenue change from FY2022 to FY2023?"
+    },
+    {
+      "case_id": "intc-lookup",
+      "source_id": "0000050863-24-000010",
+      "question": "What was revenue in FY2023?"
+    },
+    {
+      "case_id": "intc-growth",
+      "source_id": "0000050863-24-000010",
+      "question": "How did reported consolidated revenue change from FY2022 to FY2023?"
+    },
+    {
+      "case_id": "intc-incompatible",
+      "source_id": "0000050863-24-000010",
+      "question": "What was reported consolidated revenue growth from FY2022 to FY2023 using equal-length fiscal years?"
+    },
+    {
+      "case_id": "aapl-2024-present",
+      "source_id": "0000320193-24-000123",
+      "question": "What was revenue in FY2024?"
+    }
+  ]
+}

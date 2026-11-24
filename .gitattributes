@@ -4,3 +4,8 @@ tests/fixtures/* -text
 # Preserve the exact bytes hashed by the SEC acceptance freeze.
 artifacts/phase04/sec_holdout_*.py -text diff
 artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md -text diff
+
+# Preserve the Phase 5 freeze's byte-level script and manifest hashes.
+artifacts/phase05/*.py -text diff
+artifacts/phase05/inputs.json -text diff
+artifacts/phase05/expected.json -text diff

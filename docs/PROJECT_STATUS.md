@@ -93,3 +93,8 @@ Phase 2 calculator and its offline results.
   credited 4/6 abstentions and 4/18 tasks. Review found a contradicted
   missing-year claim in all four credited cases.
   [SEC held-out acceptance checkpoint](../artifacts/phase04/SEC_ACCEPTANCE.md)
+
+- Issue #27 froze 15 SEC development questions across six issuer families.
+  The pre-change run produced 4/13 correct numeric answers, 3/15 end-to-end
+  completions, and 30/30 cold and warm offline replay matches.
+  [Phase 5 development baseline](../artifacts/phase05/README.md)
