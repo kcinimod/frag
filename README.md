@@ -357,3 +357,19 @@ build/finqa-venv/Scripts/python.exe -m frag.finqa_test replay $cache $report
 
 Use the same checkpoint to resume. The status command can also run in a
 second window during inference.
+
+## SEC held-out acceptance
+
+The SEC checkpoint reports accuracy, citation support, grounded abstention,
+and task completion across 18 reserved cases. The checkpoint gives the
+PowerShell commands to prepare the frozen snapshot and copy the runner archive
+from custody. [SEC held-out acceptance checkpoint](artifacts/phase04/SEC_ACCEPTANCE.md)
+
+After preparing that snapshot in PowerShell, verify the saved cases offline.
+
+```powershell
+.venv/Scripts/python.exe "$snapshot/artifacts/phase04/sec_holdout_runner.py" replay "$snapshot/recorded/freeze.json" --inputs "$snapshot/inputs.zip" --work "$snapshot/replay" --saved-run "$snapshot/recorded/live/report.json"
+```
+
+The command prints `{"matched": 18}`. Run the scorer commands in the custody
+environment to verify the recorded metrics.

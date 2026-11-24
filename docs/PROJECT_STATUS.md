@@ -89,6 +89,7 @@ Phase 2 calculator and its offline results.
   evidence. [Holdout handoff](../artifacts/phase04/SEC_HOLDOUT.md)
 
 - Issue #25 evaluated all 18 SEC holdout cases and matched all 18 in offline
-  replay. The frozen workflow answered 0/12 answerable cases and grounded
-  4/6 abstentions for 4/18 end-to-end completion.
+  replay. The workflow answered 0/12 answerable cases. The frozen rubric
+  credited 4/6 abstentions and 4/18 tasks. Review found a contradicted
+  missing-year claim in all four credited cases.
   [SEC held-out acceptance checkpoint](../artifacts/phase04/SEC_ACCEPTANCE.md)
