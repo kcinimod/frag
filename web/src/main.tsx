@@ -241,6 +241,27 @@ type RevenueAnswer =
   | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline' | 'unavailable'; operation: 'growth' })
   | { status: 'clarify' | 'model_unavailable' | 'model_timeout' | 'invalid_plan' | 'evidence_unavailable'; message: string };
 
+type CitationLink = { title: string; href: string };
+
+function LookupCitations({ citations }: { citations: CitationLink[] }) {
+  if (citations.length === 0) return null;
+
+  return (
+    <div className="lookup-citations">
+      <p><strong>Original filing evidence</strong></p>
+      <ul>
+        {citations.map(({ title, href }) => (
+          <li key={href}>
+            <a href={href} target="_blank" rel="noopener noreferrer">
+              {title.replace(/^(Note (\d+) · )Note \2\s*:\s*/i, '$1')}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function RevenueChat({ source }: { source: Source }) {
   const [question, setQuestion] = useState('');
   const [result, setResult] = useState<RevenueAnswer>();
@@ -290,10 +311,10 @@ function RevenueChat({ source }: { source: Source }) {
           <>
             <p><strong>FY{result.fiscal_year} reported consolidated revenue</strong></p>
             <p className="growth-value">{revenueAmount(result.fact)}</p>
-            {result.citations.map(citation => (
-              <a key={citation.id} href={`${path}/citations/${result.fiscal_year}/${encodeURIComponent(citation.id)}`}
-                target="_blank" rel="noopener noreferrer">{citation.title}</a>
-            ))}
+            <LookupCitations citations={result.citations.map(citation => ({
+              title: citation.title,
+              href: `${path}/citations/${result.fiscal_year}/${encodeURIComponent(citation.id)}`,
+            }))} />
           </>
         )}
         {result && 'operation' in result && <GrowthAnswer result={result} path={`${sourcePath}/growth`} />}
@@ -303,19 +324,17 @@ function RevenueChat({ source }: { source: Source }) {
   );
 }
 
-type CollectionCitation = { title: string; href: string };
-
 type CollectionResult =
   | { status: 'answered'; request: { company: string; fiscal_year: number }; fact: RevenueFact;
-      citations: CollectionCitation[]; unresolved_requirements?: string[] }
+      citations: CitationLink[]; unresolved_requirements?: string[] }
   | { status: 'conflicting_evidence'; message: string;
-      alternatives: { fact: RevenueFact; citation: CollectionCitation }[] }
+      alternatives: { fact: RevenueFact; citation: CitationLink }[] }
   | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline'; request: { company: string } })
   | { status: 'clarify' | 'evidence_unavailable'; message: string;
       budget_limit?: 'time' | 'calls';
-      observations?: { fact: RevenueFact & { basis: string }; citation: CollectionCitation }[];
+      observations?: { fact: RevenueFact & { basis: string }; citation: CitationLink }[];
       comparisons?: { source_id: string; scope_caveats: string[] }[];
-      issues?: { detail: string; requirements?: string[] }[]; citations?: CollectionCitation[] };
+      issues?: { detail: string; requirements?: string[] }[]; citations?: CitationLink[] };
 
 function CollectionLookup() {
   const [result, setResult] = useState<CollectionResult>();
@@ -368,9 +387,7 @@ function CollectionLookup() {
           <>
             <p><strong>{result.request.company} FY{result.request.fiscal_year} reported consolidated revenue</strong></p>
             <p className="growth-value">{revenueAmount(result.fact)}</p>
-            {result.citations.map(citation => (
-              <a key={citation.href} href={citation.href} target="_blank" rel="noopener noreferrer">{citation.title}</a>
-            ))}
+            <LookupCitations citations={result.citations} />
             {!!result.unresolved_requirements?.length && (
               <p>Unavailable disclosures · {result.unresolved_requirements.join(', ')}.</p>
             )}
