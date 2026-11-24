@@ -135,7 +135,7 @@ class CollectionIndex:
                     fact["company"] or identity["company"] or "", "income statement",
                     fact["metric"], fact["scope"], fact["metric_label"], fact["basis"],
                     f'FY{fact["reporting_period"]["fiscal_year"]}',
-                    *(note["title"] + " " + note["interpretation"] for note in fact["applicable_notes"]),
+                    *(note["title"] + " " + note.get("interpretation", "") for note in fact["applicable_notes"]),
                 )))
                 entry = IndexedFact(fact, identity, terms)
                 existing = entries.setdefault(fact["fact_id"], entry)

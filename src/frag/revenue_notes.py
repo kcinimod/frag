@@ -3,7 +3,9 @@
 import re
 from typing import Any
 
-from frag.income_html import EvidenceText, StatementHTML, TextBlock, original_span
+from frag.income_html import (
+    ACCOUNTING_POLICIES_HEADING, BASIS_NOTE_HEADING, EvidenceText, StatementHTML, TextBlock, original_span,
+)
 
 NOTES_HEADING = "notes to consolidated financial statements"
 NOTE_HEADING = re.compile(r"note\s+(\d+)\s*[.\-–—:]\s*\w", re.I)
@@ -21,8 +23,14 @@ NET_REVENUE = re.compile(
 RECOGNITION = re.compile(r"\b(?:recogniz\w+|measured)\b", re.I)
 REVENUE_TERMS = re.compile(r"\b(?:revenues?|net sales)\b", re.I)
 BASIS_QUALIFICATION = re.compile(
-    r"\b(?:restat\w*|recast\w*|different (?:accounting )?basis|pending correction"
-    r"|until corrected|should not be (?:used|relied on)|correction of an error)\b", re.I,
+    r"\b(?:restat\w*|recast\w*|different (?:accounting )?basis)\b", re.I,
+)
+UNRELIABLE_AMOUNT = re.compile(
+    r"\b(?:pending correction|misstat\w*|until corrected|should not be (?:used|relied on)"
+    r"|correction of an error)\b", re.I,
+)
+UNCHANGED_CONSOLIDATED_REVENUE = re.compile(
+    r"\b(?:did not (?:affect|change)|had no effect on) (?:reported )?consolidated revenues?\b", re.I,
 )
 
 
@@ -77,15 +85,19 @@ def accounting_policy_notes(
 
 
 def dated_policy_notes(
-    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int], issuer: str,
 ) -> tuple[list[dict[str, Any]], dict[int, int]]:
     blocks = [block for block in document.blocks if block.position > after]
-    basis = _unique_heading(blocks, re.compile(r"Note 1\s*:\s*Basis of Presentation", re.I))
-    policies = _unique_heading(blocks, re.compile(r"Note 2\s*:\s*Accounting Policies", re.I))
+    basis = _unique_heading(blocks, BASIS_NOTE_HEADING)
+    policies = _unique_heading(blocks, ACCOUNTING_POLICIES_HEADING)
     if basis is None or policies is None or basis >= policies or _unresolved_revenue_basis(blocks[basis:]):
         return [], {}
     scope = blocks[basis + 1].text
-    if (not CONSOLIDATED_ACCOUNTS.search(scope)
+    accounts = re.search(r"\bour consolidated financial statements include the accounts of (.+?) and our\b",
+                         scope, re.I)
+    registered_name = " ".join(issuer.rstrip(".").casefold().split())
+    short_name = re.sub(r"\s+(?:corporation|corp|incorporated|inc)$", "", registered_name)
+    if (accounts is None or accounts[1].casefold() not in {registered_name, short_name}
             or not re.search(r"\bwe have eliminated intercompany accounts and transactions\b", scope, re.I)):
         return [], {}
     weeks: dict[int, int] = {}
@@ -98,19 +110,25 @@ def dated_policy_notes(
             weeks[int(year)] = int(duration)
     policy = blocks[policies + 1:]
     revenue = _unique_heading(policy, REVENUE)
-    if (revenue != 0 or len(policy) < 3
+    if (revenue != 0 or len(policy) < 4
             or not re.search(r"\brecognize net product revenue\b.*\btransfer of control\b", policy[1].text, re.I)
-            or not re.match(r"We measure revenue\b", policy[2].text, re.I)):
+            or not re.match(r"We measure revenue\b", policy[2].text, re.I)
+            or not re.search(r"\bpayments to our customers through cooperative advertising programs\b",
+                             policy[3].text, re.I)
+            or not re.search(r"\breduction in revenue\b", policy[3].text, re.I)):
         return [], {}
     evidence = [
         _note(lines, "consolidation", blocks[basis], blocks[policies - 1]),
-        _note(lines, "revenue", policy[0], policy[2], number=2),
+        _note(lines, "revenue", policy[0], policy[3], number=2),
     ]
     return [note for note in evidence if note is not None], weeks
 
 
 def _unresolved_revenue_basis(blocks: list[TextBlock]) -> bool:
-    return any(REVENUE_TERMS.search(sentence) and BASIS_QUALIFICATION.search(sentence)
+    return any(REVENUE_TERMS.search(sentence) and (
+                   UNRELIABLE_AMOUNT.search(sentence)
+                   or (BASIS_QUALIFICATION.search(sentence) and not UNCHANGED_CONSOLIDATED_REVENUE.search(sentence))
+               )
                for block in blocks for sentence in re.split(r"(?<=[.!?])\s+", block.text))
 
 

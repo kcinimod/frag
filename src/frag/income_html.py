@@ -4,6 +4,9 @@ import re
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
 
+BASIS_NOTE_HEADING = re.compile(r"Note 1\s*:\s*Basis of Presentation", re.I)
+ACCOUNTING_POLICIES_HEADING = re.compile(r"Note 2\s*:\s*Accounting Policies", re.I)
+
 
 class UnsupportedLayout(ValueError):
     """The statement cannot be interpreted unambiguously."""
@@ -116,7 +119,7 @@ class Table:
     nested: bool = False
     complete: bool = False
     issuer: EvidenceText | None = None
-    title_table: bool = False
+    separate_title: bool = False
     wrapper: tuple[int, int] | None = None
 
     def locator(self) -> dict[str, int]:
@@ -149,7 +152,7 @@ class StatementHTML(HTMLParser):
         self._preamble: EvidenceText | None = None
         self._block: TextBlock | None = None
         self._issuer: EvidenceText | None = None
-        self._title_table = False
+        self._separate_title = False
         self._ignored: str | None = None
         self._visibility = HTMLVisibility()
 
@@ -199,12 +202,12 @@ class StatementHTML(HTMLParser):
                 if self._heading and self._block and self._is_preamble(self._block):
                     self._finish_block()
                 self._table = Table(self._count, self.getpos(), self._heading,
-                                    preamble=self._preamble, issuer=self._issuer, title_table=self._title_table,
+                                    preamble=self._preamble, issuer=self._issuer, separate_title=self._separate_title,
                                     wrapper=self._block.position if self._block and not self._block.text else None)
                 self._heading = None
                 self._preamble = None
                 self._issuer = None
-                self._title_table = False
+                self._separate_title = False
             elif self._table:
                 self._table.nested = True
             return
@@ -294,7 +297,7 @@ class StatementHTML(HTMLParser):
             self._heading = None
             self._preamble = None
             self._issuer = None
-            self._title_table = False
+            self._separate_title = False
 
     def close(self) -> None:
         super().close()
@@ -308,12 +311,13 @@ class StatementHTML(HTMLParser):
                 self._issuer = self.blocks[-2] if self._block.end and len(self.blocks) > 1 else None
                 self._heading = self._block
                 self._preamble = None
+                self._separate_title = False
             elif self._heading and self._preamble is None and self._is_preamble(self._block):
                 self._preamble = self._block
             else:
                 self._heading = self._preamble = None
                 self._issuer = None
-                self._title_table = False
+                self._separate_title = False
         self._block = None
 
     @staticmethod
@@ -326,14 +330,14 @@ class StatementHTML(HTMLParser):
             cells = [cell for row in table.rows for cell in row if cell.text]
             if (table.complete and not table.nested and len(cells) == 1
                     and is_statement_heading(cells[0].text)):
-                self._heading, self._title_table = cells[0], True
+                self._heading, self._separate_title = cells[0], True
             elif table.heading or (
                 self._table.caption and is_statement_heading(self._table.caption.text)
             ):
                 self.tables.append(table)
             if table.complete and not table.nested and cells:
                 heading = " ".join(cell.text for cell in cells)
-                if re.fullmatch(r"Note \d+\s*:\s*(?:Basis of Presentation|Accounting Policies)", heading, re.I):
+                if BASIS_NOTE_HEADING.fullmatch(heading) or ACCOUNTING_POLICIES_HEADING.fullmatch(heading):
                     self.blocks.append(TextBlock(table.wrapper or table.position, [heading]))
             self._table = None
         self._cell = self._caption = None

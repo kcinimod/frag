@@ -63,11 +63,25 @@ def test_lookup_with_a_separate_title_table_opens_statement_and_notes(
     for citation, phrases in {
         "revenue": ("Consolidated Statements of Income", "Dec 30, 2023", "In Millions", "Net revenue", "54,228"),
         "note-1-consolidation": ("Basis of Presentation", "2022 was a 53-week fiscal year", "intercompany accounts"),
-        "note-2-revenue": ("Revenue Recognition", "transfer of control", "Variable consideration"),
+        "note-2-revenue": ("Revenue Recognition", "transfer of control", "cooperative advertising programs"),
     }.items():
         response = client.get(f"{base}/citations/2023/{citation}")
         assert response.status_code == 200
         assert all(phrase in response.text for phrase in phrases)
+
+    collection_record = tmp_path / "collection.json"
+    collection = success(
+        "ask-collection", "What was Intel Corporation revenue in FY2023?",
+        "--store", str(store.root), "--record", str(collection_record),
+    )
+    assert collection["status"] == "answered"
+    assert collection["fact"]["fact_id"] == fact["fact_id"]
+    assert success("replay-collection", str(collection_record), "--store", str(store.root)) == collection
+    assert {citation["id"] for citation in collection["citations"]} == {
+        "revenue", "note-1-consolidation", "note-2-revenue",
+    }
+    for citation in collection["citations"]:
+        assert client.get(citation["href"]).status_code == 200
 
 
 def test_conflicting_fiscal_calendar_keeps_the_affected_observation_provisional(tmp_path: Path) -> None:
@@ -87,6 +101,31 @@ def test_conflicting_fiscal_calendar_keeps_the_affected_observation_provisional(
     assert "duration conflicts" in result["message"]
     statuses = {item["reporting_period"]["fiscal_year"]: item["status"] for item in source["facts"]}
     assert statuses == {2021: "verified", 2022: "provisional", 2023: "verified"}
+
+
+@pytest.mark.parametrize(("before", "after"), [
+    (b"include the accounts of Intel and our", b"include the accounts of Example Subsidiary and our"),
+    (b"We have reclassified certain prior period amounts to conform to current period presentation.",
+     b"Revenue for fiscal 2023 is misstated. The amount should not be relied on until corrected."),
+])
+def test_unresolved_dated_statement_disclosures_keep_revenue_provisional(
+    tmp_path: Path, before: bytes, after: bytes,
+) -> None:
+    original = gzip.decompress(INTEL.read_bytes())
+    assert original.count(before) >= 1
+    # These synthetic mutations exercise the checks after intake with a local-original claim.
+    source = SourceStore(tmp_path / "store").ingest_bytes(
+        original.replace(before, after, 1), provenance="local_original",
+    )
+
+    def propose(_: dict[str, Any]) -> str:
+        pytest.fail("Provisional revenue reached the planner")
+
+    result = ask_revenue(source, "What was revenue in FY2023?", propose)
+    assert result["status"] == "evidence_unavailable"
+    assert "applicable_notes" in result["message"]
+    fact = next(item for item in source["facts"] if item["reporting_period"]["fiscal_year"] == 2023)
+    assert (fact["raw_amount"], fact["status"]) == ("54,228", "provisional")
 
 
 def test_unseen_issuer_lookup_opens_original_evidence_offline(

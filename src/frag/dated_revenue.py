@@ -49,8 +49,8 @@ class DatedStatement:
     shared_year: bool = False
 
     @property
-    def reusable(self) -> bool:
-        return self.shared_year or self.table.title_table
+    def uses_original_evidence(self) -> bool:
+        return self.shared_year or self.table.separate_title
 
 
 def is_dated_statement(table: Table) -> bool:
@@ -73,7 +73,7 @@ def original_evidence_tables(document: StatementHTML) -> list[Table]:
     return [
         table for table in document.tables
         if table.heading and CONSOLIDATED_HEADING.fullmatch(table.heading.text)
-        and (table.title_table or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row))
+        and (table.separate_title or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row))
     ]
 
 
@@ -170,7 +170,9 @@ def _inline_period(
         raise UnsupportedLayout("The inline XBRL context has dimensions that conflict with consolidated scope.")
     if fields.get("xbrli:identifier") != cik:
         raise UnsupportedLayout("The inline XBRL entity conflicts with the filing cover.")
-    if statement.reusable and context.identifier_scheme not in {"http://www.sec.gov/CIK", "https://www.sec.gov/CIK"}:
+    if statement.uses_original_evidence and context.identifier_scheme not in {
+        "http://www.sec.gov/CIK", "https://www.sec.gov/CIK",
+    }:
         raise UnsupportedLayout("The inline XBRL entity does not use an SEC CIK.")
     if fields.get("xbrli:enddate") != end.isoformat():
         raise UnsupportedLayout("The inline XBRL period conflicts with the displayed fiscal year-end.")
@@ -273,15 +275,19 @@ def _annual_facts(
     for index, end in enumerate(ordered):
         prior_end = ordered[index - 1] if index else None
         fact = None
+        week_count = weeks.get(end.year)
         try:
             fact, value = _visible_fact(statement, periods[end], end, base)
-            _verify_inline(document, statement, value, end, prior_end, cik, fact, weeks.get(end.year))
+            _verify_inline(document, statement, value, end, prior_end, cik, fact, week_count)
         except UnsupportedLayout as exc:
             diagnostics.append({"code": "unsupported_observation", "fiscal_year": end.year, "message": str(exc)})
-            if fact is None or not statement.reusable:
+            if fact is None or not statement.uses_original_evidence:
                 continue
             fact.update(status="provisional",
                         unresolved_requirements=[*fact["unresolved_requirements"], "inline_xbrl_verification"])
+        if statement.table.separate_title and week_count is None:
+            fact.update(status="provisional",
+                        unresolved_requirements=[*fact["unresolved_requirements"], "fiscal_calendar_verification"])
         facts.append(fact | {"comparative": end < ordered[-1]})
     return facts
 
@@ -375,11 +381,11 @@ def inspect_original_revenue(
         if len(document.tables) != 1:
             raise UnsupportedLayout("More than one statement table could contain consolidated revenue.")
         rows = [row.cells for row in table_grid(table)]
-        labels = SHARED_REVENUE_LABELS | {"net revenue"} if table.title_table else SHARED_REVENUE_LABELS
+        labels = SHARED_REVENUE_LABELS | {"net revenue"} if table.separate_title else SHARED_REVENUE_LABELS
         label = _one([cell for row in rows for cell in row if cell.cell.text.casefold() in labels],
                      "Expected one total revenue row in the consolidated statement.")
         headers = rows[:label.row - 1]
-        if table.title_table:
+        if table.separate_title:
             parser_version = TITLED_TABLE_PARSER_VERSION
             annual, periods = _titled_table_columns(headers)
         else:
@@ -393,19 +399,17 @@ def inspect_original_revenue(
                 or _cover(document, "documenttype") != "10-K"
                 or _displayed_date(_cover(document, "documentperiodenddate")) != current):
             requirements.append("source_identity_verification")
-        if not table.title_table and (
+        if not table.separate_title and (
             table.issuer is None or _normalized_company(table.issuer.text) != _normalized_company(company)
         ):
             requirements.append("statement_issuer_verification")
         requirements.extend(_shared_source_requirements(source, company, cik, current))
         scale, unit_locator = _original_statement_scale(table, headers, annual)
         statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
-                                   shared_year=not table.title_table)
+                                   shared_year=not table.separate_title)
         weeks: dict[int, int] = {}
-        if table.title_table:
-            notes, weeks = dated_policy_notes(document, lines, after=table.position)
-            if not {end.year for end in periods} <= weeks.keys():
-                requirements.append("fiscal_calendar_verification")
+        if table.separate_title:
+            notes, weeks = dated_policy_notes(document, lines, after=table.position, issuer=company)
         else:
             notes = accounting_policy_notes(
                 document, lines, after=table.position, includes_fees=any(
@@ -426,10 +430,13 @@ def inspect_original_revenue(
         facts = _annual_facts(document, statement, periods, cik, base, diagnostics, weeks)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
+    unresolved = list(dict.fromkeys([*requirements, *(
+        requirement for fact in facts for requirement in fact["unresolved_requirements"]
+    )]))
     return {
         "parser_version": parser_version, "evidence_version": SHARED_YEAR_EVIDENCE_VERSION,
         "facts": facts, "diagnostics": diagnostics, "comparison": legacy_comparison(),
-        "unresolved_requirements": [*requirements, *(["extraction"] if diagnostics else []),
+        "unresolved_requirements": [*unresolved, *(["extraction"] if diagnostics else []),
                                     "comparison_compatibility"],
         "verification_reference": None, "real_source_acceptance": False,
     }
@@ -438,7 +445,7 @@ def inspect_original_revenue(
 def _original_statement_scale(
     table: Table, headers: list[list[GridCell]], annual: GridCell,
 ) -> tuple[int, dict[str, int]]:
-    if table.title_table:
+    if table.separate_title:
         declaration = DATED_MONEY_HEADER.fullmatch(annual.cell.text)
         units = SHARED_MONEY_PREAMBLE.fullmatch(declaration[1]) if declaration else None
         locator = annual.locator(table)
