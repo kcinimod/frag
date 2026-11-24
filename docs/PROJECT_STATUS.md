@@ -87,3 +87,8 @@ Phase 2 calculator and its offline results.
 - Issue #24 reserves 18 cases from six domestic 10-K issuer families. The
   offline audit verified the original hashes, case coverage, and scoring
   evidence. [Holdout handoff](../artifacts/phase04/SEC_HOLDOUT.md)
+
+- Issue #25 evaluated all 18 SEC holdout cases and matched all 18 in offline
+  replay. The frozen workflow answered 0/12 answerable cases and grounded
+  4/6 abstentions for 4/18 end-to-end completion.
+  [SEC held-out acceptance checkpoint](../artifacts/phase04/SEC_ACCEPTANCE.md)

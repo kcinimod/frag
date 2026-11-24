@@ -251,3 +251,12 @@ separate scorer archive. Record the archive hashes in the repository and
 release the runner archive only after the evaluation freeze. Replace the
 whole issuer group if a reserved filing is used in development.
 [Holdout handoff](../artifacts/phase04/SEC_HOLDOUT.md)
+
+## Score the SEC holdout through the filing workflow
+
+Use the committed filing-scoped CLI and original browser citation routes.
+Freeze the runner, scorer, model settings, and rubric before the blinded
+run. Count evidence gaps on answerable cases as end-to-end misses. Require
+the missing year and the missing annual observation for abstention credit.
+Retain the run and offline replay separately from the FinQA benchmark.
+[SEC held-out acceptance checkpoint](../artifacts/phase04/SEC_ACCEPTANCE.md)

@@ -1,2 +1,6 @@
 # Preserve fixture bytes (and source hashes) across Windows checkouts.
 tests/fixtures/* -text
+
+# Preserve the exact bytes hashed by the SEC acceptance freeze.
+artifacts/phase04/sec_holdout_*.py -text diff
+artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md -text diff
