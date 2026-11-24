@@ -18,7 +18,8 @@ RESULT_VERSION = f"{PARSER_VERSION}:{PRIOR_LAYOUT_VERSION}:{EVIDENCE_VERSION}"
 
 def _extraction_cache_version() -> str:
     # Collection snapshots already pin each source's parser and evidence versions.
-    return f"{RESULT_VERSION}:{dated_revenue.PARSER_VERSION}:{dated_revenue.EVIDENCE_VERSION}"
+    return (f"{RESULT_VERSION}:{dated_revenue.PARSER_VERSION}:{dated_revenue.EVIDENCE_VERSION}"
+            f":{dated_revenue.EXTRACTION_CACHE_REVISION}")
 
 
 class SourceError(ValueError):

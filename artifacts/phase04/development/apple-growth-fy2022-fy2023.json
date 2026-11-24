@@ -1,0 +1,662 @@
+{
+  "version": 2,
+  "question": "How did reported consolidated revenue change from FY2022 to FY2023?",
+  "resolved_request": {
+    "operation": "growth",
+    "metric": "reported_consolidated_revenue",
+    "prior_year": 2022,
+    "current_year": 2023
+  },
+  "source": {
+    "source_id": "sha256:bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+    "source_hash": "bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+    "parser_version": "dated-annual-revenue-v1",
+    "evidence_version": "dated-annual-revenue-evidence-v1"
+  },
+  "evidence": [
+    {
+      "fact_id": "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+      "metric": "reported_consolidated_revenue",
+      "reporting_period": {
+        "end": "2023-09-30",
+        "fiscal_year": 2023,
+        "kind": "annual",
+        "start": "2022-09-25"
+      },
+      "normalized_amount": "383285000000",
+      "currency": "USD",
+      "scale": 1000000,
+      "role": "current"
+    },
+    {
+      "fact_id": "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1",
+      "metric": "reported_consolidated_revenue",
+      "reporting_period": {
+        "end": "2022-09-24",
+        "fiscal_year": 2022,
+        "kind": "annual",
+        "start": "2021-09-26"
+      },
+      "normalized_amount": "394328000000",
+      "currency": "USD",
+      "scale": 1000000,
+      "role": "prior"
+    }
+  ],
+  "model_settings": {
+    "expected_server_configuration": {
+      "runtime": "llama.cpp b6500-a7a98e0f",
+      "weights": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+      "quantization": "Q4_K_M",
+      "context_size": 4096,
+      "threads": 4,
+      "gpu_layers": 0,
+      "parallel": 1,
+      "offline": true,
+      "timeout_seconds": 30
+    }
+  },
+  "model_request": {
+    "model": "frag-qwen25-05b-q4km",
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "max_tokens": 320,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Plan reported consolidated revenue growth. Match each requested fiscal year to reporting_period.fiscal_year in the evidence. Replace CURRENT and PRIOR with the corresponding exact fact_id strings. Copy the second input of subtract again as the second input of divide. The denominator must be the older fiscal year's fact ID. Use compact JSON with this exact structure: {\"operation\":\"growth\",\"steps\":[{\"operation\":\"subtract\",\"inputs\":[\"CURRENT\",\"PRIOR\"]},{\"operation\":\"divide\",\"inputs\":[\"subtract\",\"PRIOR\"]},{\"operation\":\"to_percent\",\"inputs\":[\"divide\"]}]}."
+      },
+      {
+        "role": "user",
+        "content": "{\"evidence\": [{\"fact_id\": \"fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911\", \"metric\": \"reported_consolidated_revenue\", \"reporting_period\": {\"end\": \"2023-09-30\", \"fiscal_year\": 2023, \"kind\": \"annual\", \"start\": \"2022-09-25\"}, \"normalized_amount\": \"383285000000\", \"currency\": \"USD\", \"scale\": 1000000, \"role\": \"current\"}, {\"fact_id\": \"fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1\", \"metric\": \"reported_consolidated_revenue\", \"reporting_period\": {\"end\": \"2022-09-24\", \"fiscal_year\": 2022, \"kind\": \"annual\", \"start\": \"2021-09-26\"}, \"normalized_amount\": \"394328000000\", \"currency\": \"USD\", \"scale\": 1000000, \"role\": \"prior\"}], \"prior_fiscal_year\": 2022, \"current_fiscal_year\": 2023}\nUse these exact inputs in the growth plan: {\"operation\": \"growth\", \"steps\": [{\"operation\": \"subtract\", \"inputs\": [\"fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911\", \"fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1\"]}, {\"operation\": \"divide\", \"inputs\": [\"subtract\", \"fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1\"]}, {\"operation\": \"to_percent\", \"inputs\": [\"divide\"]}]}"
+      }
+    ],
+    "response_format": {
+      "type": "json_object",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "const": "growth"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "operation": {
+                  "enum": [
+                    "subtract",
+                    "divide",
+                    "to_percent"
+                  ]
+                },
+                "inputs": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "items": {
+                    "enum": [
+                      "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+                      "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1",
+                      "subtract",
+                      "divide"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "operation",
+                "inputs"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "operation",
+          "steps"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "proposed_plan": "{\"operation\": \"growth\", \"steps\": [{\"operation\": \"subtract\", \"inputs\": [\"fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911\", \"fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1\"]}, {\"operation\": \"divide\", \"inputs\": [\"subtract\", \"fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1\"]}, {\"operation\": \"to_percent\", \"inputs\": [\"divide\"]}]}",
+  "validation_status": "calculated",
+  "result": {
+    "source_id": "sha256:bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+    "source_hash": "bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+    "parser_version": "dated-annual-revenue-v1",
+    "evidence_version": "dated-annual-revenue-evidence-v1",
+    "operation": "growth",
+    "prior_year": 2022,
+    "current_year": 2023,
+    "formula": "(current revenue - prior revenue) / prior revenue \u00d7 100",
+    "operands": [
+      {
+        "role": "prior",
+        "source_id": "sha256:bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+        "company": "Apple Inc.",
+        "filing_date": "2023-11-03",
+        "parser_version": "dated-annual-revenue-v1",
+        "evidence_version": "dated-annual-revenue-evidence-v1",
+        "applicable_notes": [
+          {
+            "number": 1,
+            "title": "Summary of Significant Accounting Policies",
+            "interpretation": "The consolidation includes Apple and its wholly owned subsidiaries. Revenue excludes taxes remitted to governmental authorities. FY2023 had 53 weeks, while FY2022 and FY2021 had 52 weeks.",
+            "locator": {
+              "start": {
+                "line": 4,
+                "character": 737420
+              },
+              "end_exclusive": {
+                "line": 4,
+                "character": 745622
+              }
+            },
+            "sha256": "1b400a0e93b4a741c42b1fe27dc05d91b1049b5ac450523dc34dd45b940d60ef"
+          },
+          {
+            "number": 2,
+            "title": "Revenue",
+            "interpretation": "Revenue is recognized as control of products or services transfers. Product net sales reflect estimates of returns, price protection and other incentives.",
+            "locator": {
+              "start": {
+                "line": 4,
+                "character": 745622
+              },
+              "end_exclusive": {
+                "line": 4,
+                "character": 773743
+              }
+            },
+            "sha256": "01168d9a797519c9124409e7a28658d92d402d38b2699ef91cbefed9f9c11c5c"
+          },
+          {
+            "number": 13,
+            "title": "Segment Information and Geographic Data",
+            "interpretation": "Geographic segment net sales are supplemental disaggregation of reported consolidated net sales.",
+            "locator": {
+              "start": {
+                "line": 4,
+                "character": 1306706
+              },
+              "end_exclusive": {
+                "line": 4,
+                "character": 1376312
+              }
+            },
+            "sha256": "b0e6fed110472c22f5f17a87a1ba9a8e3f764bc5281862aced87e202bf008d93"
+          }
+        ],
+        "status": "verified",
+        "unresolved_requirements": [],
+        "parent_table_id": "sha256:bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90#table-23",
+        "fact_id": "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1",
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total net sales",
+        "raw_amount": "394,328",
+        "normalized_amount": "394328000000",
+        "currency": "USD",
+        "scale": 1000000,
+        "basis": "as_reported_in_filing",
+        "scope": "consolidated",
+        "reporting_period": {
+          "kind": "annual",
+          "fiscal_year": 2022,
+          "start": "2021-09-26",
+          "end": "2022-09-24"
+        },
+        "inline_xbrl": {
+          "fact_element_id": "f-70",
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-20",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "table": {
+            "table": 23,
+            "line": 4,
+            "character": 491823
+          },
+          "statement_heading": {
+            "line": 4,
+            "character": 491282
+          },
+          "metric_label": {
+            "table": 23,
+            "row": 7,
+            "cell": 1,
+            "column": 1,
+            "line": 4,
+            "character": 498866
+          },
+          "annual_header": {
+            "table": 23,
+            "row": 2,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 492520
+          },
+          "year_header": {
+            "table": 23,
+            "row": 3,
+            "cell": 4,
+            "column": 10,
+            "line": 4,
+            "character": 493111
+          },
+          "value": {
+            "table": 23,
+            "row": 7,
+            "cell": 5,
+            "column": 10,
+            "line": 4,
+            "character": 499783
+          },
+          "unit_header": {
+            "table": 23,
+            "line": 4,
+            "character": 491488
+          },
+          "currency_symbol": {
+            "table": 23,
+            "row": 5,
+            "cell": 6,
+            "column": 10,
+            "line": 4,
+            "character": 495281
+          },
+          "currency_measure": {
+            "line": 4,
+            "character": 10162
+          },
+          "inline_context": {
+            "line": 4,
+            "character": 12916
+          },
+          "inline_fact": {
+            "line": 4,
+            "character": 500032
+          }
+        },
+        "comparative": true
+      },
+      {
+        "role": "current",
+        "source_id": "sha256:bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+        "company": "Apple Inc.",
+        "filing_date": "2023-11-03",
+        "parser_version": "dated-annual-revenue-v1",
+        "evidence_version": "dated-annual-revenue-evidence-v1",
+        "applicable_notes": [
+          {
+            "number": 1,
+            "title": "Summary of Significant Accounting Policies",
+            "interpretation": "The consolidation includes Apple and its wholly owned subsidiaries. Revenue excludes taxes remitted to governmental authorities. FY2023 had 53 weeks, while FY2022 and FY2021 had 52 weeks.",
+            "locator": {
+              "start": {
+                "line": 4,
+                "character": 737420
+              },
+              "end_exclusive": {
+                "line": 4,
+                "character": 745622
+              }
+            },
+            "sha256": "1b400a0e93b4a741c42b1fe27dc05d91b1049b5ac450523dc34dd45b940d60ef"
+          },
+          {
+            "number": 2,
+            "title": "Revenue",
+            "interpretation": "Revenue is recognized as control of products or services transfers. Product net sales reflect estimates of returns, price protection and other incentives.",
+            "locator": {
+              "start": {
+                "line": 4,
+                "character": 745622
+              },
+              "end_exclusive": {
+                "line": 4,
+                "character": 773743
+              }
+            },
+            "sha256": "01168d9a797519c9124409e7a28658d92d402d38b2699ef91cbefed9f9c11c5c"
+          },
+          {
+            "number": 13,
+            "title": "Segment Information and Geographic Data",
+            "interpretation": "Geographic segment net sales are supplemental disaggregation of reported consolidated net sales.",
+            "locator": {
+              "start": {
+                "line": 4,
+                "character": 1306706
+              },
+              "end_exclusive": {
+                "line": 4,
+                "character": 1376312
+              }
+            },
+            "sha256": "b0e6fed110472c22f5f17a87a1ba9a8e3f764bc5281862aced87e202bf008d93"
+          }
+        ],
+        "status": "verified",
+        "unresolved_requirements": [],
+        "parent_table_id": "sha256:bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90#table-23",
+        "fact_id": "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total net sales",
+        "raw_amount": "383,285",
+        "normalized_amount": "383285000000",
+        "currency": "USD",
+        "scale": 1000000,
+        "basis": "as_reported_in_filing",
+        "scope": "consolidated",
+        "reporting_period": {
+          "kind": "annual",
+          "fiscal_year": 2023,
+          "start": "2022-09-25",
+          "end": "2023-09-30"
+        },
+        "inline_xbrl": {
+          "fact_element_id": "f-69",
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-1",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "table": {
+            "table": 23,
+            "line": 4,
+            "character": 491823
+          },
+          "statement_heading": {
+            "line": 4,
+            "character": 491282
+          },
+          "metric_label": {
+            "table": 23,
+            "row": 7,
+            "cell": 1,
+            "column": 1,
+            "line": 4,
+            "character": 498866
+          },
+          "annual_header": {
+            "table": 23,
+            "row": 2,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 492520
+          },
+          "year_header": {
+            "table": 23,
+            "row": 3,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 492786
+          },
+          "value": {
+            "table": 23,
+            "row": 7,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 499115
+          },
+          "unit_header": {
+            "table": 23,
+            "line": 4,
+            "character": 491488
+          },
+          "currency_symbol": {
+            "table": 23,
+            "row": 5,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 494470
+          },
+          "currency_measure": {
+            "line": 4,
+            "character": 10162
+          },
+          "inline_context": {
+            "line": 4,
+            "character": 5501
+          },
+          "inline_fact": {
+            "line": 4,
+            "character": 499364
+          }
+        },
+        "comparative": false
+      }
+    ],
+    "issues": [],
+    "trace": [
+      {
+        "operation": "subtract",
+        "inputs": [
+          "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+          "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1"
+        ],
+        "result": "-11043000000"
+      },
+      {
+        "operation": "divide",
+        "inputs": [
+          "subtract",
+          "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1"
+        ],
+        "result": "-11043/394328"
+      },
+      {
+        "operation": "to_percent",
+        "inputs": [
+          "divide"
+        ],
+        "result": "-2.80"
+      }
+    ],
+    "percent": {
+      "unit": "percent",
+      "value": "-2.80"
+    },
+    "absolute_change": null,
+    "citations": [
+      {
+        "id": "prior",
+        "title": "FY2022 Total net sales cell",
+        "locator": {
+          "table": 23,
+          "row": 7,
+          "cell": 5,
+          "column": 10,
+          "line": 4,
+          "character": 499783
+        },
+        "context_locators": {
+          "statement_heading": {
+            "line": 4,
+            "character": 491282
+          },
+          "metric_label": {
+            "table": 23,
+            "row": 7,
+            "cell": 1,
+            "column": 1,
+            "line": 4,
+            "character": 498866
+          },
+          "annual_header": {
+            "table": 23,
+            "row": 2,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 492520
+          },
+          "year_header": {
+            "table": 23,
+            "row": 3,
+            "cell": 4,
+            "column": 10,
+            "line": 4,
+            "character": 493111
+          },
+          "unit_header": {
+            "table": 23,
+            "line": 4,
+            "character": 491488
+          },
+          "currency_symbol": {
+            "table": 23,
+            "row": 5,
+            "cell": 6,
+            "column": 10,
+            "line": 4,
+            "character": 495281
+          },
+          "currency_measure": {
+            "line": 4,
+            "character": 10162
+          }
+        }
+      },
+      {
+        "id": "current",
+        "title": "FY2023 Total net sales cell",
+        "locator": {
+          "table": 23,
+          "row": 7,
+          "cell": 2,
+          "column": 4,
+          "line": 4,
+          "character": 499115
+        },
+        "context_locators": {
+          "statement_heading": {
+            "line": 4,
+            "character": 491282
+          },
+          "metric_label": {
+            "table": 23,
+            "row": 7,
+            "cell": 1,
+            "column": 1,
+            "line": 4,
+            "character": 498866
+          },
+          "annual_header": {
+            "table": 23,
+            "row": 2,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 492520
+          },
+          "year_header": {
+            "table": 23,
+            "row": 3,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 492786
+          },
+          "unit_header": {
+            "table": 23,
+            "line": 4,
+            "character": 491488
+          },
+          "currency_symbol": {
+            "table": 23,
+            "row": 5,
+            "cell": 2,
+            "column": 4,
+            "line": 4,
+            "character": 494470
+          },
+          "currency_measure": {
+            "line": 4,
+            "character": 10162
+          }
+        }
+      },
+      {
+        "id": "note-1",
+        "title": "Note 1 \u00b7 Summary of Significant Accounting Policies",
+        "locator": {
+          "start": {
+            "line": 4,
+            "character": 737420
+          },
+          "end_exclusive": {
+            "line": 4,
+            "character": 745622
+          }
+        }
+      },
+      {
+        "id": "note-2",
+        "title": "Note 2 \u00b7 Revenue",
+        "locator": {
+          "start": {
+            "line": 4,
+            "character": 745622
+          },
+          "end_exclusive": {
+            "line": 4,
+            "character": 773743
+          }
+        }
+      },
+      {
+        "id": "note-13",
+        "title": "Note 13 \u00b7 Segment Information and Geographic Data",
+        "locator": {
+          "start": {
+            "line": 4,
+            "character": 1306706
+          },
+          "end_exclusive": {
+            "line": 4,
+            "character": 1376312
+          }
+        }
+      },
+      {
+        "id": "foreign_currency_impact",
+        "title": "Foreign currency impact",
+        "locator": {
+          "start": {
+            "line": 4,
+            "character": 356642
+          },
+          "end_exclusive": {
+            "line": 4,
+            "character": 357164
+          }
+        }
+      }
+    ],
+    "comparison_basis": "Reported consolidated net sales as presented together in Apple's FY2023 10-K.",
+    "scope_caveats": [
+      "FY2023 spanned 53 weeks and FY2022 spanned 52 weeks. The comparison uses the reported totals for both periods.",
+      "Apple disclosed that weaker foreign currencies accounted for more than the entire year-over-year decrease in total net sales."
+    ],
+    "status": "calculated"
+  },
+  "timings_ms": {
+    "model": 7045.018,
+    "validation_and_execution": 0.182,
+    "total": 7045.281
+  }
+}

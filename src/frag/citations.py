@@ -75,7 +75,7 @@ def citation_lines(lines: list[str], source_hash: str, citation: dict[str, Any])
     if "table_locators" in citation:
         table = _fragment_at(lines, locator)
         context = citation["table_locators"]
-        statement = _visible_text(_fragment_at(lines, context["statement_heading"]))
+        statement = _context_text(lines, "statement_heading", context["statement_heading"])
         if (not re.match(r"<table[\s>]", table, re.IGNORECASE)
                 or not is_statement_heading(statement)
                 or not all(context[key]["table"] == locator["table"] for key in ("annual_header", "unit_header"))):

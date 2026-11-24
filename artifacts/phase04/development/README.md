@@ -1,4 +1,4 @@
-# Annual SEC revenue lookup development evidence
+# Annual SEC revenue development evidence
 
 The development issuers for issue #22 are Microsoft (CIK 0000789019) and Apple
 (CIK 0000320193). Exclude both issuers and their filing families from the
@@ -46,8 +46,7 @@ CLI replay paths. They verify that the browser API can reopen the amount,
 fiscal date, currency, scale and notes from the preserved bytes after the
 input file is removed. The planner in these tests supplies a fixed proposal.
 Synthetic changes exercise disagreements in period, currency, scale,
-consolidated scope, displayed amount and note content. Apple growth
-compatibility is pending issue #23.
+consolidated scope, displayed amount and note content.
 
 Local Chrome runs with the offline Qwen2.5-0.5B-Instruct and
 Qwen2.5-1.5B-Instruct Q4_K_M planners returned the three Apple amounts in the
@@ -74,3 +73,44 @@ Start the local planner and serve the same store using the repository
 workspace instructions. Select **Apple Inc.**, use **Ask the filing**
 with `What was revenue in FY2023?`, and open **FY2023 Total net sales cell**
 and **Note 1**. [Workspace setup](../../../README.md)
+
+## FY2022 to FY2023 growth
+
+Apple reported USD 394,328 million for FY2022 and USD 383,285 million for
+FY2023. Their difference is negative USD 11,043 million. Dividing by the
+FY2022 amount and converting to percent gives **−2.80%**. The verified pair
+uses the consolidated totals as filed. Note 1 discloses that FY2023
+spanned 53 weeks and FY2022 spanned 52 weeks. Management's discussion
+attributes more than the entire year-over-year decline to weaker foreign
+currencies.
+
+In the filing workspace, ask `How did reported consolidated revenue change
+from FY2022 to FY2023?` and expand **Operation trace and operands**.
+Open **FY2022 Total net sales cell**, **FY2023 Total net sales cell**,
+**Note 1**, and **Foreign currency impact** to inspect the original amounts
+and disclosures. You can also use **Calculate revenue growth** with FY2022
+and FY2023.
+
+Ask `What was revenue growth from FY2020 to FY2023?` to see the missing
+FY2020 observation alongside the verified FY2023 amount and citation.
+Asking for FY2021 to FY2023 keeps both verified observations and explains
+that those years do not match the reviewed pair.
+
+The following checks exercise the public question, citation, and
+socket-blocked CLI replay paths. They also cover the Microsoft 6.88%
+regression and the synthetic verified-zero baseline, which yields an
+undefined percentage and a USD 12 million absolute change.
+
+```powershell
+.venv/Scripts/python.exe -m pytest -q tests/test_development_revenue.py tests/test_growth_workflow.py tests/test_chat_growth.py
+```
+
+The saved growth record contains the proposal from Qwen2.5-0.5B-Instruct.
+The missing-year record does not invoke a model. After ingesting Apple as
+shown above, both records replay from the preserved original with the
+planner stopped.
+
+```powershell
+.venv/Scripts/frag.exe replay-ask artifacts/phase04/development/apple-growth-fy2022-fy2023.json --store .frag-development
+.venv/Scripts/frag.exe replay-ask artifacts/phase04/development/apple-growth-missing-fy2020.json --store .frag-development
+```

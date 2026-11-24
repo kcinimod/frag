@@ -8,13 +8,14 @@ from typing import Any, Literal, TypedDict
 
 from frag import dated_revenue
 from frag.citations import has_citable_amount, revenue_cell_citation
-from frag.growth import calculate_growth, disclosure_citations
+from frag.growth import assess_growth, calculate_growth, disclosure_citations
 from frag.local_model import MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable
 from frag.store import SourceError
 
 Planner = Callable[[dict[str, Any]], str]
 METRIC = "reported_consolidated_revenue"
 RECORD_VERSION = 1
+DATED_GROWTH_RECORD_VERSION = 2
 REVENUE = r"(?:(?:annual|reported|consolidated|total) )*revenue"
 YEAR = r"(?:fy ?|fiscal year )?([1-9][0-9]{3})"
 LOOKUP = re.compile(
@@ -99,7 +100,12 @@ def _evidence(facts: list[dict[str, Any]], year: int) -> list[dict[str, Any]]:
     keys = ("fact_id", "metric", "reporting_period", "normalized_amount", "currency", "scale")
     # Put matching evidence next to the question at the end of the prompt.
     ranked = sorted(facts, key=lambda fact: fact["reporting_period"]["fiscal_year"] == year)
-    return [{key: fact[key] for key in keys} for fact in ranked]
+    evidence = [{key: fact[key] for key in keys} for fact in ranked]
+    for fact, item in zip(ranked, evidence, strict=True):
+        if fact.get("parser_version") == dated_revenue.PARSER_VERSION:
+            # Keep the request identical for newly extracted and cached observations.
+            item["reporting_period"] = dict(sorted(item["reporting_period"].items()))
+    return evidence
 
 
 def _lookup_payload(year: int, evidence: list[dict[str, Any]]) -> dict[str, Any]:
@@ -168,7 +174,7 @@ def _growth_payload(request: ResolvedGrowth, evidence: list[dict[str, Any]]) -> 
 
 
 def _planner_input(
-    source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
+    source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest, *, legacy_growth: bool = False,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if request["operation"] == "lookup":
         year = request["fiscal_year"]
@@ -176,6 +182,22 @@ def _planner_input(
             facts = _facts_for_year(facts, year)
         evidence = _evidence(facts, year)
         return evidence, _lookup_payload(year, evidence)
+    if source.get("parser_version") == dated_revenue.PARSER_VERSION and not legacy_growth:
+        prior, current = request["prior_year"], request["current_year"]
+        pair = [fact for fact in facts if fact["reporting_period"]["fiscal_year"] in (prior, current)]
+        # Present the reviewed operands in subtraction order.
+        evidence = _evidence(pair, prior)
+        for item in evidence:
+            item["role"] = "current" if item["reporting_period"]["fiscal_year"] == current else "prior"
+        payload = _growth_payload(request, evidence)
+        if [item["role"] for item in evidence] == ["current", "prior"]:
+            current_id, prior_id = (item["fact_id"] for item in evidence)
+            plan = {"operation": "growth", "steps": [
+                {"operation": operation, "inputs": inputs}
+                for (operation, _), inputs in zip(GROWTH_STEPS, _growth_inputs(current_id, prior_id), strict=True)
+            ]}
+            payload["messages"][1]["content"] += "\nUse these exact inputs in the growth plan: " + json.dumps(plan)
+        return evidence, payload
     evidence = _evidence(facts, request["current_year"])
     return evidence, _growth_payload(request, evidence)
 
@@ -247,9 +269,13 @@ def _execute_growth(
 
     # Bind references to resolved roles before the calculator verifies and uses the pair.
     prior_id, current_id = prior[0]["fact_id"], current[0]["fact_id"]
-    if [step["inputs"] for step in steps] != [[current_id, prior_id], ["subtract", prior_id], ["divide"]]:
+    if [step["inputs"] for step in steps] != _growth_inputs(current_id, prior_id):
         return invalid
     return {"operation": "growth", **calculate_growth(source, prior_year, current_year)}
+
+
+def _growth_inputs(current: str, prior: str) -> list[list[str]]:
+    return [[current, prior], ["subtract", prior], ["divide"]]
 
 
 def _execute(
@@ -263,6 +289,12 @@ def _execute(
 
 def _identity(source: dict[str, Any]) -> dict[str, Any]:
     return {key: source.get(key) for key in ("source_id", "source_hash", "parser_version", "evidence_version")}
+
+
+def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
+    if request["operation"] == "growth" and source.get("parser_version") == dated_revenue.PARSER_VERSION:
+        return DATED_GROWTH_RECORD_VERSION
+    return RECORD_VERSION
 
 
 def _dated_lookup_gap(
@@ -281,6 +313,17 @@ def _dated_lookup_gap(
     return {"status": "evidence_unavailable", "message": f"FY{year} revenue evidence gap. " + " ".join(reasons)}
 
 
+def _question_gap(
+    source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
+) -> dict[str, Any] | None:
+    if request["operation"] == "lookup":
+        return _dated_lookup_gap(source, facts, request)
+    growth = assess_growth(source, request["prior_year"], request["current_year"])
+    if growth["status"] == "unavailable":
+        return {"operation": "growth", **growth}
+    return None
+
+
 def ask_revenue(
     source: dict[str, Any], question: str, planner: Planner, *, record: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -296,7 +339,7 @@ def ask_revenue(
     proposal = None
     model_ms = None
     execution_start: float | None = perf_counter()
-    outcome = _dated_lookup_gap(source, facts, request)
+    outcome = _question_gap(source, facts, request)
     if outcome is None:
         execution_start = None
         model_start = perf_counter()
@@ -316,7 +359,7 @@ def ask_revenue(
     result = {**_identity(source), **outcome}
     if record is not None:
         record.update({
-            "version": RECORD_VERSION,
+            "version": _record_version(source, request),
             "question": question,
             "resolved_request": request,
             "source": _identity(source),
@@ -336,20 +379,40 @@ def ask_revenue(
     return result
 
 
+def _matches_legacy_dated_payload(saved: dict[str, Any], expected: dict[str, Any]) -> bool:
+    try:
+        messages = saved["messages"]
+        user_message = messages[1]
+        content = expected["messages"][1]["content"]
+        if json.loads(user_message["content"], object_pairs_hook=_unique_keys) != json.loads(content):
+            return False
+        normalized = [*messages[:1], user_message | {"content": content}, *messages[2:]]
+    except (ValueError, TypeError, KeyError, IndexError, RecursionError):
+        return False
+    return saved | {"messages": normalized} == expected
+
+
 def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
     question, proposal = record.get("question"), record.get("proposed_plan")
-    if record.get("version") != RECORD_VERSION or not isinstance(question, str):
+    if not isinstance(question, str):
         raise SourceError("The validation record must contain a supported saved question.")
     request = resolve_request(question)
     if request is None or record.get("resolved_request") != request:
         raise SourceError("The saved request does not match its question.")
+    version = record.get("version")
+    expected_version = _record_version(source, request)
+    if version not in (RECORD_VERSION, expected_version):
+        raise SourceError("The validation record must contain a supported saved question.")
+    legacy_growth = version == RECORD_VERSION and expected_version == DATED_GROWTH_RECORD_VERSION
     facts = _eligible_facts(source)
-    evidence, expected_payload = _planner_input(source, facts, request)
+    evidence, expected_payload = _planner_input(source, facts, request, legacy_growth=legacy_growth)
     identity = _identity(source)
     if record.get("source") != identity or record.get("evidence") != evidence:
         raise SourceError("The saved source or evidence does not match the current filing evidence.")
     saved_payload = record.get("model_request")
-    gap = _dated_lookup_gap(source, facts, request)
+    # Older records may contain a model proposal for a growth question with missing evidence.
+    gap = (_question_gap(source, facts, request) if saved_payload is None
+           else _dated_lookup_gap(source, facts, request))
     if gap is not None:
         if "proposed_plan" not in record or proposal is not None or "model_request" not in record or saved_payload is not None:
             raise SourceError("The saved evidence gap must record that no model request was made.")
@@ -358,11 +421,19 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         raise SourceError("The validation record must contain its original model request.")
     # The alias identifies the original planner. Replay validates the proposal with no model loaded.
     expected_payload["model"] = saved_payload["model"]
-    if saved_payload != expected_payload:
+    legacy_dated = version == RECORD_VERSION and source.get("parser_version") == dated_revenue.PARSER_VERSION
+    if saved_payload != expected_payload and not (
+        legacy_dated and _matches_legacy_dated_payload(saved_payload, expected_payload)
+    ):
         raise SourceError("The saved source or evidence does not match the current filing evidence.")
     if not isinstance(proposal, str):
         raise SourceError("The validation record must contain a supported saved proposal.")
-    return {**identity, **_execute(source, facts, request, proposal)}
+    if legacy_growth:
+        source = source | {"comparison": dated_revenue.legacy_comparison()}
+    outcome = _execute(source, facts, request, proposal)
+    if legacy_growth and outcome["status"] == "unavailable":
+        outcome["citations"] = []
+    return {**identity, **outcome}
 
 
 replay_lookup = replay_revenue

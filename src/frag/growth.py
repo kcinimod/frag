@@ -4,13 +4,14 @@ from decimal import Context, Decimal
 from fractions import Fraction
 from typing import Any
 
-from frag.citations import revenue_cell_citation
+from frag.citations import has_citable_amount, revenue_cell_citation
 from frag.store import SourceError
 
 FORMULA = "(current revenue - prior revenue) / prior revenue × 100"
 
 
-def calculate_growth(source: dict[str, Any], prior_year: int, current_year: int) -> dict[str, Any]:
+def assess_growth(source: dict[str, Any], prior_year: int, current_year: int) -> dict[str, Any]:
+    """Resolve operands and check eligibility without executing a calculation."""
     if not 1 <= prior_year < current_year <= 9999:
         raise SourceError("Choose fiscal years with the prior year before the current year.")
 
@@ -32,8 +33,8 @@ def calculate_growth(source: dict[str, Any], prior_year: int, current_year: int)
         "percent": None,
         "absolute_change": None,
         "citations": [],
-        "comparison_basis": comparison.get("basis"),
-        "scope_caveats": comparison.get("scope_caveats", []),
+        "comparison_basis": None,
+        "scope_caveats": [],
     }
     selected = []
     for role, year in (("prior", prior_year), ("current", current_year)):
@@ -42,28 +43,56 @@ def calculate_growth(source: dict[str, Any], prior_year: int, current_year: int)
             issue = {"code": "missing" if not candidates else "incompatible", "role": role, "fiscal_year": year}
             if candidates:
                 issue["detail"] = f"Multiple reported consolidated revenue observations match FY{year}."
+            else:
+                issue["detail"] = _observation_gap(source, year)
             result["issues"].append(issue)
             continue
         fact = candidates[0]
         result["operands"].append({"role": role, **fact})
         selected.append(fact)
-        if (fact["status"] != "verified" or fact["normalized_amount"] is None
-                or not fact["currency"] or not fact["scale"]):
-            result["issues"].append({"code": "unverified", "role": role, "fiscal_year": year})
+        if fact["status"] != "verified" or not has_citable_amount(fact):
+            result["issues"].append({
+                "code": "unverified", "role": role, "fiscal_year": year,
+                "detail": _observation_gap(source, year, fact),
+            })
+
+    if not result["issues"]:
+        prior, current = selected
+        detail = _comparison_issue(comparison, facts, prior, current)
+        if detail:
+            result["issues"].append({
+                "code": "incompatible", "role": None, "fiscal_year": None, "detail": detail,
+            })
 
     if result["issues"]:
         result["status"] = "unavailable"
+        supported = [fact for fact in result["operands"] if fact["status"] == "verified" and has_citable_amount(fact)]
+        result["citations"] = _citations(supported, {})
+    else:
+        result.update(status="ready", comparison_basis=comparison.get("basis"),
+                      scope_caveats=comparison.get("scope_caveats", []))
+    return result
+
+
+def _observation_gap(source: dict[str, Any], year: int, fact: dict[str, Any] | None = None) -> str:
+    reasons = [
+        item["message"] for item in source.get("diagnostics", [])
+        if item.get("fiscal_year", year) == year
+    ]
+    if fact is not None:
+        reasons.extend(fact.get("unresolved_requirements", []))
+    if not reasons:
+        reasons.append("No unique annual revenue observation was found." if fact is None
+                       else "The annual revenue observation has not passed verification.")
+    return f"FY{year} revenue evidence gap. " + " ".join(reasons)
+
+
+def calculate_growth(source: dict[str, Any], prior_year: int, current_year: int) -> dict[str, Any]:
+    result = assess_growth(source, prior_year, current_year)
+    if result["status"] == "unavailable":
         return result
 
-    prior, current = selected
-    detail = _comparison_issue(comparison, facts, prior, current)
-    if detail:
-        result["status"] = "unavailable"
-        result["issues"].append({
-            "code": "incompatible", "role": None, "fiscal_year": None, "detail": detail,
-        })
-        return result
-
+    prior, current = result["operands"]
     baseline = Decimal(prior["normalized_amount"])
     latest = Decimal(current["normalized_amount"])
     # Align decimal places and subtract independently of the caller's arithmetic context.
@@ -74,7 +103,7 @@ def calculate_growth(source: dict[str, Any], prior_year: int, current_year: int)
     result["trace"].append({
         "operation": "subtract", "inputs": [current["fact_id"], prior["fact_id"]], "result": amount,
     })
-    result["citations"] = _citations(result["operands"], comparison)
+    result["citations"] = _citations(result["operands"], source["comparison"])
 
     if not baseline:
         result["status"] = "undefined_zero_baseline"
@@ -99,8 +128,10 @@ def _comparison_issue(
         requirements = ", ".join(item.replace("_", " ") for item in comparison.get("unresolved_requirements", []))
         message = "The filing's comparison evidence does not establish compatibility."
         return f"{message} Open requirements · {requirements}" if requirements else message
-    # The existing verifier's comparison applies to the single extracted pair.
-    if len(facts) != 2 or not prior["comparative"] or current["comparative"]:
+    # Older verifiers reviewed their only extracted pair. Newer records identify it explicitly.
+    fact_ids = comparison.get("fact_ids", [fact["fact_id"] for fact in facts])
+    if (len(fact_ids) != 2 or set(fact_ids) != {prior["fact_id"], current["fact_id"]}
+            or not prior["comparative"] or current["comparative"]):
         return "The selected fiscal years do not match the filing's verified comparative and current pair."
     if prior["currency"] != current["currency"]:
         return f'The verified revenue amounts use different currencies ({prior["currency"]} and {current["currency"]}).'

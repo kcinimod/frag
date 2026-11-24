@@ -100,9 +100,8 @@ def test_chat_rejects_plans_that_do_not_match_the_resolved_growth(
 
 def test_chat_rejects_unresolved_comparison(microsoft: tuple[SourceStore, dict[str, Any]]) -> None:
     _, source = microsoft
-    prior, current = (fact["fact_id"] for fact in source["facts"])
     source["comparison"]["status"] = "unresolved"
-    result = ask_revenue(source, QUESTION, lambda payload: json.dumps(growth_plan(prior, current)))
+    result = ask_revenue(source, QUESTION, lambda payload: pytest.fail("Unresolved comparison reached the planner"))
     assert result["status"] == "unavailable"
     assert result["issues"][0]["code"] == "incompatible"
     assert result["trace"] == []
@@ -115,23 +114,20 @@ def test_guidance_and_provisional_revenue_cannot_supply_actuals(tmp_path: Path) 
     source["facts"].append({
         **source["facts"][1], "fact_id": "guidance", "status": "verified", "metric": "revenue_guidance",
     })
-    prior = source["facts"][0]["fact_id"]
-
     def propose(payload: dict[str, Any]) -> str:
-        assert json.loads(payload["messages"][1]["content"])["evidence"] == []
-        return json.dumps(growth_plan(prior, "guidance"))
+        pytest.fail("Unverified evidence reached the planner")
 
     result = ask_revenue(source, QUESTION, propose)
-    assert result["status"] == "evidence_unavailable"
-    assert "trace" not in result
+    assert result["status"] == "unavailable"
+    assert [issue["code"] for issue in result["issues"]] == ["unverified", "unverified"]
+    assert result["trace"] == result["citations"] == []
 
 
-def test_malformed_program_is_invalid_even_without_verified_evidence() -> None:
+def test_missing_evidence_returns_both_gaps_without_planning() -> None:
     source = {"source_id": "synthetic", "facts": []}
-    plan = growth_plan("prior", "current")
-    plan["steps"][1]["inputs"] = ["subtract"]
-    result = ask_revenue(source, QUESTION, lambda payload: json.dumps(plan))
-    assert result["status"] == "invalid_plan"
+    result = ask_revenue(source, QUESTION, lambda payload: pytest.fail("Missing evidence reached the planner"))
+    assert result["status"] == "unavailable"
+    assert [issue["fiscal_year"] for issue in result["issues"]] == [2022, 2023]
 
 
 @pytest.mark.parametrize("question", [

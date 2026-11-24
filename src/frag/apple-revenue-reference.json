@@ -16,6 +16,23 @@
     "2022": 52,
     "2023": 53
   },
+  "comparison": {
+    "prior_year": 2022,
+    "current_year": 2023,
+    "basis": "Reported consolidated net sales as presented together in Apple's FY2023 10-K.",
+    "scope_caveats": [
+      "FY2023 spanned 53 weeks and FY2022 spanned 52 weeks. The comparison uses the reported totals for both periods."
+    ],
+    "evidence": {
+      "id": "foreign_currency_impact",
+      "scope_caveat": "Apple disclosed that weaker foreign currencies accounted for more than the entire year-over-year decrease in total net sales.",
+      "locator": {
+        "start": {"line": 4, "character": 356642},
+        "end_exclusive": {"line": 4, "character": 357164}
+      },
+      "sha256": "4aea1ca01e9153f3f0a25645dd676e49659aa52b6b6fb314c1998cbefa3dfe57"
+    }
+  },
   "notes": [
     {
       "number": 1,

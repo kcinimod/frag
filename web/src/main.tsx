@@ -117,16 +117,18 @@ type GrowthResult = {
 };
 
 function growthIssueText(issue: GrowthIssue) {
+  if (issue.detail) return issue.detail;
   const period = issue.role ? `FY${issue.fiscal_year} (${issue.role})` : 'The selected fiscal years';
   switch (issue.code) {
     case 'missing': return `Missing reported consolidated revenue for ${period}.`;
     case 'unverified': return `Unverified reported consolidated revenue for ${period}.`;
-    case 'incompatible': return issue.detail ?? `Comparison evidence is incompatible or unresolved for ${period}.`;
+    case 'incompatible': return `Comparison evidence is incompatible or unresolved for ${period}.`;
   }
 }
 
 function GrowthCalculator({ source }: { source: Source }) {
-  const priorYear = source.facts.find(fact => fact.comparative)?.reporting_period.fiscal_year;
+  const comparativeYears = source.facts.filter(fact => fact.comparative).map(fact => fact.reporting_period.fiscal_year);
+  const priorYear = comparativeYears.length ? Math.max(...comparativeYears) : undefined;
   const currentYear = source.facts.find(fact => !fact.comparative)?.reporting_period.fiscal_year;
   const [prior, setPrior] = useState(String(priorYear ?? (currentYear ? currentYear - 1 : 2022)));
   const [current, setCurrent] = useState(String(currentYear ?? (priorYear ? priorYear + 1 : 2023)));
@@ -179,6 +181,13 @@ function GrowthAnswer({ result, path }: { result: GrowthResult; path?: string })
   const citationQuery = new URLSearchParams({
     prior: String(result.prior_year), current: String(result.current_year),
   });
+  const operands = result.operands.filter(fact => fact.status === 'verified' && fact.normalized_amount !== null);
+  const operandRows = operands.map(fact => (
+    <p key={fact.fact_id}>
+      {fact.role} · FY{fact.reporting_period.fiscal_year} · {fact.currency} {fact.normalized_amount}
+      {' · '}<span className="mono">{fact.fact_id}</span>
+    </p>
+  ));
   return (
     <div className="growth-result" aria-live="polite">
       {result.percent && <p className="growth-value">{result.percent.value}%</p>}
@@ -199,16 +208,21 @@ function GrowthAnswer({ result, path }: { result: GrowthResult; path?: string })
           <details>
             <summary>Operation trace and operands</summary>
             <p>Evidence version · {result.evidence_version}</p>
-            {result.operands.map(fact => (
-              <p key={fact.fact_id}>
-                {fact.role} · FY{fact.reporting_period.fiscal_year} · {fact.currency} {fact.normalized_amount}
-                {' · '}<span className="mono">{fact.fact_id}</span>
-              </p>
-            ))}
+            {operandRows}
             <ol>{result.trace.map(step => (
               <li key={step.operation}>{step.operation} ({step.inputs.join(', ')}) = {step.result}</li>
             ))}</ol>
           </details>
+        </>
+      )}
+      {result.trace.length === 0 && operands.length > 0 && (
+        <>
+          <h4>Supported observations</h4>
+          {operandRows}
+        </>
+      )}
+      {result.citations.length > 0 && (
+        <>
           <h4>Original filing evidence</h4>
           <ul>{result.citations.map(citation => (
             <li key={citation.id}>

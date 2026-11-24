@@ -233,3 +233,12 @@ applicable fiscal-calendar disclosure. Pin the original hash and exact note
 spans before publishing a verified lookup. Evaluate compatibility separately
 before using those observations for growth.
 [Development evidence](../artifacts/phase04/development/README.md)
+
+## Reported revenue growth on development 10-Ks
+
+For issue #23, pin the reviewed FY2022 and FY2023 pair in the Apple FY2023
+10-K. Keep FY2021 available as a standalone verified observation. The
+calculation uses reported consolidated totals and cites the fiscal-calendar
+and foreign-currency disclosures. Resolve evidence gaps before invoking the planner, and
+retain the available verified operands and their original citations.
+[Development growth and replay](../artifacts/phase04/development/README.md#fy2022-to-fy2023-growth)

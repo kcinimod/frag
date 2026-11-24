@@ -11,6 +11,7 @@ from urllib.parse import quote
 
 from frag import store as source_store
 from frag.citations import citation_lines, citation_text, has_citable_amount, revenue_cell_citation
+from frag.dated_revenue import PARSER_VERSION as DATED_PARSER_VERSION, legacy_comparison
 from frag.growth import calculate_growth, disclosure_citations, note_citation_id
 from frag.lookup import METRIC, resolve_request
 from frag.store import SourceError, SourceNotFound, SourceStore, StoreMissing
@@ -80,9 +81,12 @@ class CollectionIndex:
     facts: tuple[IndexedFact, ...]
     comparisons: dict[str, dict[str, Any]]
     store: SourceStore
+    legacy_dated_comparison: bool = False
 
     @classmethod
-    def build(cls, store: SourceStore, source_ids: set[str] | None = None) -> "CollectionIndex":
+    def build(
+        cls, store: SourceStore, source_ids: set[str] | None = None, *, legacy_dated_comparison: bool = False,
+    ) -> "CollectionIndex":
         try:
             sources = store.inspect_sources(source_ids)
         except StoreMissing:
@@ -99,9 +103,11 @@ class CollectionIndex:
             if identity["source_id"] != "sha256:" + identity["source_hash"]:
                 raise SourceError("Collection source identifier does not match its preserved hash.")
             inputs.append(identity | {"evidence_hash": _fingerprint(source["facts"])})
+            comparison = (legacy_comparison() if legacy_dated_comparison and identity["parser_version"] == DATED_PARSER_VERSION
+                          else source["comparison"])
             comparisons[identity["source_id"]] = {
-                "comparison": source["comparison"],
-                "fact_ids": [fact["fact_id"] for fact in source["facts"]],
+                "comparison": comparison,
+                "fact_ids": comparison.get("fact_ids", [fact["fact_id"] for fact in source["facts"]]),
             }
             # A verified observation can supply the company when ingestion omitted metadata.
             names = [source["company"], *(fact["company"] for fact in source["facts"])]
@@ -145,7 +151,8 @@ class CollectionIndex:
             "comparison_hash": _fingerprint(comparisons),
         }
         return cls({"snapshot_id": "sha256:" + _fingerprint(manifest), **manifest},
-                   companies, tuple(entries[key] for key in sorted(entries)), comparisons, store)
+                   companies, tuple(entries[key] for key in sorted(entries)), comparisons, store,
+                   legacy_dated_comparison)
 
 
 def _resolve(index: CollectionIndex, question: str) -> tuple[dict[str, Any] | None, str]:
@@ -293,9 +300,11 @@ class RecoveryBudget:
 
 
 class _PinnedCitations:
-    def __init__(self, store: SourceStore) -> None:
+    def __init__(self, store: SourceStore, *, legacy_dated_comparison: bool = False) -> None:
         self.store = store
         self.original_lines: dict[str, list[str] | None] = {}
+        self.legacy_dated_comparison = legacy_dated_comparison
+        self.legacy_dated_sources: set[str] = set()
 
     def valid_ids(self, source_id: str, citations: dict[str, dict[str, Any]]) -> list[str]:
         if not citations:
@@ -306,6 +315,8 @@ class _PinnedCitations:
                 source, original = self.store.inspect_with_original(source_id)
                 if source["source_id"] == source_id == "sha256:" + source["source_hash"]:
                     self.original_lines[source_id] = original.decode("utf-8-sig").split("\n")
+                    if self.legacy_dated_comparison and source["parser_version"] == DATED_PARSER_VERSION:
+                        self.legacy_dated_sources.add(source_id)
             except (SourceError, OSError, UnicodeError):
                 pass
         lines = self.original_lines[source_id]
@@ -313,6 +324,9 @@ class _PinnedCitations:
             return []
         valid = []
         for citation_id, citation in citations.items():
+            if source_id in self.legacy_dated_sources and "table_locators" in citation:
+                # The former heading reader rejected the archived one-line Apple statement.
+                continue
             try:
                 citation_lines(lines, source_id.removeprefix("sha256:"), citation)
             except (SourceError, KeyError, TypeError):
@@ -768,7 +782,7 @@ def _ask_collection(
         ))
         eligible = [entry for candidate, entry in ranked if not candidate["exclusions"]]
         if growth:
-            pinned_citations = _PinnedCitations(index.store)
+            pinned_citations = _PinnedCitations(index.store, legacy_dated_comparison=index.legacy_dated_comparison)
             citations = None if search_version in (LEGACY_GROWTH_VERSION, LEGACY_BOUNDED_VERSION) else pinned_citations
             retain_partial_context = search_version in (None, GROWTH_SEARCH_VERSION, BOUNDED_SEARCH_VERSION)
             initial = eligible[:min(initial_fact_limit or context_limit, initial_context_limit or context_limit)]
@@ -855,6 +869,8 @@ def replay_collection(store: SourceStore, record: object) -> dict[str, Any]:
         }
         legacy_manifest["index_version"] = "collection-index-v1"
         index = replace(index, manifest={"snapshot_id": "sha256:" + _fingerprint(legacy_manifest), **legacy_manifest})
+    elif _fingerprint(index.manifest) != _fingerprint(manifest):
+        index = CollectionIndex.build(store, source_ids, legacy_dated_comparison=True)
     if _fingerprint(index.manifest) != _fingerprint(manifest):
         raise SourceError("The saved collection snapshot does not match the reproduced index or versions.")
     reproduced: dict[str, Any] = {}

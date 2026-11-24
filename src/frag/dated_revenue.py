@@ -17,6 +17,7 @@ from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cel
 PARSER_VERSION = "dated-annual-revenue-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
+EXTRACTION_CACHE_REVISION = "reviewed-comparison-v1"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONEY_PREAMBLE = re.compile(r"^\((?:dollars )?in (thousands|millions|billions)\b", re.I)
@@ -74,19 +75,30 @@ def _source_requirements(source: dict[str, Any], cik: str, company: str, end: da
     return unresolved
 
 
+def _matches_disclosure(lines: list[str], disclosure: dict[str, Any]) -> bool:
+    span = disclosure["locator"]
+    try:
+        excerpt = original_span(lines, span["start"], span["end_exclusive"])
+    except ValueError:
+        return False
+    return bool(excerpt and hashlib.sha256(excerpt.encode("utf-8")).hexdigest() == disclosure["sha256"])
+
+
 def _notes(lines: list[str], unresolved: list[str]) -> list[dict[str, Any]]:
     notes = []
     for note in REFERENCE["notes"]:
-        span = note["locator"]
-        try:
-            excerpt = original_span(lines, span["start"], span["end_exclusive"])
-        except ValueError:
-            excerpt = ""
-        if excerpt and hashlib.sha256(excerpt.encode("utf-8")).hexdigest() == note["sha256"]:
+        if _matches_disclosure(lines, note):
             notes.append(deepcopy(note))
         else:
             unresolved.append(f'note_{note["number"]}_boundary_or_content')
     return notes
+
+
+def legacy_comparison() -> dict[str, Any]:
+    return {
+        "status": "unresolved", "reference_status": "unresolved", "basis": None,
+        "evidence": [], "scope_caveats": [], "unresolved_requirements": ["comparison_compatibility"],
+    }
 
 
 def _period_columns(rows: list[list[GridCell]]) -> tuple[GridCell, dict[date, GridCell]]:
@@ -203,7 +215,7 @@ def inspect_dated_revenue(
 ) -> dict[str, Any]:
     facts: list[dict[str, Any]] = []
     diagnostics: list[dict[str, Any]] = []
-    unresolved = ["comparison_compatibility"]
+    unresolved = []
     try:
         table = _one([table for table in document.tables if is_dated_statement(table)],
                       "Expected one visible consolidated statement of operations.")
@@ -250,12 +262,26 @@ def inspect_dated_revenue(
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
     if diagnostics:
         unresolved.append("extraction")
+    reviewed = REFERENCE["comparison"]
+    verified = {fact["reporting_period"]["fiscal_year"]: fact["fact_id"]
+                for fact in facts if fact["status"] == "verified"}
+    pair_years = (reviewed["prior_year"], reviewed["current_year"])
+    comparison = legacy_comparison()
+    if all(year in verified for year in pair_years):
+        disclosure = reviewed["evidence"]
+        if _matches_disclosure(lines, disclosure):
+            comparison.update(
+                status="compatible", reference_status="compatible", basis=reviewed["basis"],
+                scope_caveats=[*reviewed["scope_caveats"], disclosure["scope_caveat"]],
+                evidence=[deepcopy(disclosure)], unresolved_requirements=[],
+                fact_ids=[verified[year] for year in pair_years],
+            )
+        else:
+            comparison["unresolved_requirements"].append(disclosure["id"])
+    unresolved.extend(comparison["unresolved_requirements"])
     return {
         "parser_version": PARSER_VERSION, "evidence_version": EVIDENCE_VERSION, "facts": facts,
         "diagnostics": diagnostics, "unresolved_requirements": unresolved,
-        "comparison": {
-            "status": "unresolved", "reference_status": "unresolved", "basis": None,
-            "evidence": [], "scope_caveats": [], "unresolved_requirements": ["comparison_compatibility"],
-        },
-        "real_source_acceptance": False,
+        "comparison": comparison,
+        "real_source_acceptance": not unresolved,
     }

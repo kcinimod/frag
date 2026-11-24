@@ -80,3 +80,7 @@ Phase 2 calculator and its offline results.
   development 10-Ks. The filing workspace opens Apple's original statement
   cells and applicable disclosures offline.
   [Development evidence and replay](../artifacts/phase04/development/README.md)
+- Issue #23 verifies FY2022 to FY2023 growth on both development 10-Ks.
+  Apple returns −2.80% with fiscal-calendar and currency caveats. Growth questions
+  expose evidence gaps and keep supported observations available for
+  inspection. [Development growth and replay](../artifacts/phase04/development/README.md#fy2022-to-fy2023-growth)

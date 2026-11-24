@@ -35,7 +35,9 @@ def test_retained_microsoft_growth_through_offline_cli(tmp_path: Path) -> None:
 
     missing = success("growth", source["source_id"], "2021", "2023", "--store", store)
     assert missing["percent"] is None
-    assert missing["issues"] == [{"code": "missing", "role": "prior", "fiscal_year": 2021}]
+    issue, = missing["issues"]
+    assert (issue["code"], issue["role"], issue["fiscal_year"]) == ("missing", "prior", 2021)
+    assert "FY2021 revenue evidence gap" in issue["detail"]
     assert missing["operands"][0]["fact_id"] == source["facts"][1]["fact_id"]
     assert missing["operands"][0]["status"] == "verified"
 
@@ -78,7 +80,8 @@ def synthetic_verified_source() -> dict[str, Any]:
             "reporting_period": {"kind": "annual", "fiscal_year": year},
             "status": "verified", "comparative": year == 2022,
             "currency": "USD", "scale": 1_000_000, "normalized_amount": amount,
-            "locators": {"value": {}, "metric_label": {}, "year_header": {}, "unit_header": {}},
+            "locators": {"value": {"line": 1, "character": 1},
+                         "metric_label": {}, "year_header": {}, "unit_header": {}},
             "applicable_notes": [],
         }
         for year, amount in ((2022, "0"), (2023, "12000000"))
