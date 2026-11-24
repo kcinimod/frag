@@ -103,13 +103,19 @@ def test_conflicting_fiscal_calendar_keeps_the_affected_observation_provisional(
     assert statuses == {2021: "verified", 2022: "provisional", 2023: "verified"}
 
 
-@pytest.mark.parametrize(("before", "after"), [
-    (b"include the accounts of Intel and our", b"include the accounts of Example Subsidiary and our"),
+@pytest.mark.parametrize(("before", "after", "verified_years"), [
+    (b"include the accounts of Intel and our", b"include the accounts of Example Subsidiary and our", set()),
     (b"We have reclassified certain prior period amounts to conform to current period presentation.",
-     b"Revenue for fiscal 2023 is misstated. The amount should not be relied on until corrected."),
+     b"Revenue for fiscal 2023 is misstated. The amount should not be relied on until corrected.", {2021, 2022}),
+    (b"We have reclassified certain prior period amounts to conform to current period presentation.",
+     b"For fiscal 2023, see the consolidated revenue line in the statement. "
+     b"The amount should not be relied on until corrected.", {2021, 2022}),
+    (b"We have reclassified certain prior period amounts to conform to current period presentation.",
+     b"Prior-period segment revenues were recast to conform to the current segment presentation. "
+     b"This did not change reported consolidated revenue.", {2021, 2022, 2023}),
 ])
-def test_unresolved_dated_statement_disclosures_keep_revenue_provisional(
-    tmp_path: Path, before: bytes, after: bytes,
+def test_dated_statement_disclosures_qualify_the_affected_observations(
+    tmp_path: Path, before: bytes, after: bytes, verified_years: set[int],
 ) -> None:
     original = gzip.decompress(INTEL.read_bytes())
     assert original.count(before) >= 1
@@ -121,11 +127,14 @@ def test_unresolved_dated_statement_disclosures_keep_revenue_provisional(
     def propose(_: dict[str, Any]) -> str:
         pytest.fail("Provisional revenue reached the planner")
 
-    result = ask_revenue(source, "What was revenue in FY2023?", propose)
-    assert result["status"] == "evidence_unavailable"
-    assert "applicable_notes" in result["message"]
+    assert {item["reporting_period"]["fiscal_year"] for item in source["facts"]
+            if item["status"] == "verified"} == verified_years
     fact = next(item for item in source["facts"] if item["reporting_period"]["fiscal_year"] == 2023)
-    assert (fact["raw_amount"], fact["status"]) == ("54,228", "provisional")
+    assert fact["raw_amount"] == "54,228"
+    if 2023 not in verified_years:
+        result = ask_revenue(source, "What was revenue in FY2023?", propose)
+        assert result["status"] == "evidence_unavailable"
+        assert "applicable_notes" in result["message"]
 
 
 def test_unseen_issuer_lookup_opens_original_evidence_offline(

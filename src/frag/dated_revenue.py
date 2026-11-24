@@ -23,7 +23,7 @@ FILING_SCOPED_PARSERS = {PARSER_VERSION, SHARED_YEAR_PARSER_VERSION, TITLED_TABL
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "titled-table-v1"
+EXTRACTION_CACHE_REVISION = "titled-table-v2"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
@@ -268,7 +268,7 @@ def _verify_inline(
 def _annual_facts(
     document: StatementHTML, statement: DatedStatement, periods: dict[date, GridCell],
     cik: str, base: dict[str, Any], diagnostics: list[dict[str, Any]],
-    weeks: dict[int, int],
+    weeks: dict[int, int], qualified_years: set[int] | None = None,
 ) -> list[dict[str, Any]]:
     facts = []
     ordered = sorted(periods)
@@ -288,6 +288,9 @@ def _annual_facts(
         if statement.table.separate_title and week_count is None:
             fact.update(status="provisional",
                         unresolved_requirements=[*fact["unresolved_requirements"], "fiscal_calendar_verification"])
+        if qualified_years and end.year in qualified_years:
+            fact.update(status="provisional",
+                        unresolved_requirements=[*fact["unresolved_requirements"], "applicable_notes"])
         facts.append(fact | {"comparative": end < ordered[-1]})
     return facts
 
@@ -408,8 +411,9 @@ def inspect_original_revenue(
         statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
                                    shared_year=not table.separate_title)
         weeks: dict[int, int] = {}
+        qualified_years: set[int] = set()
         if table.separate_title:
-            notes, weeks = dated_policy_notes(document, lines, after=table.position, issuer=company)
+            notes, weeks, qualified_years = dated_policy_notes(document, lines, after=table.position, issuer=company)
         else:
             notes = accounting_policy_notes(
                 document, lines, after=table.position, includes_fees=any(
@@ -427,7 +431,7 @@ def inspect_original_revenue(
             "unresolved_requirements": requirements.copy(),
             "parent_table_id": f'{source["source_id"]}#table-{table.number}',
         }
-        facts = _annual_facts(document, statement, periods, cik, base, diagnostics, weeks)
+        facts = _annual_facts(document, statement, periods, cik, base, diagnostics, weeks, qualified_years)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
     unresolved = list(dict.fromkeys([*requirements, *(
