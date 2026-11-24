@@ -78,8 +78,8 @@ def accounting_policy_notes(
     if len(policy) > scope_end + 1 and policy[scope_end + 1].text.casefold() == "use of estimates":
         scope_end += 1
     evidence = [
-        _note(lines, "consolidation", policy[consolidation], policy[scope_end]),
-        _note(lines, "revenue", policy[revenue], policy[revenue_end]),
+        _note(lines, "consolidation", policy[consolidation], policy[scope_end].end),
+        _note(lines, "revenue", policy[revenue], policy[revenue_end].end),
     ]
     return [note for note in evidence if note is not None]
 
@@ -118,8 +118,8 @@ def dated_policy_notes(
             or not re.search(r"\breduction in revenue\b", policy[3].text, re.I)):
         return [], {}
     evidence = [
-        _note(lines, "consolidation", blocks[basis], blocks[policies - 1]),
-        _note(lines, "revenue", policy[0], policy[3], number=2),
+        _note(lines, "consolidation", blocks[basis], blocks[policies].position),
+        _note(lines, "revenue", policy[0], policy[3].end, number=2),
     ]
     return [note for note in evidence if note is not None], weeks
 
@@ -138,11 +138,11 @@ def _unique_heading(blocks: list[TextBlock], pattern: re.Pattern[str]) -> int | 
 
 
 def _note(
-    lines: list[str], topic: str, start: TextBlock, last: TextBlock, *, number: int = 1,
+    lines: list[str], topic: str, start: TextBlock, end: tuple[int, int] | None, *, number: int = 1,
 ) -> dict[str, Any] | None:
-    if last.end is None:
+    if end is None:
         return None
-    locator = {"start": start.locator(), "end_exclusive": EvidenceText(last.end).locator()}
+    locator = {"start": start.locator(), "end_exclusive": EvidenceText(end).locator()}
     try:
         original_span(lines, locator["start"], locator["end_exclusive"])
     except ValueError:
