@@ -8,6 +8,8 @@ directly to isolate the measurement from working-tree changes.
 
 [Issue #28 shared year-end lookup checkpoint](UNSEEN_LOOKUP.md)
 
+[Issue #29 development layout verification](DEVELOPMENT_LAYOUTS.md)
+
 ## Fixed cohort and evidence
 
 The 15 questions cover lookup and growth across six issuer families and

@@ -278,3 +278,12 @@ with the statement and require accounting-policy evidence. Preserve a
 provisional visible observation and locator when inline verification fails.
 Keep comparison compatibility unresolved until the evidence establishes it.
 [Unseen-issuer lookup checkpoint](../artifacts/phase05/UNSEEN_LOOKUP.md)
+
+## Verify separately titled statements with fiscal-calendar disclosures
+
+Associate the adjacent title, combined period and scale header, and dated
+revenue cells. Check the issuer identified by the consolidation disclosure
+against the cover and inline SEC CIK, and assess the disclosed week count
+against each annual context. Keep a visible observation provisional when
+its disclosure or context does not establish agreement.
+[Development layout verification](../artifacts/phase05/DEVELOPMENT_LAYOUTS.md)

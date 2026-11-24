@@ -104,3 +104,8 @@ Phase 2 calculator and its offline results.
   17/22 requested observations matched the original locator, 16/22 verified,
   and 30/30 results and citations matched in offline replay.
   [Unseen-issuer lookup checkpoint](../artifacts/phase05/UNSEEN_LOOKUP.md)
+
+- Issue #29 verifies Intel annual revenue from the original statement, fiscal
+  calendar, and recognition disclosures. Six filing and collection lookups
+  passed with original citations, and all 30 cold and warm results replayed.
+  [Development layout verification](../artifacts/phase05/DEVELOPMENT_LAYOUTS.md)
