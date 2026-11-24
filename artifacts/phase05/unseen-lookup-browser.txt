@@ -1,0 +1,5 @@
+﻿Stopped the planner before opening original evidence. Chrome page requests were restricted to localhost.
+Chrome opened revenue from preserved HTML.
+Chrome opened note-1-consolidation from preserved HTML.
+Chrome opened note-1-revenue from preserved HTML.
+Chrome FY2023: USD 574,785,000,000; three original citations opened.

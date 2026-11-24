@@ -98,3 +98,9 @@ Phase 2 calculator and its offline results.
   The pre-change run produced 4/13 correct numeric answers, 3/15 end-to-end
   completions, and 30/30 cold and warm offline replay matches.
   [Phase 5 development baseline](../artifacts/phase05/README.md)
+
+- Issue #28 verifies annual revenue lookups from the original Amazon,
+  Alphabet, and Walmart statements. On the fixed development questions,
+  17/22 requested observations matched the original locator, 16/22 verified,
+  and 30/30 results and citations matched in offline replay.
+  [Unseen-issuer lookup checkpoint](../artifacts/phase05/UNSEEN_LOOKUP.md)

@@ -269,3 +269,12 @@ production configuration separately and report extraction and verification
 before comparing question results. Use the development CIKs to exclude the
 entire issuer families from the fresh holdout.
 [Phase 5 development baseline](../artifacts/phase05/README.md)
+
+## Verify shared year-end statements observation by observation
+
+Associate fiscal years with revenue cells through the visible statement grid.
+Require the inline SEC CIK, annual duration, unit, scale, and amount to agree
+with the statement and require accounting-policy evidence. Preserve a
+provisional visible observation and locator when inline verification fails.
+Keep comparison compatibility unresolved until the evidence establishes it.
+[Unseen-issuer lookup checkpoint](../artifacts/phase05/UNSEEN_LOOKUP.md)

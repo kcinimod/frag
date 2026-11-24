@@ -6,6 +6,8 @@ and its Qwen2.5-0.5B-Instruct Q4_K_M planner. The snapshot exports that commit
 directly to isolate the measurement from working-tree changes.
 [Issue #27](https://github.com/kcinimod/frag/issues/27)
 
+[Issue #28 shared year-end lookup checkpoint](UNSEEN_LOOKUP.md)
+
 ## Fixed cohort and evidence
 
 The 15 questions cover lookup and growth across six issuer families and
