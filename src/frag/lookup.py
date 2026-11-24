@@ -10,12 +10,14 @@ from frag import dated_revenue
 from frag.citations import has_citable_amount, revenue_cell_citation
 from frag.growth import assess_growth, calculate_growth, disclosure_citations
 from frag.local_model import MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable
+from frag.revenue import PARSER_VERSION as LEGACY_STATEMENT_PARSER
 from frag.store import SourceError
 
 Planner = Callable[[dict[str, Any]], str]
 METRIC = "reported_consolidated_revenue"
 RECORD_VERSION = 1
 DATED_GROWTH_RECORD_VERSION = 2
+STATEMENT_LOOKUP_RECORD_VERSION = 3
 REVENUE = r"(?:(?:annual|reported|consolidated|total) )*revenue"
 YEAR = r"(?:fy ?|fiscal year )?([1-9][0-9]{3})"
 LOOKUP = re.compile(
@@ -89,9 +91,10 @@ def lookup_citation(source: dict[str, Any], year: int, citation_id: str) -> dict
     return next((item for item in _lookup_citations(facts[0]) if item["id"] == citation_id), None)
 
 
-def _lookup_citations(fact: dict[str, Any]) -> list[dict[str, Any]]:
-    citations = [revenue_cell_citation(fact, "revenue")]
-    if fact["parser_version"] in dated_revenue.FILING_SCOPED_PARSERS:
+def _lookup_citations(fact: dict[str, Any], *, legacy: bool = False) -> list[dict[str, Any]]:
+    include_context = fact["parser_version"] == LEGACY_STATEMENT_PARSER and not legacy
+    citations = [revenue_cell_citation(fact, "revenue", include_statement_context=include_context)]
+    if include_context or fact["parser_version"] in dated_revenue.FILING_SCOPED_PARSERS:
         citations.extend(disclosure_citations([fact], {}).values())
     return citations
 
@@ -216,7 +219,7 @@ def _parse_plan(proposal: str) -> Any:
         return None
 
 
-def _execute_lookup(facts: list[dict[str, Any]], year: int, plan: Any) -> dict[str, Any]:
+def _execute_lookup(facts: list[dict[str, Any]], year: int, plan: Any, *, legacy: bool) -> dict[str, Any]:
     invalid = {"status": "invalid_plan", "message": f"The plan did not match the verified FY{year} lookup."}
     if (not isinstance(plan, dict) or set(plan) != {"operation", "fact_id"}
             or plan["operation"] != "lookup" or not isinstance(plan["fact_id"], str)):
@@ -234,7 +237,7 @@ def _execute_lookup(facts: list[dict[str, Any]], year: int, plan: Any) -> dict[s
         "status": "answered",
         "fiscal_year": year,
         "fact": fact,
-        "citations": _lookup_citations(fact),
+        "citations": _lookup_citations(fact, legacy=legacy),
         "trace": [{
             "operation": "lookup",
             "fact_id": fact["fact_id"],
@@ -280,10 +283,11 @@ def _growth_inputs(current: str, prior: str) -> list[list[str]]:
 
 def _execute(
     source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest, proposal: str,
+    *, legacy_lookup: bool = False,
 ) -> dict[str, Any]:
     plan = _parse_plan(proposal)
     if request["operation"] == "lookup":
-        return _execute_lookup(facts, request["fiscal_year"], plan)
+        return _execute_lookup(facts, request["fiscal_year"], plan, legacy=legacy_lookup)
     return _execute_growth(source, facts, request, plan)
 
 
@@ -292,6 +296,8 @@ def _identity(source: dict[str, Any]) -> dict[str, Any]:
 
 
 def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
+    if request["operation"] == "lookup" and source.get("parser_version") == LEGACY_STATEMENT_PARSER:
+        return STATEMENT_LOOKUP_RECORD_VERSION
     if request["operation"] == "growth" and source.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS:
         return DATED_GROWTH_RECORD_VERSION
     return RECORD_VERSION
@@ -430,7 +436,7 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         raise SourceError("The validation record must contain a supported saved proposal.")
     if legacy_growth:
         source = source | {"comparison": dated_revenue.legacy_comparison()}
-    outcome = _execute(source, facts, request, proposal)
+    outcome = _execute(source, facts, request, proposal, legacy_lookup=version == RECORD_VERSION)
     if legacy_growth and outcome["status"] == "unavailable":
         outcome["citations"] = []
     return {**identity, **outcome}

@@ -116,6 +116,8 @@ class Table:
     nested: bool = False
     complete: bool = False
     issuer: EvidenceText | None = None
+    title_table: bool = False
+    wrapper: tuple[int, int] | None = None
 
     def locator(self) -> dict[str, int]:
         return {"table": self.number, **EvidenceText(self.position).locator()}
@@ -147,6 +149,7 @@ class StatementHTML(HTMLParser):
         self._preamble: EvidenceText | None = None
         self._block: TextBlock | None = None
         self._issuer: EvidenceText | None = None
+        self._title_table = False
         self._ignored: str | None = None
         self._visibility = HTMLVisibility()
 
@@ -196,10 +199,12 @@ class StatementHTML(HTMLParser):
                 if self._heading and self._block and self._is_preamble(self._block):
                     self._finish_block()
                 self._table = Table(self._count, self.getpos(), self._heading,
-                                    preamble=self._preamble, issuer=self._issuer)
+                                    preamble=self._preamble, issuer=self._issuer, title_table=self._title_table,
+                                    wrapper=self._block.position if self._block and not self._block.text else None)
                 self._heading = None
                 self._preamble = None
                 self._issuer = None
+                self._title_table = False
             elif self._table:
                 self._table.nested = True
             return
@@ -289,6 +294,7 @@ class StatementHTML(HTMLParser):
             self._heading = None
             self._preamble = None
             self._issuer = None
+            self._title_table = False
 
     def close(self) -> None:
         super().close()
@@ -307,6 +313,7 @@ class StatementHTML(HTMLParser):
             else:
                 self._heading = self._preamble = None
                 self._issuer = None
+                self._title_table = False
         self._block = None
 
     @staticmethod
@@ -315,10 +322,19 @@ class StatementHTML(HTMLParser):
 
     def _finish_table(self) -> None:
         if self._table:
-            if self._table.heading or (
+            table = self._table
+            cells = [cell for row in table.rows for cell in row if cell.text]
+            if (table.complete and not table.nested and len(cells) == 1
+                    and is_statement_heading(cells[0].text)):
+                self._heading, self._title_table = cells[0], True
+            elif table.heading or (
                 self._table.caption and is_statement_heading(self._table.caption.text)
             ):
-                self.tables.append(self._table)
+                self.tables.append(table)
+            if table.complete and not table.nested and cells:
+                heading = " ".join(cell.text for cell in cells)
+                if re.fullmatch(r"Note \d+\s*:\s*(?:Basis of Presentation|Accounting Policies)", heading, re.I):
+                    self.blocks.append(TextBlock(table.wrapper or table.position, [heading]))
             self._table = None
         self._cell = self._caption = None
         self._inline_fact = None

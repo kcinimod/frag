@@ -18,20 +18,24 @@ def has_citable_amount(fact: dict[str, Any]) -> bool:
     )
 
 
-def revenue_cell_citation(fact: dict[str, Any], citation_id: str) -> dict[str, Any]:
+def revenue_cell_citation(
+    fact: dict[str, Any], citation_id: str, *, include_statement_context: bool = False,
+) -> dict[str, Any]:
     year = fact["reporting_period"]["fiscal_year"]
     locators = fact["locators"]
     keys: tuple[str, ...] = ("metric_label", "year_header", "unit_header")
     if "currency_symbol" in locators:
         keys = ("statement_heading", "metric_label", "annual_header", "year_header",
                 "unit_header", "currency_symbol", "currency_measure")
+    elif include_statement_context:
+        keys = ("statement_heading", "annual_header", "currency_measure", *keys)
     if "statement_issuer" in locators:
         keys = ("statement_issuer", *keys)
     return {
         "id": citation_id,
         "title": f'FY{year} {fact["metric_label"]} cell',
         "locator": fact["locators"]["value"],
-        "context_locators": {key: locators[key] for key in keys},
+        "context_locators": {key: locators.get(key) for key in keys},
     }
 
 
@@ -139,6 +143,8 @@ def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
     if "cell" in locator:
         return _cell_text(lines, locator)
     fragment = _fragment_at(lines, locator)
+    if key == "statement_heading" and re.match(r"<(?:td|th)[\s>]", fragment, re.IGNORECASE):
+        return _cell_text(lines, locator)
     tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]"
     start = re.match(rf"<({tags})[\s>]", fragment, re.IGNORECASE)
     boundary = r"|(?=<table[\s>])" if key == "unit_header" else ""

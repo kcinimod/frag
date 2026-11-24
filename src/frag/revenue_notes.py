@@ -39,8 +39,7 @@ def accounting_policy_notes(
         return []
     start = sections[0] + 2
     # A later disclosure may qualify the amounts or basis established by these policies.
-    if any(REVENUE_TERMS.search(sentence) and BASIS_QUALIFICATION.search(sentence)
-           for block in blocks[start:] for sentence in re.split(r"(?<=[.!?])\s+", block.text)):
+    if _unresolved_revenue_basis(blocks[start:]):
         return []
     end = next((i for i in range(start, len(blocks)) if NOTE_HEADING.match(blocks[i].text)), None)
     if end is None:
@@ -77,13 +76,51 @@ def accounting_policy_notes(
     return [note for note in evidence if note is not None]
 
 
+def dated_policy_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> tuple[list[dict[str, Any]], dict[int, int]]:
+    blocks = [block for block in document.blocks if block.position > after]
+    basis = _unique_heading(blocks, re.compile(r"Note 1\s*:\s*Basis of Presentation", re.I))
+    policies = _unique_heading(blocks, re.compile(r"Note 2\s*:\s*Accounting Policies", re.I))
+    if basis is None or policies is None or basis >= policies or _unresolved_revenue_basis(blocks[basis:]):
+        return [], {}
+    scope = blocks[basis + 1].text
+    if (not CONSOLIDATED_ACCOUNTS.search(scope)
+            or not re.search(r"\bwe have eliminated intercompany accounts and transactions\b", scope, re.I)):
+        return [], {}
+    weeks: dict[int, int] = {}
+    for years, duration in re.findall(
+        r"\b(20\d{2}(?: and 20\d{2})?) (?:was|were) (?:a )?(52|53)-week fiscal years?\b", scope, re.I,
+    ):
+        for year in re.findall(r"\d{4}", years):
+            if int(year) in weeks:
+                return [], {}
+            weeks[int(year)] = int(duration)
+    policy = blocks[policies + 1:]
+    revenue = _unique_heading(policy, REVENUE)
+    if (revenue != 0 or len(policy) < 3
+            or not re.search(r"\brecognize net product revenue\b.*\btransfer of control\b", policy[1].text, re.I)
+            or not re.match(r"We measure revenue\b", policy[2].text, re.I)):
+        return [], {}
+    evidence = [
+        _note(lines, "consolidation", blocks[basis], blocks[policies - 1]),
+        _note(lines, "revenue", policy[0], policy[2], number=2),
+    ]
+    return [note for note in evidence if note is not None], weeks
+
+
+def _unresolved_revenue_basis(blocks: list[TextBlock]) -> bool:
+    return any(REVENUE_TERMS.search(sentence) and BASIS_QUALIFICATION.search(sentence)
+               for block in blocks for sentence in re.split(r"(?<=[.!?])\s+", block.text))
+
+
 def _unique_heading(blocks: list[TextBlock], pattern: re.Pattern[str]) -> int | None:
     matches = [i for i, block in enumerate(blocks[:-1]) if pattern.fullmatch(block.text)]
     return matches[0] if len(matches) == 1 else None
 
 
 def _note(
-    lines: list[str], topic: str, start: TextBlock, last: TextBlock,
+    lines: list[str], topic: str, start: TextBlock, last: TextBlock, *, number: int = 1,
 ) -> dict[str, Any] | None:
     if last.end is None:
         return None
@@ -92,4 +129,4 @@ def _note(
         original_span(lines, locator["start"], locator["end_exclusive"])
     except ValueError:
         return None
-    return {"number": 1, "id": f"note-1-{topic}", "title": start.text, "locator": locator}
+    return {"number": number, "id": f"note-{number}-{topic}", "title": start.text, "locator": locator}

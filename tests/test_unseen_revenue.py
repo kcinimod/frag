@@ -16,6 +16,77 @@ from frag.web import create_app
 
 ORIGINALS = Path(__file__).parents[1] / "artifacts/phase05/originals"
 AMAZON = ORIGINALS / "amzn-20231231.htm.gz"
+INTEL = ORIGINALS / "intc-20231230.htm.gz"
+
+
+def test_lookup_with_a_separate_title_table_opens_statement_and_notes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    def deny_network(*args: Any, **kwargs: Any) -> Any:
+        pytest.fail("Offline lookup opened a socket")
+
+    monkeypatch.setattr(socket, "socket", deny_network)
+    path = tmp_path / "intc-20231230.htm"
+    path.write_bytes(gzip.decompress(INTEL.read_bytes()))
+    store = SourceStore(tmp_path / "store")
+    source = success("ingest", str(path), "--provenance", "local_original", "--store", str(store.root))
+    path.unlink()
+
+    def propose(payload: dict[str, Any]) -> str:
+        evidence, = json.loads(payload["messages"][1]["content"])["evidence"]
+        assert evidence["reporting_period"]["fiscal_year"] == 2023
+        return json.dumps({"operation": "lookup", "fact_id": evidence["fact_id"]})
+
+    question = "What was revenue in FY2023?"
+    monkeypatch.setattr(cli, "propose_lookup", propose)
+    record = tmp_path / "answer.json"
+    assert cli.main(["ask", source["source_id"], question, "--store", str(store.root),
+                     "--record", str(record)]) == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result["status"] == "answered"
+    fact = result["fact"]
+    assert (fact["raw_amount"], fact["normalized_amount"], fact["currency"], fact["scale"], fact["scope"]) == (
+        "54,228", "54228000000", "USD", 1_000_000, "consolidated",
+    )
+    assert fact["inline_xbrl"]["fact_element_id"] == "f-44"
+    assert (fact["reporting_period"]["start"], fact["reporting_period"]["end"]) == ("2023-01-01", "2023-12-30")
+    prior = next(item for item in source["facts"] if item["reporting_period"]["fiscal_year"] == 2022)
+    assert (prior["status"], prior["raw_amount"], prior["reporting_period"]["start"]) == (
+        "verified", "63,054", "2021-12-26",
+    )
+    assert source["verification_reference"] is None
+    assert success("replay-ask", str(record), "--store", str(store.root)) == result
+
+    client = create_app(store, tmp_path, planner=propose).test_client()
+    base = f'/api/sources/{source["source_id"]}/lookup'
+    assert client.post(base, json={"question": question}, headers={"X-Frag-Ask": "1"}).get_json() == result
+    for citation, phrases in {
+        "revenue": ("Consolidated Statements of Income", "Dec 30, 2023", "In Millions", "Net revenue", "54,228"),
+        "note-1-consolidation": ("Basis of Presentation", "2022 was a 53-week fiscal year", "intercompany accounts"),
+        "note-2-revenue": ("Revenue Recognition", "transfer of control", "Variable consideration"),
+    }.items():
+        response = client.get(f"{base}/citations/2023/{citation}")
+        assert response.status_code == 200
+        assert all(phrase in response.text for phrase in phrases)
+
+
+def test_conflicting_fiscal_calendar_keeps_the_affected_observation_provisional(tmp_path: Path) -> None:
+    original = gzip.decompress(INTEL.read_bytes())
+    disclosure = b"2022 was a 53-week fiscal year"
+    assert original.count(disclosure) == 1
+    store = SourceStore(tmp_path / "store")
+    # Deliberately contradict the inline XBRL annual duration in a synthetic mutation.
+    source = store.ingest_bytes(original.replace(disclosure, b"2022 was a 52-week fiscal year"),
+                                provenance="local_original")
+
+    def propose(_: dict[str, Any]) -> str:
+        pytest.fail("Provisional revenue reached the planner")
+
+    result = ask_revenue(source, "What was revenue in FY2022?", propose)
+    assert result["status"] == "evidence_unavailable"
+    assert "duration conflicts" in result["message"]
+    statuses = {item["reporting_period"]["fiscal_year"]: item["status"] for item in source["facts"]}
+    assert statuses == {2021: "verified", 2022: "provisional", 2023: "verified"}
 
 
 def test_unseen_issuer_lookup_opens_original_evidence_offline(
