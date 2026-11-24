@@ -6,7 +6,9 @@ from copy import deepcopy
 from importlib.resources import files
 from typing import Any
 
-from frag.dated_revenue import applies_to, inspect_dated_revenue
+from frag.dated_revenue import (
+    applies_to, inspect_dated_revenue, inspect_shared_year_revenue, shared_year_tables,
+)
 from frag.income_html import StatementHTML, original_span
 from frag.revenue import PRIOR_LAYOUT_VERSION, extract_revenue, matches_microsoft_company
 
@@ -116,6 +118,9 @@ def inspect_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
     else:
         document.feed(html)
         document.close()
+        tables = shared_year_tables(document)
+        if tables:
+            return inspect_shared_year_revenue(document, tables, html.split("\n"), source)
         if applies_to(document):
             return inspect_dated_revenue(document, html.split("\n"), source)
         result = extract_revenue(original, source, document)

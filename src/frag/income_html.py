@@ -9,12 +9,40 @@ class UnsupportedLayout(ValueError):
     """The statement cannot be interpreted unambiguously."""
 
 
+class HTMLVisibility:
+    """Track content explicitly hidden by the original markup."""
+
+    def __init__(self) -> None:
+        self._tag: str | None = None
+        self._depth = 0
+
+    @property
+    def hidden(self) -> bool:
+        return self._tag is not None
+
+    def start(self, tag: str, attrs: dict[str, str | None]) -> None:
+        if not self.hidden and tag not in VOID_TAGS and (
+            tag in {"ix:hidden", "template"} or "hidden" in attrs
+            or HIDDEN_STYLE.search(attrs.get("style") or "")
+        ):
+            self._tag = tag
+        if tag == self._tag:
+            self._depth += 1
+
+    def end(self, tag: str) -> None:
+        if tag == self._tag:
+            self._depth -= 1
+            if self._depth == 0:
+                self._tag = None
+
+
 def is_statement_heading(text: str) -> bool:
     # The filing can split a heading across styled inline runs.
     compact = re.sub(r"\s+", "", text).casefold()
     return compact in {
         "incomestatement", "incomestatements",
         "consolidatedincomestatement", "consolidatedincomestatements",
+        "consolidatedstatementofincome", "consolidatedstatementsofincome",
         "consolidatedstatementofoperations", "consolidatedstatementsofoperations",
     }
 
@@ -54,6 +82,11 @@ class EvidenceText:
 
 
 @dataclass
+class TextBlock(EvidenceText):
+    end: tuple[int, int] | None = None
+
+
+@dataclass
 class Cell(EvidenceText):
     attrs: dict[str, str | None] = field(default_factory=dict)
     inline_facts: list["InlineFact"] = field(default_factory=list)
@@ -69,6 +102,7 @@ class InlineContext:
     position: tuple[int, int]
     fields: dict[str, EvidenceText] = field(default_factory=dict)
     dimensioned: bool = False
+    identifier_scheme: str | None = None
 
 
 @dataclass
@@ -81,6 +115,7 @@ class Table:
     rows: list[list[Cell]] = field(default_factory=list)
     nested: bool = False
     complete: bool = False
+    issuer: EvidenceText | None = None
 
     def locator(self) -> dict[str, int]:
         return {"table": self.number, **EvidenceText(self.position).locator()}
@@ -95,6 +130,7 @@ class StatementHTML(HTMLParser):
         self.unit_measures: dict[str, list[EvidenceText]] = {}
         self.contexts: dict[str, list[InlineContext]] = {}
         self.cover_facts: dict[str, list[EvidenceText]] = {}
+        self.blocks: list[TextBlock] = []
         self._cover_fact: EvidenceText | None = None
         self._cover_depth = 0
         self._context: InlineContext | None = None
@@ -109,8 +145,10 @@ class StatementHTML(HTMLParser):
         self._caption: EvidenceText | None = None
         self._heading: EvidenceText | None = None
         self._preamble: EvidenceText | None = None
-        self._block: EvidenceText | None = None
+        self._block: TextBlock | None = None
+        self._issuer: EvidenceText | None = None
         self._ignored: str | None = None
+        self._visibility = HTMLVisibility()
 
     def handle_starttag(self, tag: str, attributes: list[tuple[str, str | None]]) -> None:
         if self._ignored:
@@ -118,8 +156,10 @@ class StatementHTML(HTMLParser):
         if tag in {"script", "style"}:
             self._ignored = tag
             return
+        attrs = dict(attributes)
+        self._visibility.start(tag, attrs)
         if tag == "ix:nonnumeric":
-            name = (dict(attributes).get("name") or "").casefold()
+            name = (attrs.get("name") or "").casefold()
             if self._cover_fact:
                 self._cover_depth += 1
             elif name in COVER_FACTS:
@@ -127,12 +167,12 @@ class StatementHTML(HTMLParser):
                 self._cover_depth = 1
                 self.cover_facts.setdefault(name, []).append(self._cover_fact)
         if tag == "xbrli:unit":
-            self._unit = dict(attributes).get("id")
+            self._unit = attrs.get("id")
         elif tag == "xbrli:measure" and self._unit:
             self._measure = EvidenceText(self.getpos())
             self.unit_measures.setdefault(self._unit, []).append(self._measure)
         elif tag == "xbrli:context":
-            context_id = dict(attributes).get("id")
+            context_id = attrs.get("id")
             if context_id:
                 self._context = InlineContext(self.getpos())
                 self.contexts.setdefault(context_id, []).append(self._context)
@@ -141,22 +181,32 @@ class StatementHTML(HTMLParser):
                 if tag in self._context.fields:
                     self._context.dimensioned = True
                 self._context_field = self._context.fields[tag] = EvidenceText(self.getpos())
-            elif tag in {"xbrli:segment", "xbrli:scenario"}:
+                if tag == "xbrli:identifier":
+                    self._context.identifier_scheme = attrs.get("scheme")
+            elif tag in {"xbrli:segment", "xbrli:scenario", "xbrli:instant",
+                         "xbrldi:explicitmember", "xbrldi:typedmember"}:
                 self._context.dimensioned = True
         if tag == "table":
             self._count += 1
+        if self._visibility.hidden:
+            return
+        if tag == "table":
             self._depth += 1
             if self._depth == 1:
-                self._table = Table(self._count, self.getpos(), self._heading, preamble=self._preamble)
+                if self._heading and self._block and self._is_preamble(self._block):
+                    self._finish_block()
+                self._table = Table(self._count, self.getpos(), self._heading,
+                                    preamble=self._preamble, issuer=self._issuer)
                 self._heading = None
                 self._preamble = None
+                self._issuer = None
             elif self._table:
                 self._table.nested = True
             return
         if self._depth == 0:
             if tag in BLOCK_TAGS:
                 self._finish_block()
-                self._block = EvidenceText(self.getpos())
+                self._block = TextBlock(self.getpos())
             return
         table = self._table
         if self._depth != 1 or table is None:
@@ -167,10 +217,10 @@ class StatementHTML(HTMLParser):
             self._cell = None
             table.rows.append([])
         elif tag in {"td", "th"} and table.rows:
-            self._cell = Cell(self.getpos(), attrs=dict(attributes))
+            self._cell = Cell(self.getpos(), attrs=attrs)
             table.rows[-1].append(self._cell)
         elif self._cell and tag == "ix:nonfraction":
-            self._inline_fact = InlineFact(self.getpos(), attrs=dict(attributes))
+            self._inline_fact = InlineFact(self.getpos(), attrs=attrs)
             self._cell.inline_facts.append(self._inline_fact)
         elif tag == "br":
             active = self._cell or self._caption
@@ -195,6 +245,9 @@ class StatementHTML(HTMLParser):
             self._context_field = None
         elif tag in CONTEXT_FIELDS:
             self._context_field = None
+        if self._visibility.hidden:
+            self._visibility.end(tag)
+            return
         if tag == "table" and self._depth:
             self._depth -= 1
             if self._depth == 0 and self._table:
@@ -208,6 +261,9 @@ class StatementHTML(HTMLParser):
             elif tag == "caption":
                 self._caption = None
         elif self._depth == 0 and tag in BLOCK_TAGS:
+            if self._block:
+                line, column = self.getpos()
+                self._block.end = (line, column + len(tag) + 3)
             self._finish_block()
 
     def handle_data(self, data: str) -> None:
@@ -219,6 +275,8 @@ class StatementHTML(HTMLParser):
             self._measure.parts.append(data)
         if self._context_field:
             self._context_field.parts.append(data)
+        if self._visibility.hidden:
+            return
         if self._depth == 1:
             if self._inline_fact:
                 self._inline_fact.parts.append(data)
@@ -230,6 +288,7 @@ class StatementHTML(HTMLParser):
         elif self._depth == 0 and data.strip():
             self._heading = None
             self._preamble = None
+            self._issuer = None
 
     def close(self) -> None:
         super().close()
@@ -237,15 +296,22 @@ class StatementHTML(HTMLParser):
 
     def _finish_block(self) -> None:
         if self._block and self._block.text:
+            if self._block.end is not None:
+                self.blocks.append(self._block)
             if is_statement_heading(self._block.text):
+                self._issuer = self.blocks[-2] if self._block.end and len(self.blocks) > 1 else None
                 self._heading = self._block
                 self._preamble = None
-            elif (self._heading and self._preamble is None
-                  and self._block.text.casefold().startswith(("(in ", "(dollars in "))):
+            elif self._heading and self._preamble is None and self._is_preamble(self._block):
                 self._preamble = self._block
             else:
                 self._heading = self._preamble = None
+                self._issuer = None
         self._block = None
+
+    @staticmethod
+    def _is_preamble(block: EvidenceText) -> bool:
+        return block.text.casefold().startswith(("(in ", "(dollars in ", "(amounts in "))
 
     def _finish_table(self) -> None:
         if self._table:
@@ -259,6 +325,9 @@ class StatementHTML(HTMLParser):
 
 
 BLOCK_TAGS = {"div", "p", "h1", "h2", "h3", "h4", "h5", "h6"}
+VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
+             "param", "source", "track", "wbr"}
+HIDDEN_STYLE = re.compile(r"(?:^|;)\s*(?:display\s*:\s*none|visibility\s*:\s*hidden)\b", re.I)
 CONTEXT_FIELDS = {"xbrli:identifier", "xbrli:startdate", "xbrli:enddate"}
 COVER_FACTS = {"dei:documenttype", "dei:documentperiodenddate", "dei:entitycentralindexkey",
                "dei:entityregistrantname"}

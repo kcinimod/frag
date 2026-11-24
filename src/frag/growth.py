@@ -160,4 +160,4 @@ def disclosure_citations(facts: list[dict[str, Any]], comparison: dict[str, Any]
 
 
 def note_citation_id(note: dict[str, Any]) -> str:
-    return f'note-{note["number"]}'
+    return str(note.get("id", f'note-{note["number"]}'))

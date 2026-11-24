@@ -91,7 +91,7 @@ def lookup_citation(source: dict[str, Any], year: int, citation_id: str) -> dict
 
 def _lookup_citations(fact: dict[str, Any]) -> list[dict[str, Any]]:
     citations = [revenue_cell_citation(fact, "revenue")]
-    if fact["parser_version"] == dated_revenue.PARSER_VERSION:
+    if fact["parser_version"] in dated_revenue.FILING_SCOPED_PARSERS:
         citations.extend(disclosure_citations([fact], {}).values())
     return citations
 
@@ -102,7 +102,7 @@ def _evidence(facts: list[dict[str, Any]], year: int) -> list[dict[str, Any]]:
     ranked = sorted(facts, key=lambda fact: fact["reporting_period"]["fiscal_year"] == year)
     evidence = [{key: fact[key] for key in keys} for fact in ranked]
     for fact, item in zip(ranked, evidence, strict=True):
-        if fact.get("parser_version") == dated_revenue.PARSER_VERSION:
+        if fact.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS:
             # Keep the request identical for newly extracted and cached observations.
             item["reporting_period"] = dict(sorted(item["reporting_period"].items()))
     return evidence
@@ -178,11 +178,11 @@ def _planner_input(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if request["operation"] == "lookup":
         year = request["fiscal_year"]
-        if source.get("parser_version") == dated_revenue.PARSER_VERSION:
+        if source.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS:
             facts = _facts_for_year(facts, year)
         evidence = _evidence(facts, year)
         return evidence, _lookup_payload(year, evidence)
-    if source.get("parser_version") == dated_revenue.PARSER_VERSION and not legacy_growth:
+    if source.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS and not legacy_growth:
         prior, current = request["prior_year"], request["current_year"]
         pair = [fact for fact in facts if fact["reporting_period"]["fiscal_year"] in (prior, current)]
         # Present the reviewed operands in subtraction order.
@@ -292,7 +292,7 @@ def _identity(source: dict[str, Any]) -> dict[str, Any]:
 
 
 def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
-    if request["operation"] == "growth" and source.get("parser_version") == dated_revenue.PARSER_VERSION:
+    if request["operation"] == "growth" and source.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS:
         return DATED_GROWTH_RECORD_VERSION
     return RECORD_VERSION
 
@@ -300,7 +300,7 @@ def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
 def _dated_lookup_gap(
     source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
 ) -> dict[str, Any] | None:
-    if request["operation"] != "lookup" or source.get("parser_version") != dated_revenue.PARSER_VERSION:
+    if request["operation"] != "lookup" or source.get("parser_version") not in dated_revenue.FILING_SCOPED_PARSERS:
         return None
     year = request["fiscal_year"]
     if len(_facts_for_year(facts, year)) == 1:

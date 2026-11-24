@@ -8,19 +8,31 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from importlib.resources import files
 from typing import Any
+from urllib.parse import urlsplit
 
 from frag.income_html import (
     EvidenceText, GridCell, StatementHTML, Table, UnsupportedLayout, original_span, table_grid,
 )
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
+from frag.revenue_notes import accounting_policy_notes
 
 PARSER_VERSION = "dated-annual-revenue-v1"
+SHARED_YEAR_PARSER_VERSION = "shared-year-revenue-v1"
+FILING_SCOPED_PARSERS = {PARSER_VERSION, SHARED_YEAR_PARSER_VERSION}
+SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "reviewed-comparison-v1"
+EXTRACTION_CACHE_REVISION = "shared-year-v1"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
+CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
-MONEY_PREAMBLE = re.compile(r"^\((?:dollars )?in (thousands|millions|billions)\b", re.I)
+SHARED_YEAR_HEADER = re.compile(r"(?:fiscal )?years? ended ([A-Za-z]+ [0-9]{1,2}),?", re.I)
+MONEY_PREAMBLE = re.compile(r"^\((?:dollars |amounts )?in (thousands|millions|billions)\b", re.I)
+SHARED_MONEY_PREAMBLE = re.compile(
+    r"\((?:dollars |amounts )?in (thousands|millions|billions)(?:, except per[- ]share (?:data|amounts))?\)",
+    re.I,
+)
+SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues"}
 
 
 @dataclass(frozen=True)
@@ -30,6 +42,8 @@ class DatedStatement:
     label: GridCell
     annual: GridCell
     scale: int
+    unit_header: dict[str, int]
+    shared_year: bool = False
 
 
 def is_dated_statement(table: Table) -> bool:
@@ -44,6 +58,14 @@ def _cover(document: StatementHTML, concept: str) -> str:
 def applies_to(document: StatementHTML) -> bool:
     return (_cover(document, "entitycentralindexkey") == REFERENCE["identity"]["cik"]
             or any(is_dated_statement(table) for table in document.tables))
+
+
+def shared_year_tables(document: StatementHTML) -> list[Table]:
+    return [
+        table for table in document.tables
+        if table.heading and CONSOLIDATED_HEADING.fullmatch(table.heading.text)
+        and any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row)
+    ]
 
 
 def _displayed_date(text: str) -> date:
@@ -128,7 +150,7 @@ def _one[T](items: list[T], message: str) -> T:
 
 def _inline_period(
     document: StatementHTML, inline: dict[str, str | None], cik: str,
-    end: date, prior_end: date | None,
+    end: date, prior_end: date | None, *, shared_year: bool,
 ) -> tuple[date, dict[str, int]]:
     context = _one(
         document.contexts.get(inline.get("contextref") or "", []),
@@ -139,6 +161,8 @@ def _inline_period(
         raise UnsupportedLayout("The inline XBRL context has dimensions that conflict with consolidated scope.")
     if fields.get("xbrli:identifier") != cik:
         raise UnsupportedLayout("The inline XBRL entity conflicts with the filing cover.")
+    if shared_year and context.identifier_scheme not in {"http://www.sec.gov/CIK", "https://www.sec.gov/CIK"}:
+        raise UnsupportedLayout("The inline XBRL entity does not use an SEC CIK.")
     if fields.get("xbrli:enddate") != end.isoformat():
         raise UnsupportedLayout("The inline XBRL period conflicts with the displayed fiscal year-end.")
     raw_start = fields.get("xbrli:startdate", "")
@@ -149,65 +173,108 @@ def _inline_period(
     days = (end - start).days + 1
     if (days not in {364, 365, 366, 371}
             or (prior_end is not None and start != prior_end + timedelta(days=1))
+            or (shared_year and days not in {365, 366})
             or (str(end.year) in REFERENCE["period_weeks"] and cik == REFERENCE["identity"]["cik"]
                 and days != 7 * REFERENCE["period_weeks"][str(end.year)])):
         raise UnsupportedLayout("Inline XBRL duration conflicts with the annual statement or fiscal calendar.")
     return start, EvidenceText(context.position).locator()
 
 
-def _fact(
-    document: StatementHTML, statement: DatedStatement, header: GridCell, end: date,
-    prior_end: date | None, cik: str, base: dict[str, Any],
-) -> dict[str, Any]:
+def _visible_fact(
+    statement: DatedStatement, header: GridCell, end: date, base: dict[str, Any],
+) -> tuple[dict[str, Any], GridCell]:
     table, rows, label, scale = statement.table, statement.rows, statement.label, statement.scale
     value = _value_cell(rows[label.row - 1], label, header)
     if value is None:
         raise UnsupportedLayout("The revenue cell is missing from the displayed fiscal year column.")
-    tagged = _one(value.cell.inline_facts, "Expected one inline XBRL fact in the revenue cell.")
-    inline = tagged.attrs
-    if (inline.get("name") or "").casefold() != REVENUE_CONCEPT.casefold():
-        raise UnsupportedLayout("The inline XBRL concept conflicts with the total revenue row.")
-    start, context = _inline_period(document, inline, cik, end, prior_end)
-    if inline.get("scale") != str(len(str(scale)) - 1):
-        raise UnsupportedLayout("Inline XBRL scale conflicts with the visible statement scale.")
     raw = value.cell.text
     amount = _normalize(raw, scale)
-    if (inline.get("format") != "ixt:num-dot-decimal" or inline.get("sign") is not None
-            or amount is None or amount.startswith("-")
-            or amount != _normalize(tagged.text, scale)):
+    if amount is None or amount.startswith("-"):
         raise UnsupportedLayout("Inline XBRL amount or sign conflicts with the displayed revenue amount.")
-    measure = _one(
-        document.unit_measures.get(inline.get("unitref") or "", []),
-        "The inline XBRL currency unit does not resolve uniquely.",
-    )
     markers = [
         entry for row in rows[header.row:label.row] for entry in row
         if entry.cell.text in {"$", "US$", "USD"} and set(entry.columns) <= set(header.columns)
     ]
-    if measure.text.casefold() != "iso4217:usd" or not markers:
-        raise UnsupportedLayout("The USD inline XBRL unit and visible statement currency could not be reconciled.")
-    assert table.heading is not None and table.preamble is not None
+    if not markers:
+        raise UnsupportedLayout("The visible statement currency could not be established.")
+    assert table.heading is not None
+    locators = {
+        "table": table.locator(), "statement_heading": table.heading.locator(),
+        "metric_label": label.locator(table), "annual_header": statement.annual.locator(table),
+        "year_header": header.locator(table), "value": value.locator(table),
+        "unit_header": statement.unit_header, "currency_symbol": markers[0].locator(table),
+    }
+    if statement.shared_year and table.issuer:
+        locators["statement_issuer"] = table.issuer.locator()
+    start = None
+    if statement.shared_year:
+        try:
+            start = (end.replace(year=end.year - 1) + timedelta(days=1)).isoformat()
+        except ValueError:
+            pass
     return {
         **base, "fact_id": revenue_fact_id(base["source_id"], end.year),
         "metric": "reported_consolidated_revenue", "metric_label": label.cell.text,
         "raw_amount": raw, "normalized_amount": amount, "currency": "USD", "scale": scale,
         "basis": "as_reported_in_filing", "scope": "consolidated",
-        "reporting_period": {"kind": "annual", "fiscal_year": end.year,
-                             "start": start.isoformat(), "end": end.isoformat()},
-        "inline_xbrl": {
-            "fact_element_id": inline.get("id"), "concept": inline["name"],
-            "context_id": inline["contextref"], "unit_id": inline["unitref"],
-        },
-        "locators": {
-            "table": table.locator(), "statement_heading": table.heading.locator(),
-            "metric_label": label.locator(table), "annual_header": statement.annual.locator(table),
-            "year_header": header.locator(table), "value": value.locator(table),
-            "unit_header": {"table": table.number, **table.preamble.locator()},
-            "currency_symbol": markers[0].locator(table),
-            "currency_measure": measure.locator(), "inline_context": context,
-            "inline_fact": tagged.locator(),
-        },
+        "reporting_period": {"kind": "annual", "fiscal_year": end.year, "start": start, "end": end.isoformat()},
+        "inline_xbrl": None, "locators": locators,
+    }, value
+
+
+def _verify_inline(
+    document: StatementHTML, statement: DatedStatement, value: GridCell, end: date,
+    prior_end: date | None, cik: str, fact: dict[str, Any],
+) -> None:
+    tagged = _one(value.cell.inline_facts, "Expected one inline XBRL fact in the revenue cell.")
+    inline = tagged.attrs
+    concepts = {REVENUE_CONCEPT.casefold()}
+    if statement.shared_year:
+        concepts.add("us-gaap:revenues")
+    if (inline.get("name") or "").casefold() not in concepts:
+        raise UnsupportedLayout("The inline XBRL concept conflicts with the total revenue row.")
+    start, context = _inline_period(document, inline, cik, end, prior_end,
+                                    shared_year=statement.shared_year)
+    if inline.get("scale") != str(len(str(statement.scale)) - 1):
+        raise UnsupportedLayout("Inline XBRL scale conflicts with the visible statement scale.")
+    if (inline.get("format") != "ixt:num-dot-decimal" or inline.get("sign") is not None
+            or inline.get("xsi:nil") in {"true", "1"}
+            or fact["normalized_amount"] != _normalize(tagged.text, statement.scale)):
+        raise UnsupportedLayout("Inline XBRL amount or sign conflicts with the displayed revenue amount.")
+    measure = _one(
+        document.unit_measures.get(inline.get("unitref") or "", []),
+        "The inline XBRL currency unit does not resolve uniquely.",
+    )
+    if measure.text.casefold() != "iso4217:usd":
+        raise UnsupportedLayout("The USD inline XBRL unit and visible statement currency could not be reconciled.")
+    fact["reporting_period"]["start"] = start.isoformat()
+    fact["inline_xbrl"] = {
+        "fact_element_id": inline.get("id"), "concept": inline["name"],
+        "context_id": inline["contextref"], "unit_id": inline["unitref"],
     }
+    fact["locators"].update(currency_measure=measure.locator(), inline_context=context, inline_fact=tagged.locator())
+
+
+def _annual_facts(
+    document: StatementHTML, statement: DatedStatement, periods: dict[date, GridCell],
+    cik: str, base: dict[str, Any], diagnostics: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    facts = []
+    ordered = sorted(periods)
+    for index, end in enumerate(ordered):
+        prior_end = ordered[index - 1] if index else None
+        fact = None
+        try:
+            fact, value = _visible_fact(statement, periods[end], end, base)
+            _verify_inline(document, statement, value, end, prior_end, cik, fact)
+        except UnsupportedLayout as exc:
+            diagnostics.append({"code": "unsupported_observation", "fiscal_year": end.year, "message": str(exc)})
+            if fact is None or not statement.shared_year:
+                continue
+            fact.update(status="provisional",
+                        unresolved_requirements=[*fact["unresolved_requirements"], "inline_xbrl_verification"])
+        facts.append(fact | {"comparative": end < ordered[-1]})
+    return facts
 
 
 def inspect_dated_revenue(
@@ -237,7 +304,9 @@ def inspect_dated_revenue(
         if units is None:
             raise UnsupportedLayout("The monetary scale is missing from the visible consolidated statement.")
         scale = SCALES[units[1].casefold()]
-        statement = DatedStatement(table, rows, label, annual, scale)
+        assert table.preamble is not None
+        statement = DatedStatement(table, rows, label, annual, scale,
+                                   {"table": table.number, **table.preamble.locator()})
         requirements = _source_requirements(source, cik, company, current)
         notes = _notes(lines, requirements) if cik == REFERENCE["identity"]["cik"] else []
         if not notes:
@@ -251,13 +320,7 @@ def inspect_dated_revenue(
             "unresolved_requirements": requirements,
             "parent_table_id": f'{source["source_id"]}#table-{table.number}',
         }
-        for index, end in enumerate(ordered):
-            prior_end = ordered[index - 1] if index else None
-            try:
-                fact = _fact(document, statement, periods[end], end, prior_end, cik, base)
-                facts.append(fact | {"comparative": end < current})
-            except UnsupportedLayout as exc:
-                diagnostics.append({"code": "unsupported_observation", "fiscal_year": end.year, "message": str(exc)})
+        facts = _annual_facts(document, statement, periods, cik, base, diagnostics)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
     if diagnostics:
@@ -285,3 +348,114 @@ def inspect_dated_revenue(
         "comparison": comparison,
         "real_source_acceptance": not unresolved,
     }
+
+
+def inspect_shared_year_revenue(
+    document: StatementHTML, tables: list[Table], lines: list[str], source: dict[str, Any],
+) -> dict[str, Any]:
+    """Find an annual observation and verify its evidence without a reviewed reference."""
+    facts: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, Any]] = []
+    requirements: list[str] = []
+    try:
+        table = _one(tables, "Expected one visible consolidated statement with a shared year-end header.")
+        if len(document.tables) != 1:
+            raise UnsupportedLayout("More than one statement table could contain consolidated revenue.")
+        rows = [row.cells for row in table_grid(table)]
+        label = _one([cell for row in rows for cell in row if cell.cell.text.casefold() in SHARED_REVENUE_LABELS],
+                     "Expected one total revenue row in the consolidated statement.")
+        headers = rows[:label.row - 1]
+        annual = _one([cell for row in headers for cell in row if SHARED_YEAR_HEADER.fullmatch(cell.cell.text)],
+                      "Expected one shared fiscal year-end above the revenue row.")
+        periods = _shared_year_columns(headers, annual)
+        current = max(periods)
+        company = _cover(document, "entityregistrantname")
+        cik = _cover(document, "entitycentralindexkey")
+        if (not company or not re.fullmatch(r"[0-9]{10}", cik)
+                or _cover(document, "documenttype") != "10-K"
+                or _displayed_date(_cover(document, "documentperiodenddate")) != current):
+            requirements.append("source_identity_verification")
+        if table.issuer is None or _normalized_company(table.issuer.text) != _normalized_company(company):
+            requirements.append("statement_issuer_verification")
+        requirements.extend(_shared_source_requirements(source, company, cik, current))
+        unit_entries: list[tuple[EvidenceText, dict[str, int]]] = [
+            (cell.cell, cell.locator(table)) for row in headers for cell in row
+            if MONEY_PREAMBLE.match(cell.cell.text)
+        ]
+        if table.preamble:
+            unit_entries.append((table.preamble, {"table": table.number, **table.preamble.locator()}))
+        unit, unit_locator = _one(unit_entries, "Expected one visible consolidated statement scale.")
+        units = SHARED_MONEY_PREAMBLE.fullmatch(unit.text)
+        if units is None:
+            raise UnsupportedLayout("The visible statement currency or scale declaration is unsupported.")
+        statement = DatedStatement(table, rows, label, annual, SCALES[units[1].casefold()],
+                                   unit_locator, shared_year=True)
+        notes = accounting_policy_notes(
+            document, lines, after=table.position, includes_fees=any(
+                cell.cell.text.casefold() == "membership and other income"
+                for row in rows[:label.row - 1] for cell in row
+            ),
+        )
+        if len(notes) != 2:
+            requirements.append("applicable_notes")
+        base = {
+            "source_id": source["source_id"], "company": company or None,
+            "filing_date": source["filing_date"], "parser_version": SHARED_YEAR_PARSER_VERSION,
+            "evidence_version": SHARED_YEAR_EVIDENCE_VERSION, "applicable_notes": notes,
+            "status": "provisional" if requirements else "verified",
+            "unresolved_requirements": requirements.copy(),
+            "parent_table_id": f'{source["source_id"]}#table-{table.number}',
+        }
+        facts = _annual_facts(document, statement, periods, cik, base, diagnostics)
+    except UnsupportedLayout as exc:
+        diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
+    return {
+        "parser_version": SHARED_YEAR_PARSER_VERSION, "evidence_version": SHARED_YEAR_EVIDENCE_VERSION,
+        "facts": facts, "diagnostics": diagnostics, "comparison": legacy_comparison(),
+        "unresolved_requirements": [*requirements, *(["extraction"] if diagnostics else []),
+                                    "comparison_compatibility"],
+        "verification_reference": None, "real_source_acceptance": False,
+    }
+
+
+def _shared_year_columns(rows: list[list[GridCell]], annual: GridCell) -> dict[date, GridCell]:
+    match = SHARED_YEAR_HEADER.fullmatch(annual.cell.text)
+    assert match is not None
+    candidates = [
+        [cell for cell in row if cell.cell.text and cell.columns.start in annual.columns]
+        for row in rows[annual.row:]
+    ]
+    headers = _one([row for row in candidates if row and all(re.fullmatch(r"(?:19|20)\d{2}", cell.cell.text)
+                                                            for cell in row)],
+                   "Expected one row of fiscal years below the shared year-end.")
+    periods = {_displayed_date(f"{match[1]}, {cell.cell.text}"): cell for cell in headers}
+    if (len(periods) != len(headers) or len(periods) < 2
+            or not all(set(cell.columns) <= set(annual.columns) for cell in headers)):
+        raise UnsupportedLayout("The displayed fiscal year columns are ambiguous.")
+    return periods
+
+
+def _normalized_company(name: str) -> str:
+    return " ".join(re.sub(r"[,\.]", "", name).casefold().split())
+
+
+def _shared_source_requirements(source: dict[str, Any], company: str, cik: str, end: date) -> list[str]:
+    unresolved = []
+    if source["provenance"]["kind"] == "synthetic":
+        unresolved.append("original_filing")
+    if source["company"] is not None and _normalized_company(source["company"]) != _normalized_company(company):
+        unresolved.append("supplied_company_conflict")
+    if source["form"] not in (None, "10-K"):
+        unresolved.append("supplied_form_conflict")
+    if source["filing_date"] is not None and source["filing_date"] < end.isoformat():
+        unresolved.append("supplied_filing_date_conflict")
+    if source["source_url"] is not None:
+        try:
+            path = urlsplit(source["source_url"]).path
+        except ValueError:
+            path = ""
+        match = re.fullmatch(r"(?:/Archives/edgar/data)?/(\d+)/(\d{18})/[^/]+", path)
+        if (not match or not cik or match[1].lstrip("0") != cik.lstrip("0")
+                or (source["accession"] is not None and source["accession"].replace("-", "") != match[2])):
+            unresolved.append("supplied_source_url_conflict")
+    return unresolved

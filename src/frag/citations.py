@@ -4,7 +4,7 @@ import re
 from html.parser import HTMLParser
 from typing import Any
 
-from frag.income_html import is_statement_heading, original_span
+from frag.income_html import HTMLVisibility, is_statement_heading, original_span
 from frag.store import SourceError
 from frag.verification import REFERENCE
 
@@ -25,6 +25,8 @@ def revenue_cell_citation(fact: dict[str, Any], citation_id: str) -> dict[str, A
     if "currency_symbol" in locators:
         keys = ("statement_heading", "metric_label", "annual_header", "year_header",
                 "unit_header", "currency_symbol", "currency_measure")
+    if "statement_issuer" in locators:
+        keys = ("statement_issuer", *keys)
     return {
         "id": citation_id,
         "title": f'FY{year} {fact["metric_label"]} cell',
@@ -38,25 +40,30 @@ class _ExcerptText(HTMLParser):
         super().__init__()
         self.parts: list[str] = []
         self.ignored: str | None = None
+        self.visibility = HTMLVisibility()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if not self.ignored:
             if tag in {"script", "style"}:
                 self.ignored = tag
-            elif tag == "br" or tag in BLOCK_TAGS:
-                self.parts.append("\n")
+            else:
+                self.visibility.start(tag, dict(attrs))
+                if not self.visibility.hidden and (tag == "br" or tag in BLOCK_TAGS):
+                    self.parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
         if self.ignored:
             if tag == self.ignored:
                 self.ignored = None
+        elif self.visibility.hidden:
+            self.visibility.end(tag)
         elif tag in {"td", "th"}:
             self.parts.append(" ")
         elif tag in BLOCK_TAGS:
             self.parts.append("\n")
 
     def handle_data(self, data: str) -> None:
-        if not self.ignored:
+        if not self.ignored and not self.visibility.hidden:
             self.parts.append(data)
 
     @property
@@ -123,10 +130,9 @@ def _fragment_at(lines: list[str], locator: dict[str, int]) -> str:
 
 def _cell_text(lines: list[str], locator: dict[str, int]) -> str:
     fragment = _fragment_at(lines, locator)
-    end = CELL_END.search(fragment)
-    if not end or not fragment.startswith(("<td", "<th")):
+    if not re.match(r"<(?:td|th)[\s>]", fragment, re.IGNORECASE):
         raise SourceError("The statement cell cannot be opened at its verified locator.")
-    return _visible_text(fragment[:end.end()])
+    return _bounded_text(lines, locator, fragment, CELL_END)
 
 
 def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
@@ -135,10 +141,25 @@ def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
     fragment = _fragment_at(lines, locator)
     tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]"
     start = re.match(rf"<({tags})[\s>]", fragment, re.IGNORECASE)
-    end = re.search(rf"</{start[1]}\s*>", fragment, re.IGNORECASE) if start else None
-    if not end:
+    boundary = r"|(?=<table[\s>])" if key == "unit_header" else ""
+    if not start:
         raise SourceError("The statement context cannot be opened at its verified locator.")
-    return _visible_text(fragment[:end.end()])
+    end = re.compile(rf"</{start[1]}\s*>{boundary}", re.IGNORECASE)
+    return _bounded_text(lines, locator, fragment, end)
+
+
+def _bounded_text(
+    lines: list[str], locator: dict[str, int], first_line: str, boundary: re.Pattern[str],
+) -> str:
+    if end := boundary.search(first_line):
+        return _visible_text(first_line[:end.end()])
+    parts = [first_line]
+    for line in lines[locator["line"]:]:
+        if end := boundary.search(line):
+            parts.append(line[:end.end()])
+            return _visible_text("\n".join(parts))
+        parts.append(line)
+    raise SourceError("The statement evidence has no closing boundary in the original.")
 
 
 def _visible_text(fragment: str) -> str:
