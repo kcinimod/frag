@@ -84,3 +84,6 @@ Phase 2 calculator and its offline results.
   Apple returns −2.80% with fiscal-calendar and currency caveats. Growth questions
   expose evidence gaps and keep supported observations available for
   inspection. [Development growth and replay](../artifacts/phase04/development/README.md#fy2022-to-fy2023-growth)
+- Issue #24 reserves 18 cases from six domestic 10-K issuer families. The
+  offline audit verified the original hashes, case coverage, and scoring
+  evidence. [Holdout handoff](../artifacts/phase04/SEC_HOLDOUT.md)

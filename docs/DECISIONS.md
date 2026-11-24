@@ -242,3 +242,12 @@ calculation uses reported consolidated totals and cites the fiscal-calendar
 and foreign-currency disclosures. Resolve evidence gaps before invoking the planner, and
 retain the available verified operands and their original citations.
 [Development growth and replay](../artifacts/phase04/development/README.md#fy2022-to-fy2023-growth)
+
+## SEC holdout custody
+
+Keep the reserved originals and questions in a runner archive outside the
+development checkout. Store expected results and citation locators in a
+separate scorer archive. Record the archive hashes in the repository and
+release the runner archive only after the evaluation freeze. Replace the
+whole issuer group if a reserved filing is used in development.
+[Holdout handoff](../artifacts/phase04/SEC_HOLDOUT.md)

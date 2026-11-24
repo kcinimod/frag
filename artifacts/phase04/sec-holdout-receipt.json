@@ -1,0 +1,16 @@
+{
+  "case_count": 18,
+  "cohort": "sec-holdout-24-v1",
+  "issuer_count": 6,
+  "preparation_base": "22781aa2dd4cd71084b6f1a648c9cdc05b8bc835",
+  "runner_bundle": {
+    "path": "runner/inputs.zip",
+    "sha256": "cb9b42aca097499c7e02e93b69e0dae0c2da1ad466e22295e45761da061e94f6"
+  },
+  "scorer_bundle": {
+    "path": "scorer/expected.zip",
+    "sha256": "93b272bd16163c5fcd1a2f7db46d376f4c9ad4a2a85fb777a70d470578579da5"
+  },
+  "statement_layout_count": 3,
+  "version": 1
+}
