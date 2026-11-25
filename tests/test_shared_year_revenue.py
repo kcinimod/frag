@@ -26,7 +26,66 @@ def byte_position(original: list[bytes], locator: dict[str, int]) -> int:
             + len(original[index].decode()[:locator["character"] - 1].encode()))
 
 
-@pytest.mark.parametrize("conflict", ("extra_year_row", "missing_trade_promotion_note"))
+def test_walmart_total_revenues_remain_verified_above_net_sales_subtotal(tmp_path: Path) -> None:
+    archive = ROOT / "artifacts/phase05/originals/wmt-20240131.htm.gz"
+    store = SourceStore(tmp_path)
+    source = store.ingest_bytes(gzip.decompress(archive.read_bytes()), provenance="local_original")
+    current = next(fact for fact in source["facts"] if fact["reporting_period"]["fiscal_year"] == 2024)
+    assert (current["status"], current["metric_label"], current["normalized_amount"]) == (
+        "verified", "Total revenues", "648125000000",
+    )
+    client = create_app(store, tmp_path).test_client()
+    growth = client.get(f'/api/sources/{source["source_id"]}/growth?prior=2023&current=2024').get_json()
+    assert growth["status"] == "calculated"
+    assert growth["percent"] == {"unit": "percent", "value": "6.03"}
+
+
+def test_coca_cola_consolidation_citation_includes_both_reordered_disclosures(tmp_path: Path) -> None:
+    filename = "ko-20241231.htm"
+    archive = ROOT / "artifacts/phase06/originals" / (filename + ".gz")
+    original = gzip.decompress(archive.read_bytes())
+    first, second = [note["locator"] for note in REVIEWS[filename]["evidence"]["applicable_notes"][:2]]
+    a, b = first["start_byte"], first["end_byte"]
+    c, d = second["start_byte"], second["end_byte"]
+    # Synthetic layout variation swaps the two reviewed paragraphs within Note 1.
+    changed = original[:a] + original[c:d] + original[b:c] + original[a:b] + original[d:]
+    store = SourceStore(tmp_path)
+    source = store.ingest_bytes(changed, provenance="local_original")
+    client = create_app(store, tmp_path).test_client()
+    excerpt = client.get(f'/api/sources/{source["source_id"]}/lookup/citations/2024/note-1-consolidation')
+    assert excerpt.status_code == 200
+    assert "all significant intercompany transactions" in excerpt.text
+    assert "we were determined to be the primary beneficiary" in excerpt.text
+
+
+def test_coca_cola_unresolved_comparison_keeps_verified_lookup(tmp_path: Path) -> None:
+    filename = "ko-20241231.htm"
+    archive = ROOT / "artifacts/phase06/originals" / (filename + ".gz")
+    original = gzip.decompress(archive.read_bytes())
+    span = REVIEWS[filename]["evidence"]["applicable_notes"][3]["locator"]
+    start, end = span["start_byte"], span["end_byte"]
+    # Synthetic variant removes the reviewed comparison disclosure.
+    changed = original[:start] + original[end:]
+    store = SourceStore(tmp_path)
+    source = store.ingest_bytes(changed, provenance="local_original")
+    current = next(fact for fact in source["facts"] if fact["reporting_period"]["fiscal_year"] == 2024)
+
+    def propose(_: dict[str, Any]) -> str:
+        return json.dumps({"operation": "lookup", "fact_id": current["fact_id"]})
+
+    client = create_app(store, tmp_path, planner=propose).test_client()
+    base = f'/api/sources/{source["source_id"]}'
+    lookup = client.post(base + "/lookup", json={"question": REVIEWS[filename]["cases"][0]["question"]},
+                         headers={"X-Frag-Ask": "1"}).get_json()
+    assert lookup["status"] == "answered"
+    assert lookup["fact"]["normalized_amount"] == "47061000000"
+    growth = client.get(base + "/growth?prior=2023&current=2024").get_json()
+    assert growth["status"] == "unavailable"
+    assert "applicable comparison disclosures" in growth["issues"][0]["detail"]
+    assert {fact["reporting_period"]["fiscal_year"] for fact in growth["operands"]} == {2023, 2024}
+
+
+@pytest.mark.parametrize("conflict", ("extra_year_row", "missing_trade_promotion_note", "conflicting_trade_promotion"))
 def test_shared_row_conflicts_withhold_verified_revenue(conflict: str, tmp_path: Path) -> None:
     filename = "pg-20240630.htm"
     original = gzip.decompress((ROOT / "artifacts/phase06/originals" / (filename + ".gz")).read_bytes())
@@ -41,7 +100,15 @@ def test_shared_row_conflicts_withhold_verified_revenue(conflict: str, tmp_path:
         original = original[:end] + alternate + original[end:]
     else:
         span = review["applicable_notes"][2]["locator"]
-        original = original[:span["start_byte"]] + original[span["end_byte"]:]
+        start, end = span["start_byte"], span["end_byte"]
+        paragraph = original[start:end]
+        if conflict == "conflicting_trade_promotion":
+            phrase = b"Sales are recorded net of trade promotion spending"
+            assert phrase in paragraph
+            paragraph = paragraph.replace(phrase, b"Sales are recorded gross of trade promotion spending. " + phrase)
+        else:
+            paragraph = b""
+        original = original[:start] + paragraph + original[end:]
     # Synthetic mutations retain the local-original intake path for verification.
     source = SourceStore(tmp_path).ingest_bytes(original, provenance="local_original")
     assert not any(fact["status"] == "verified" for fact in source["facts"])

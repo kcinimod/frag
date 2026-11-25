@@ -43,12 +43,12 @@ class HTMLVisibility:
                 self._tag = None
 
 
-def is_statement_heading(text: str) -> bool:
+def is_statement_heading(text: str, *, allow_short_income_heading: bool = True) -> bool:
     # The filing can split a heading across styled inline runs.
     compact = re.sub(r"\s+", "", text).casefold()
+    if allow_short_income_heading and compact.removeprefix("consolidated") in {"incomestatement", "incomestatements"}:
+        return True
     return compact in {
-        "incomestatement", "incomestatements",
-        "consolidatedincomestatement", "consolidatedincomestatements",
         "consolidatedstatementofincome", "consolidatedstatementsofincome",
         "consolidatedstatementofearnings", "consolidatedstatementsofearnings",
         "consolidatedstatementofoperations", "consolidatedstatementsofoperations",

@@ -11,7 +11,8 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from frag.income_html import (
-    EvidenceText, GridCell, StatementHTML, Table, UnsupportedLayout, original_span, statement_periods, table_grid,
+    EvidenceText, GridCell, StatementHTML, Table, UnsupportedLayout, is_statement_heading, original_span,
+    statement_periods, table_grid,
 )
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
 from frag.revenue_notes import (
@@ -30,7 +31,6 @@ REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").re
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
 EXTRACTION_CACHE_REVISION = "statement-periods-v3"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
-CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income|earnings)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
 FISCAL_YEAR = re.compile(r"(?:19|20)[0-9]{2}")
@@ -44,8 +44,7 @@ MONEY_PREAMBLE = re.compile(r"^\((?:dollars |amounts )?in (thousands|millions|bi
 SHARED_MONEY_PREAMBLE = re.compile(rf"\({MONEY_DECLARATION}\)", re.I)
 DATED_MONEY_HEADER = re.compile(r"years ended (\(.+\))", re.I)
 DATE_MONTHS = MONTHS | {name[:3]: month for name, month in MONTHS.items()}
-SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues",
-                         "net sales", "net operating revenues"}
+SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues", "net operating revenues"}
 
 
 @dataclass(frozen=True)
@@ -85,7 +84,7 @@ def original_evidence_tables(document: StatementHTML) -> list[Table]:
     reviewed_dated_filing = _cover(document, "entitycentralindexkey") == REFERENCE["identity"]["cik"]
     return [
         table for table in document.tables
-        if table.heading and CONSOLIDATED_HEADING.fullmatch(table.heading.text)
+        if table.heading and is_statement_heading(table.heading.text, allow_short_income_heading=False)
         and (table.separate_title or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row)
              or (not reviewed_dated_filing
                  and any(cell.text.casefold() == "years ended" for row in table.rows for cell in row)))
@@ -409,8 +408,11 @@ def inspect_original_revenue(
             raise UnsupportedLayout("More than one statement table could contain consolidated revenue.")
         rows = [row.cells for row in table_grid(table)]
         labels = SHARED_REVENUE_LABELS | {"net revenue"} if table.separate_title else SHARED_REVENUE_LABELS
-        label = _one([cell for row in rows for cell in row if cell.cell.text.casefold() in labels],
-                     "Expected one total revenue row in the consolidated statement.")
+        candidates = [cell for row in rows for cell in row if cell.cell.text.casefold() in labels]
+        # Net sales may be a subtotal when the statement also reports total revenue.
+        if not candidates:
+            candidates = [cell for row in rows for cell in row if cell.cell.text.casefold() == "net sales"]
+        label = _one(candidates, "Expected one total revenue row in the consolidated statement.")
         headers = rows[:label.row - 1]
         date_prefixes: dict[date, GridCell] = {}
         shared_row = False
@@ -453,7 +455,8 @@ def inspect_original_revenue(
         weeks: dict[int, int] = {}
         qualified_years: set[int] = set()
         acquisition_notes: list[dict[str, Any]] = []
-        caveats: list[str] = []
+        caveats: list[str] | None = []
+        pair = sorted(periods)[-2:]
         if table.separate_title:
             notes, weeks, qualified_years = dated_policy_notes(document, lines, after=table.position, issuer=company)
         elif statement.original_dated_columns:
@@ -469,7 +472,7 @@ def inspect_original_revenue(
                 acquisition_notes, caveats = acquisition
         else:
             extended_notes = cross_section_policy_notes(
-                document, lines, after=table.position, years={end.year for end in periods},
+                document, lines, after=table.position, comparison_years={end.year for end in pair},
             )
             if extended_notes is None:
                 notes = accounting_policy_notes(
@@ -497,10 +500,9 @@ def inspect_original_revenue(
         for fact in facts:
             if fact["reporting_period"]["fiscal_year"] == current.year and acquisition_notes:
                 fact["applicable_notes"] = [*fact["applicable_notes"], *acquisition_notes]
-        pair = sorted(periods)[-2:]
         disclosures = comparison_disclosures(document, lines, after=table.position, years={end.year for end in pair})
-        comparison = _original_comparison(facts, pair, weeks, disclosures)
-        if comparison["status"] == "compatible":
+        comparison = _original_comparison(facts, pair, weeks, disclosures, unresolved_notes=caveats is None)
+        if comparison["status"] == "compatible" and caveats:
             comparison["scope_caveats"].extend(caveats)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
@@ -568,6 +570,7 @@ def _check_revenue_columns(row: list[GridCell], label: GridCell, periods: dict[d
 
 def _original_comparison(
     facts: list[dict[str, Any]], ends: list[date], weeks: dict[int, int], disclosures: list[dict[str, Any]],
+    *, unresolved_notes: bool,
 ) -> dict[str, Any]:
     prior_end, current_end = ends
     verified = {fact["reporting_period"]["fiscal_year"]: fact for fact in facts if fact["status"] == "verified"}
@@ -582,6 +585,9 @@ def _original_comparison(
             detail="The filing says reported consolidated revenue is not comparable across these fiscal years.",
             evidence=disclosures,
         )
+        return comparison
+    if unresolved_notes:
+        comparison["detail"] = "The filing's applicable comparison disclosures could not be established."
         return comparison
     if (prior_end.year + 1 != current_end.year
             or current["reporting_period"]["start"] != (prior_end + timedelta(days=1)).isoformat()):

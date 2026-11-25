@@ -21,6 +21,11 @@ consolidation and intercompany eliminations in Note 1, the refranchising
 disclosure in Note 2, and revenue recognition in Note 3. The as-reported
 growth result includes the refranchising caveat.
 
+The seven earlier development originals and Cisco retained the same facts,
+statement periods, diagnostics, and comparison evidence as the pre-change
+revision. The regression suite also checks Walmart's total revenue separately
+from its net sales subtotal.
+
 The four lookup and growth questions were answered using the Phase 6
 baseline model, runtime, and generation settings. All four saved results
 and their citation responses matched offline, including 16 opened
@@ -32,5 +37,57 @@ evidence spans, exercise the browser API and CLI, and replay saved plans
 with sockets blocked.
 
 ```powershell
-.venv/Scripts/python.exe -m pytest -q tests/test_shared_year_revenue.py tests/test_cisco_revenue.py
+$issue38Tests = "build/phase06-test-$([guid]::NewGuid().ToString('N'))"
+.venv/Scripts/python.exe -m pytest -q -p no:cacheprovider --basetemp $issue38Tests tests/test_shared_year_revenue.py tests/test_cisco_revenue.py
+```
+
+To open the two originals in the browser, unpack them into a fresh directory.
+Upload either HTML file with **Local original** selected, then use
+**Ask the filing**. Both years and the disclosure excerpts are available
+from the growth result's citation links.
+
+```powershell
+$issue38Review = "build/phase06-review-$([guid]::NewGuid().ToString('N'))"
+.venv/Scripts/python.exe -c "import gzip, pathlib, sys; out = pathlib.Path(sys.argv[1]); out.mkdir(); src = pathlib.Path('artifacts/phase06/originals'); [(out / name).write_bytes(gzip.decompress((src / (name + '.gz')).read_bytes())) for name in ('pg-20240630.htm', 'ko-20241231.htm')]" $issue38Review
+Get-ChildItem -LiteralPath $issue38Review
+```
+
+To reproduce the retained local-model plans from fresh ingestion with
+sockets blocked, run the following from the repository root. Each of the
+four questions should print `matched`.
+
+```powershell
+@'
+import gzip
+import json
+import socket
+import sys
+from pathlib import Path
+from uuid import uuid4
+
+sys.path.insert(0, 'artifacts/phase04')
+from sec_holdout_runner import ingest, replay_case
+
+def deny(*args, **kwargs):
+    raise AssertionError('Socket opened during replay')
+
+socket.socket = deny
+phase = Path('artifacts/phase06')
+records = json.loads(gzip.decompress((phase / 'pg-ko-validation.json.gz').read_bytes()))
+refs = json.loads(Path('tests/fixtures/phase06_pg_ko_review.json').read_bytes())
+work = Path('build') / f'issue38-replay-{uuid4().hex}'
+work.mkdir()
+store = work / 'store'
+for filename, ref in refs.items():
+    original = work / filename
+    original.write_bytes(gzip.decompress((phase / 'originals' / (filename + '.gz')).read_bytes()))
+    source = ingest(store, original, ref['source'])
+    original.unlink()
+    for case in ref['cases']:
+        key = filename + '-' + case['kind']
+        row = records[key]
+        replay = replay_case(store, {'case_id': key, 'question': row['question']}, source, row['live'])
+        assert replay == {'status': 'matched'}, key
+        print(key, 'matched')
+'@ | .venv/Scripts/python.exe -
 ```
