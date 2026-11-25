@@ -123,3 +123,9 @@ Phase 2 calculator and its offline results.
   reopened the verified companion amounts and their disclosures. All 30
   cold and warm development outcomes and citations matched in offline replay.
   [Evidence gap checkpoint](../artifacts/phase05/EVIDENCE_GAPS.md)
+
+- Issue #32 sealed 15 fresh SEC holdout cases from six issuer families.
+  The offline audit checked seven original 10-Ks, four statement layouts,
+  19 corroborated annual observations, and zero issuer overlap with either
+  prior cohort. The separate runner and scorer archives are in local custody.
+  [Phase 5 holdout handoff](../artifacts/phase05/SEC_HOLDOUT.md)

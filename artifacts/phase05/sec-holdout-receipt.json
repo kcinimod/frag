@@ -1,0 +1,34 @@
+{
+  "case_count": 15,
+  "case_counts_by_outcome": {
+    "absent_year": 1,
+    "answerable": 12,
+    "incompatible_periods": 1,
+    "present_unverifiable": 1
+  },
+  "cohort": "sec-phase05-holdout-32-v1",
+  "custody": {
+    "evaluation_run": "pending",
+    "holder": "FRAG preparation machine",
+    "location_relative_to_checkout": "../FRAG-SEC-Holdout-32",
+    "prepared_on": "2026-11-25",
+    "runner_release": "after evaluation freeze",
+    "scorer_access": "scorer only"
+  },
+  "issuer_count": 6,
+  "observation_count": 19,
+  "original_count": 7,
+  "phase04_runner_sha256": "cb9b42aca097499c7e02e93b69e0dae0c2da1ad466e22295e45761da061e94f6",
+  "preparation_base": "fe44a953906737555d5091a43e25dbb9db450b90",
+  "prior_cohort_cik_overlap_count": 0,
+  "runner_bundle": {
+    "path": "runner/inputs.zip",
+    "sha256": "6fcbe48f14f1b5a8ca773ce437141605a1a62446dc1e74db750fb8f3ea925db8"
+  },
+  "scorer_bundle": {
+    "path": "scorer/expected.zip",
+    "sha256": "36884eef3151e396aa023f6954eb3588f9fc22e2329d9b68f203dd5e1a14be3b"
+  },
+  "statement_layout_count": 4,
+  "version": 1
+}
