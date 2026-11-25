@@ -109,8 +109,15 @@ For the original scoring interpretation, see the Phase 5 checkpoint.
 
 ## Reproduce on Windows
 
-From the repository root, use the locked Python environment and the local
-Phase 5 custody archives. The default custody path is
+From the repository root, set up the locked environment with the exact
+Python version required by both freezes.
+
+```powershell
+uv sync --locked --python 3.12.14
+if ($LASTEXITCODE -ne 0) { throw 'Pinned Python environment setup failed.' }
+```
+
+Use the local Phase 5 custody archives. The default custody path is
 `../FRAG-SEC-Holdout-32`. Pass `-Custody` to use another local copy.
 Replay uses saved plans, reingests the original bytes, and reopens any
 original citation routes with all socket connections blocked. Review the
