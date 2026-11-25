@@ -7,6 +7,9 @@ from typing import Any
 
 BASIS_NOTE_HEADING = re.compile(r"Note 1\s*:\s*Basis of Presentation", re.I)
 ACCOUNTING_POLICIES_HEADING = re.compile(r"Note 2\s*:\s*Accounting Policies", re.I)
+ADDITIONAL_PERIOD_LABEL = re.compile(
+    r"\b[A-Za-z]+\s+\d{1,2},?\s+\d{4}\b|\b\d{4}\s*\(|\b(?:fiscal year|fy)\s*\d{4}\b", re.I,
+)
 
 
 class UnsupportedLayout(ValueError):
@@ -388,7 +391,8 @@ def statement_periods(
            and entry not in headers.values() for entry in header_row):
         return None
     if any(entry.cell.text and entry is not annual and entry.columns.start >= label.columns.stop
-           and not any(set(entry.columns) <= set(header.columns) for header in headers.values())
+           and (not any(set(entry.columns) <= set(header.columns) for header in headers.values())
+                or entry not in headers.values() and ADDITIONAL_PERIOD_LABEL.search(entry.cell.text))
            for row in rows[:label.row] for entry in row):
         return None
     return {

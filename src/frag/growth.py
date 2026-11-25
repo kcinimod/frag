@@ -112,6 +112,7 @@ def observation_gap(source: dict[str, Any], year: int, candidates: list[dict[str
             requirements = [
                 item for item in requirements if item != "source_identity_verification"
                 and not item.startswith("supplied_")
+                and not item.endswith("_boundary_or_content")
             ]
         reasons.extend({
             "applicable_notes": "The applicable filing disclosures need verification.",

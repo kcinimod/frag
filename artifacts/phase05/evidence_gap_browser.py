@@ -73,7 +73,7 @@ def check_browser(store: SourceStore, sources: list[dict[str, Any]], results: li
                         if identifier == "current":
                             evidence = (fact["raw_amount"], "2023", "iso4217:USD")
                         if identifier == "statement-periods":
-                            evidence = ("CONSOLIDATED STATEMENTS OF OPERATIONS", "Total net sales",
+                            evidence = ("CONSOLIDATED STATEMENTS OF OPERATIONS", "Years ended", "Total net sales",
                                         "September 25, 2021", "September 24, 2022", "September 30, 2023")
                         check_citation(context, chat.get_by_role("link", name=title, exact=True), source_hash, *evidence)
                     if issue["code"] == "absent":
@@ -81,7 +81,8 @@ def check_browser(store: SourceStore, sources: list[dict[str, Any]], results: li
                         chat.get_by_role("button", name="Ask", exact=True).click()
                         expect(chat.get_by_text(issue["detail"], exact=True)).to_be_visible()
                         check_citation(context, chat.get_by_role("link", name="Consolidated revenue statement periods"),
-                                       source_hash, "Total net sales", "September 25, 2021", "September 30, 2023")
+                                       source_hash, "CONSOLIDATED STATEMENTS OF OPERATIONS", "Years ended",
+                                       "Total net sales", "September 25, 2021", "September 30, 2023")
                 print(f"Chrome {browser.version} matched all three offline CLI explanations.")
                 print("Apple FY2020 absence and Microsoft FY2021 extraction gap kept cited FY2023 amounts.")
                 print("Apple FY2024 remained an evidence gap for disclosure verification.")

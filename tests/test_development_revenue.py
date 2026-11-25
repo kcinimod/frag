@@ -136,20 +136,26 @@ def test_apple_lookup_distinguishes_absent_and_unverified_years(tmp_path: Path) 
             assert result["citations"] == []
 
 
-def test_incomplete_period_headers_cannot_establish_absence(tmp_path: Path) -> None:
+@pytest.mark.parametrize("move_original_header", [True, False])
+def test_ambiguous_period_headers_cannot_establish_absence(tmp_path: Path, move_original_header: bool) -> None:
     original = gzip.decompress(ARCHIVE.read_bytes())
     header = b"September 24,<br/>2022</span></td>"
-    # A synthetic mutation moves FY2022 to a separate header row and blanks its total.
     header_position = original.index(header)
     end_of_row = original.index(b"</tr>", header_position) + len(b"</tr>")
-    original = (
-        original[:end_of_row].replace(header, b"</span></td>", 1)
-        + b'<tr><td colspan="9"></td><td colspan="3">Fiscal year ending September 24, 2022</td></tr>'
-        + original[end_of_row:]
-    ).replace(b"394,328</ix:nonFraction>", b"</ix:nonFraction>", 1)
+    # Synthetic changes add a second period-header row in the same FY2022 column.
+    prefix, suffix = original[:end_of_row], original[end_of_row:]
+    year = 2020
+    date_label = b"September 26, 2020"
+    if move_original_header:
+        year = 2022
+        date_label = b"September 24, 2022"
+        prefix = prefix.replace(header, b"</span></td>", 1)
+        suffix = suffix.replace(b"394,328</ix:nonFraction>", b"</ix:nonFraction>", 1)
+    original = (prefix + b'<tr><td colspan="9"></td><td colspan="3">Fiscal year ending '
+                + date_label + b'</td></tr>' + suffix)
     store = SourceStore(tmp_path / "store")
     source = store.ingest_bytes(original, provenance="local_original")
-    result = success("ask", source["source_id"], "What was revenue in FY2022?", "--store", str(store.root))
+    result = success("ask", source["source_id"], f"What was revenue in FY{year}?", "--store", str(store.root))
     assert result["reason"] == "unverified"
     assert "did not establish the statement periods" in result["message"]
     assert result["citations"] == []
@@ -244,7 +250,7 @@ def test_apple_lookup_opens_the_original_dated_statement_offline(
     (b'383,285</ix:nonFraction>&#160;</span>', b'383,285</ix:nonFraction>8&#160;</span>',
      "displayed revenue amount"),
     (b"Basis of Presentation and Preparation", b"Basis of Presentation and Reporting",
-     "Note 1 boundary or content"),
+     "applicable filing disclosures"),
 ])
 def test_synthetic_disagreement_returns_a_specific_lookup_gap(
     tmp_path: Path, before: bytes, after: bytes, gap: str,

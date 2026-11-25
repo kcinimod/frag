@@ -105,7 +105,9 @@ def score_statement_periods(lines: list[bytes], review: dict[str, Any], run: dic
     opened = run["citations"].get("statement-periods", {})
     if citation is None or opened.get("http_status") != 200:
         return False
-    context = citation["context_locators"]
+    context = citation.get("context_locators", {})
+    if not {"statement_heading", "annual_header", "metric_label"} <= context.keys():
+        return False
     year_locators = [context[key] for key in context if key.startswith("year_")] + [citation["locator"]]
     _, _, excerpt = opened["text"].partition("\n\n")
     period_span = review["locators"]["period_header"]
@@ -116,6 +118,9 @@ def score_statement_periods(lines: list[bytes], review: dict[str, Any], run: dic
         and within(position(lines, context["annual_header"]), period_span)
         and within(position(lines, context["statement_heading"]), review["locators"]["statement_title_and_units"])
         and within(position(lines, context["metric_label"]), review["locators"]["revenue_row"])
+        and re.search(r"\b(?:consolidated )?(?:income statements?|statements? of (?:income|operations))\b",
+                      excerpt, re.I) is not None
+        and re.search(r"\byears? ended\b", excerpt, re.I) is not None
         and review["statement_row"].casefold() in excerpt.casefold()
         and set(re.findall(r"\b(?:19|20)\d{2}\b", excerpt)) == set(review["facts"])
     )
