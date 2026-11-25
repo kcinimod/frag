@@ -1,0 +1,40 @@
+{
+  "msft-growth": {
+    "comparison_basis": "The adjoining annual periods use the same June 30 year-end and reported consolidated US GAAP revenue definition in the FY2023 filing. The FY2022 observation is the comparative reported in that filing. Note 1 says the disclosed recasts did not affect consolidated income statements.",
+    "scope_caveats": [
+      "Reported revenue reflects foreign currency translation at average rates for each year.",
+      "Nuance was consolidated from March 4, 2022. FY2022 includes a partial year of Nuance and FY2023 includes a full year.",
+      "Microsoft disclosed an unfavorable foreign currency impact on revenue in its FY2023 comparison.",
+      "The filing identifies Xandr in a component revenue discussion. This evidence supplies no adjustment to total consolidated revenue."
+    ]
+  },
+  "aapl-growth": {
+    "comparison_basis": "Reported consolidated net sales as presented together in Apple's FY2023 10-K.",
+    "scope_caveats": [
+      "FY2023 spanned 53 weeks and FY2022 spanned 52 weeks. The comparison uses the reported totals for both periods.",
+      "Apple disclosed that weaker foreign currencies accounted for more than the entire year-over-year decrease in total net sales."
+    ]
+  },
+  "amzn-growth": {
+    "comparison_basis": "Consecutive annual consolidated revenue amounts from the same statement and reporting basis.",
+    "scope_caveats": ["Growth uses reported consolidated amounts, including any effects of exchange rates or acquisitions."]
+  },
+  "wmt-growth": {
+    "comparison_basis": "Consecutive annual consolidated revenue amounts from the same statement and reporting basis.",
+    "scope_caveats": ["Growth uses reported consolidated amounts, including any effects of exchange rates or acquisitions."]
+  },
+  "goog-growth": {
+    "comparison_basis": "Consecutive annual consolidated revenue amounts from the same statement and reporting basis.",
+    "scope_caveats": ["Growth uses reported consolidated amounts, including any effects of exchange rates or acquisitions."]
+  },
+  "intc-growth": {
+    "comparison_basis": "Consecutive annual consolidated revenue amounts from the same statement and reporting basis.",
+    "scope_caveats": [
+      "Growth uses reported consolidated amounts, including any effects of exchange rates or acquisitions.",
+      "FY2022 spans 53 weeks and FY2023 spans 52 weeks. Growth uses the fiscal years as reported."
+    ]
+  },
+  "aapl-2024-present": {
+    "verification_gap": "FY2024 revenue evidence gap. The extracted observation could not be verified. The filing has not been matched to the reviewed verification reference. The applicable filing disclosures need verification."
+  }
+}

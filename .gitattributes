@@ -9,3 +9,4 @@ artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md -text diff
 artifacts/phase05/*.py -text diff
 artifacts/phase05/inputs.json -text diff
 artifacts/phase05/expected.json -text diff
+artifacts/phase05/acceptance-text.json -text diff

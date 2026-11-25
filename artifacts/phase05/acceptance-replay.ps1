@@ -9,8 +9,10 @@ $python = Join-Path $repo '.venv/Scripts/python.exe'
 $live = (Resolve-Path -LiteralPath $LiveReport).Path
 $revision = '7c558e27ae0ff9a3ca0fc32af68d6e80a55b3390'
 $snapshot = & (Join-Path $PSScriptRoot 'snapshot.ps1') -Destination $Destination
-if (Test-Path -LiteralPath "$snapshot/artifacts/phase05/expected.json") {
-    throw 'The scorer reference is present in the replay snapshot.'
+foreach ($name in @('expected.json', 'acceptance-text.json')) {
+    if (Test-Path -LiteralPath "$snapshot/artifacts/phase05/$name") {
+        throw "The scorer reference $name is present in the replay snapshot."
+    }
 }
 $files = @(git -C $repo diff --name-only f62d21a $revision -- src/frag)
 if ($LASTEXITCODE -ne 0) { throw 'Could not list the frozen production changes.' }

@@ -373,3 +373,21 @@ After preparing that snapshot in PowerShell, verify the saved cases offline.
 
 The command prints `{"matched": 18}`. Run the scorer commands in the custody
 environment to verify the recorded metrics.
+
+## Phase 5 SEC scorer controls
+
+From the repository root in PowerShell, replay the 15 saved development
+questions offline and audit the answers against the original filings.
+
+```powershell
+$replay = "build/issue33-positive-$([guid]::NewGuid())"
+& artifacts/phase05/acceptance-replay.ps1 -Destination $replay
+if ($LASTEXITCODE -ne 0) { throw 'Offline replay failed.' }
+.venv/Scripts/python.exe artifacts/phase05/acceptance_score.py . "$replay/live.json" "$replay/replay/report.json" "$replay/acceptance-score.json"
+if ($LASTEXITCODE -ne 1) { throw 'Expected the existing Microsoft citation failure.' }
+```
+
+Replay reports 30 matches. The scorer exits with code 1 for the known
+Microsoft currency citation gap and writes the per-case findings to JSON.
+The negative controls alter a saved answer and a citation to verify that
+replay detects both mismatches. [Scorer and offline replay controls](artifacts/phase05/ACCEPTANCE_SCORER.md)

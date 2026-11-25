@@ -21,24 +21,26 @@ abstention with both cited amounts and the 53-week versus 52-week disclosure.
 It flagged the existing Microsoft growth citations because the opened cells
 omit the USD measure. Apple's FY2024 verification gap remained an incomplete
 case against its independently answerable label.
-[Independent development reference](expected.json) · [Original run](EVIDENCE_GAPS.md)
+[Original evidence reference](expected.json) · [Reviewed explanation text](acceptance-text.json) · [Original run](EVIDENCE_GAPS.md)
 
 The regression controls alter copies of retained records. They cover incorrect
-amounts, currencies, scales, periods, and percentage units; unsupported
-partial amounts, disclosures, and statement-period links; and an extra
-unsupported citation. They also recreate the Phase 4 failure class by adding
-a missing FY2022 claim to Intel's abstention even though its original reports
-FY2022 revenue. Another control injects that claim into the displayed reason
-without changing its structured issue code.
+amounts, currencies, scales, periods, percentage units, and calculation traces.
+They also cover unsupported comparison claims, partial amounts, disclosures,
+statement-period links, and an extra unsupported citation. They recreate the
+Phase 4 failure class by adding a missing FY2022 claim to Intel's abstention
+even though its original reports FY2022 revenue. Another control injects
+that claim into the displayed reason without changing its structured issue
+code. Two controls put the same incorrect claim in the saved intake evidence
+and displayed answer. The scorer checks those claims against the independent
+text reference and records its SHA-256 with the score.
 [Scorer controls](../../tests/test_phase05_acceptance.py) · [Phase 4 result](../phase04/SEC_ACCEPTANCE.md)
 
 ## Verify in PowerShell
 
 Run from the repository root with the locked Python environment installed.
 The historical development runner exports the measured source revision
-before replay. The fresh replay report records the digest of the exact
-uncompressed live JSON. Historical status-only replay artifacts are also
-readable, and the scorer identifies them as lacking that digest.
+before replay. The scorer requires a replay report with the digest of the
+exact uncompressed live JSON.
 
 ```powershell
 $replay = "build/issue33-positive-$([guid]::NewGuid())"

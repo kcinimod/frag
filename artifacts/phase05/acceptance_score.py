@@ -1,6 +1,7 @@
 """Score Phase 5 filing-scoped results after offline replay."""
 
 import argparse
+from fractions import Fraction
 import gzip
 from hashlib import sha256
 import json
@@ -23,25 +24,20 @@ def unpack_report(raw: bytes) -> bytes:
 
 
 def audit_reference(original: bytes, filing: dict[str, Any], review: dict[str, Any]) -> None:
-    if sha256(original).hexdigest() != filing["sha256"]:
-        raise ValueError(f"Original hash differs for {filing['accession']}.")
-    checked = {key: checked_span(original, span) for key, span in review["locators"].items()}
-    if "in millions" not in visible(checked["statement_title_and_units"]).casefold():
+    facts = review["facts"]
+    inline = {year: fact for year, fact in facts.items() if "inline_fact" in fact["locators"]}
+    audit(original, filing, {**review, "facts": inline})
+    units = checked_span(original, review["locators"]["statement_title_and_units"])
+    if "in millions" not in visible(units).casefold():
         raise ValueError("Original statement units differ from the reference.")
-    if review["statement_row"].casefold() not in visible(checked["revenue_row"]).casefold():
-        raise ValueError("Original revenue row differs from the reference.")
-    inline = {}
-    for year, fact in review["facts"].items():
-        span = fact["locators"]
-        cell = checked_span(original, span["statement_cell"])
+    period_header = visible(checked_span(original, review["locators"]["period_header"]))
+    for year, fact in facts.items():
+        cell = checked_span(original, fact["locators"]["statement_cell"])
         if (fact["scope"] != "consolidated" or fact["currency"] != "USD" or fact["scale"] != 1_000_000
-                or str(fact["fiscal_year"]) != year or year not in visible(checked["period_header"])
+                or str(fact["fiscal_year"]) != year or year not in period_header
                 or not re.search(rf"(?<![\d,]){re.escape(fact['raw_amount'])}(?![\d,])", visible(cell))
                 or int(fact["raw_amount"].replace(",", "")) * fact["scale"] != int(fact["normalized_amount"])):
             raise ValueError(f"Original statement observation differs for FY{year}.")
-        if "inline_fact" in span:
-            inline[year] = fact
-    audit(original, filing, {**review, "facts": inline})
 
 
 def citation_response_matches(
@@ -108,16 +104,34 @@ def supported_citations(
         return False
 
 
-def growth_amounts_match(result: dict[str, Any], label: dict[str, Any]) -> bool:
+def growth_amounts_match(
+    result: dict[str, Any], label: dict[str, Any], facts: dict[str, Any], prior_amount: str,
+) -> bool:
     percent = result.get("percent") or {}
     change = result.get("absolute_change")
-    subtractions = [item.get("result") for item in result.get("trace", []) if item["operation"] == "subtract"]
+    trace = result.get("trace", [])
     weeks = label.get("period_weeks") or []
+    subtraction = {
+        "operation": "subtract", "inputs": [facts["current"]["fact_id"], facts["prior"]["fact_id"]],
+        "result": label["absolute_change"],
+    }
+    presentation = label["presentation"]
+    if (result.get("issues") or result.get("comparison_basis") != presentation["comparison_basis"]
+            or result.get("scope_caveats") != presentation["scope_caveats"]):
+        return False
+    if int(prior_amount) == 0:
+        return (result.get("status") == "undefined_zero_baseline" and label.get("percent") is None
+                and not percent and change == {"currency": "USD", "value": label["absolute_change"]}
+                and trace == [subtraction])
+    ratio = Fraction(int(label["absolute_change"]), int(prior_amount))
     return (
-        percent.get("unit") == "percent" and matches_amount(percent.get("value"), label["percent"])
-        and len(subtractions) == 1 and matches_amount(subtractions[0], label["absolute_change"])
-        and (change is None or (change.get("currency") == "USD"
-                                and matches_amount(change.get("value"), label["absolute_change"])))
+        result.get("status") == "calculated" and percent.get("unit") == "percent"
+        and matches_amount(percent.get("value"), label["percent"]) and change is None
+        and trace == [
+            subtraction,
+            {"operation": "divide", "inputs": ["subtract", facts["prior"]["fact_id"]], "result": str(ratio)},
+            {"operation": "to_percent", "inputs": ["divide"], "result": label["percent"]},
+        ]
         and (not weeks or any(reports_week_lengths(text, label["years"], weeks)
                               for text in result.get("scope_caveats", [])))
     )
@@ -156,13 +170,10 @@ def reason_matches(
             {"code": "incompatible", "role": None, "fiscal_year": None, "detail": detail},
         ]
     if outcome == "present_unverifiable" or label.get("baseline_gap") == "present_unverifiable":
-        year, = requested.values()
-        message = result.get("message", "")
+        candidates = extracted.get("revenue", [])
         return (status == "evidence_unavailable" and result.get("reason") == "unverified"
-                and any(fact["status"] == "provisional" for fact in extracted.get("revenue", []))
-                and message.startswith(f"FY{year} revenue evidence gap. The extracted observation could not be verified.")
-                and not re.search(r"\b(?:absent|missing)\b|\b(?:does not|did not)\s+(?:show|report|contain)\b",
-                                  message, re.IGNORECASE))
+                and len(candidates) == 1 and candidates[0]["status"] == "provisional"
+                and result.get("message") == label["presentation"]["verification_gap"])
     raise ValueError(f"Unsupported acceptance outcome {outcome!r}.")
 
 
@@ -194,11 +205,13 @@ def score_case(
                    and result.get("source_id") == f"sha256:{original_hash}")
     numeric = status in {"answered", "calculated"} or bool(result.get("percent") or result.get("absolute_change"))
     answerable = label["outcome"] == "answerable"
-    accurate = (answerable and status == ("calculated" if growth else "answered") and facts_correct
-                and identity_ok and facts.keys() == requested.keys()
-                and (not growth or growth_amounts_match(result, label)))
+    accurate = (
+        answerable and facts_correct and identity_ok and facts.keys() == requested.keys()
+        and (growth_amounts_match(result, label, facts, present["prior"]["normalized_amount"])
+             if growth else status == "answered")
+    )
     absence = label["outcome"] == "absent_year" and not numeric
-    comparison = status == "calculated" or label["outcome"] == "incompatible_periods"
+    comparison = (growth and numeric) or label["outcome"] == "incompatible_periods"
     citations_ok = supported_citations(
         original, original_hash, review, run,
         present if numeric else {role: present[role] for role in facts if role in present},
@@ -248,7 +261,9 @@ def main() -> int:
     args = parser.parse_args()
     inputs = (args.data / PHASE / "inputs.json").read_bytes()
     reference = (args.data / PHASE / "expected.json").read_bytes()
+    text_reference = (args.data / PHASE / "acceptance-text.json").read_bytes()
     manifest, labels = json.loads(inputs), json.loads(reference)
+    presentation = json.loads(text_reference)
     live_bytes, replay_bytes = args.live.read_bytes(), args.replay.read_bytes()
     live_json = unpack_report(live_bytes)
     live, replay = json.loads(live_json), json.loads(unpack_report(replay_bytes))
@@ -256,7 +271,7 @@ def main() -> int:
     live_json_hash = sha256(live_json).hexdigest()
     if (replay["freeze"] != frozen or frozen["inputs_sha256"] != sha256(inputs).hexdigest()
             or frozen["reference_sha256"] != sha256(reference).hexdigest()
-            or ("live_sha256" in replay and replay["live_sha256"] != live_json_hash)
+            or replay.get("live_sha256") != live_json_hash
             or any([row["case"] for row in report["cases"]] != manifest["cases"] for report in (live, replay))
             or live["sources"].keys() != replay["sources"].keys()
             or live["sources"].keys() != {filing["source_id"] for filing in manifest["sources"]}
@@ -272,8 +287,9 @@ def main() -> int:
     report: dict[str, Any] = {
         "live_sha256": sha256(live_bytes).hexdigest(),
         "replay_sha256": sha256(replay_bytes).hexdigest(),
-        "replay_bound_to_live": "live_sha256" in replay,
+        "replayed_live_sha256": live_json_hash,
         "reference_sha256": sha256(reference).hexdigest(),
+        "text_reference_sha256": sha256(text_reference).hexdigest(),
         "scorer_sha256": sha256(Path(__file__).read_bytes()).hexdigest(),
         "audited_originals": len(originals),
     }
@@ -282,8 +298,9 @@ def main() -> int:
         for row, repeated in zip(live["cases"], replay["cases"], strict=True):
             case = row["case"]
             key, case_id = case["source_id"], case["case_id"]
+            label = {**labels["cases"][case_id], "presentation": presentation.get(case_id, {})}
             scored = score_case(row[mode], repeated[mode], live["sources"][key]["evidence"],
-                                labels["cases"][case_id], labels["sources"][key], *originals[key])
+                                label, labels["sources"][key], *originals[key])
             rows.append({"case_id": case_id, **scored})
         answerable = [row for row in rows if row["expected_outcome"] == "answerable"]
         emitted = [row for row in rows if row["numeric_answer_emitted"]]
