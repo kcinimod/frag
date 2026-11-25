@@ -173,7 +173,7 @@ def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
         return _cell_text(lines, locator)
     tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]|caption"
     start = re.match(rf"<({tags})[\s>]", fragment, re.IGNORECASE)
-    boundary = r"|(?=<table[\s>])" if key == "unit_header" else ""
+    boundary = r"|(?=<table[\s>])" if key in {"unit_header", "statement_heading"} else ""
     if not start:
         raise SourceError("The statement context cannot be opened at its verified locator.")
     end = re.compile(rf"</{start[1]}\s*>{boundary}", re.IGNORECASE)

@@ -59,3 +59,4 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 ## Phase 6 SEC development
 
 - [x] Freeze the pre-change production revision, planner and retrieval settings. Audit both development cohorts and replay all 60 cold and warm results and citation sets with sockets blocked. [Run records and reproduction](artifacts/phase06/README.md) · [Issuer and layout inventory](artifacts/phase06/DEVELOPMENT_LAYOUTS.md)
+- [x] Verify all six reviewed P&G and Coca-Cola observations and reproduce both filings' lookup and growth answers with original citations offline. [Issue #38 evidence and checks](artifacts/phase06/PG_KO_REVENUE.md)

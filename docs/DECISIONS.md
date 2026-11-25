@@ -342,3 +342,13 @@ the fiscal calendar and revenue policy notes for verification. Cite the
 applicable acquisition and pro forma disclosures for the reported
 comparison. Keep the existing reviewed Apple evidence path for its issuer.
 [Cisco implementation issue](https://github.com/kcinimod/frag/issues/37)
+
+### Associate fiscal years beside a shared year-end (#38)
+
+Use the visible cell spans when a shared year-end and its fiscal years
+appear in the same row. Read the scale from the shared cell or the
+statement's preamble, and check annual inline contexts and USD against
+the original. Resolve split or cross-referenced accounting notes from
+their visible headings and cited text. Carry the refranchising disclosure
+into Coca-Cola's reported growth caveats.
+[Issue #38 evidence and checks](../artifacts/phase06/PG_KO_REVENUE.md)

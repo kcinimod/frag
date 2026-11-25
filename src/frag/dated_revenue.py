@@ -16,7 +16,7 @@ from frag.income_html import (
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
 from frag.revenue_notes import (
     accounting_policy_notes, acquisition_revenue_notes, comparison_disclosures, dated_policy_notes,
-    numbered_policy_notes,
+    cross_section_policy_notes, numbered_policy_notes,
 )
 
 PARSER_VERSION = "dated-annual-revenue-v1"
@@ -28,21 +28,24 @@ FILING_SCOPED_PARSERS = ORIGINAL_EVIDENCE_PARSERS | {PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "statement-periods-v2"
+EXTRACTION_CACHE_REVISION = "statement-periods-v3"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
-CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income)", re.I)
+CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income|earnings)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
 FISCAL_YEAR = re.compile(r"(?:19|20)[0-9]{2}")
-SHARED_YEAR_HEADER = re.compile(r"(?:fiscal )?years? ended ([A-Za-z]+ [0-9]{1,2}),?", re.I)
-MONEY_PREAMBLE = re.compile(r"^\((?:dollars |amounts )?in (thousands|millions|billions)\b", re.I)
-SHARED_MONEY_PREAMBLE = re.compile(
-    r"\((?:dollars |amounts )?in (thousands|millions|billions)(?:, except per[- ]share (?:data|amounts))?\)",
-    re.I,
+MONEY_DECLARATION = (
+    r"(?:dollars |amounts )?in (thousands|millions|billions)(?:,? except per[- ]share (?:data|amounts))?"
 )
+SHARED_YEAR_HEADER = re.compile(
+    rf"(?:{MONEY_DECLARATION}; )?(?:fiscal )?years? ended ([A-Za-z]+ [0-9]{{1,2}}),?", re.I,
+)
+MONEY_PREAMBLE = re.compile(r"^\((?:dollars |amounts )?in (thousands|millions|billions)\b", re.I)
+SHARED_MONEY_PREAMBLE = re.compile(rf"\({MONEY_DECLARATION}\)", re.I)
 DATED_MONEY_HEADER = re.compile(r"years ended (\(.+\))", re.I)
 DATE_MONTHS = MONTHS | {name[:3]: month for name, month in MONTHS.items()}
-SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues"}
+SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues",
+                         "net sales", "net operating revenues"}
 
 
 @dataclass(frozen=True)
@@ -410,6 +413,7 @@ def inspect_original_revenue(
                      "Expected one total revenue row in the consolidated statement.")
         headers = rows[:label.row - 1]
         date_prefixes: dict[date, GridCell] = {}
+        shared_row = False
         if table.separate_title:
             parser_version = TITLED_TABLE_PARSER_VERSION
             annual, periods = _titled_table_columns(headers)
@@ -420,7 +424,10 @@ def inspect_original_revenue(
         else:
             annual = _one([cell for row in headers for cell in row if SHARED_YEAR_HEADER.fullmatch(cell.cell.text)],
                           "Expected one shared fiscal year-end above the revenue row.")
-            periods = _shared_year_columns(headers, annual)
+            shared_row = annual.columns.stop <= label.columns.stop
+            periods = _shared_year_columns(headers, annual, label, shared_row=shared_row)
+            if shared_row:
+                _check_revenue_columns(rows[label.row - 1], label, periods)
         current = max(periods)
         company = _cover(document, "entityregistrantname")
         cik = _cover(document, "entitycentralindexkey")
@@ -429,14 +436,14 @@ def inspect_original_revenue(
                 or _displayed_date(_cover(document, "documentperiodenddate")) != current):
             requirements.append("source_identity_verification")
         if not table.separate_title and (
-            table.issuer is None or _normalized_company(table.issuer.text) != _normalized_company(company)
+            table.issuer is None or _company_words(table.issuer.text, statement=True) != _company_words(company)
         ):
             requirements.append("statement_issuer_verification")
         requirements.extend(_shared_source_requirements(source, company, cik, current))
         if not requirements:
             coverage = statement_periods(table, annual, {end.year: header for end, header in periods.items()},
                                          label, rows, date_prefixes={end.year: cell for end, cell in date_prefixes.items()})
-            if parser_version == DATED_COLUMNS_PARSER_VERSION and not coverage:
+            if (shared_row or parser_version == DATED_COLUMNS_PARSER_VERSION) and not coverage:
                 raise UnsupportedLayout("The visible fiscal year headers do not establish an unambiguous period inventory.")
         scale, unit_locator = _original_statement_scale(table, headers, annual)
         statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
@@ -461,13 +468,19 @@ def inspect_original_revenue(
             else:
                 acquisition_notes, caveats = acquisition
         else:
-            notes = accounting_policy_notes(
-                document, lines, after=table.position, includes_fees=any(
-                    cell.cell.text.casefold() == "membership and other income"
-                    for row in headers for cell in row
-                ),
+            extended_notes = cross_section_policy_notes(
+                document, lines, after=table.position, years={end.year for end in periods},
             )
-        if len(notes) != 2:
+            if extended_notes is None:
+                notes = accounting_policy_notes(
+                    document, lines, after=table.position, includes_fees=any(
+                        cell.cell.text.casefold() == "membership and other income"
+                        for row in headers for cell in row
+                    ),
+                )
+            else:
+                notes, caveats, qualified_years = extended_notes
+        if len(notes) < 2:
             requirements.append("applicable_notes")
             if statement.original_dated_columns:
                 diagnostics.append({"code": "unsupported_notes",
@@ -600,11 +613,16 @@ def _original_statement_scale(
         units = SHARED_MONEY_PREAMBLE.fullmatch(declaration[1]) if declaration else None
         locator = annual.locator(table)
     else:
+        declaration = SHARED_YEAR_HEADER.fullmatch(annual.cell.text)
         unit_entries: list[tuple[EvidenceText, dict[str, int]]] = [
             (cell.cell, cell.locator(table)) for row in headers for cell in row if MONEY_PREAMBLE.match(cell.cell.text)
         ]
         if table.preamble:
             unit_entries.append((table.preamble, {"table": table.number, **table.preamble.locator()}))
+        if declaration and declaration[1]:
+            if unit_entries:
+                raise UnsupportedLayout("Expected one visible consolidated statement scale.")
+            return SCALES[declaration[1].casefold()], annual.locator(table)
         unit, locator = _one(unit_entries, "Expected one visible consolidated statement scale.")
         units = SHARED_MONEY_PREAMBLE.fullmatch(unit.text)
     if units is None:
@@ -622,25 +640,43 @@ def _titled_table_columns(rows: list[list[GridCell]]) -> tuple[GridCell, dict[da
     return annual, periods
 
 
-def _shared_year_columns(rows: list[list[GridCell]], annual: GridCell) -> dict[date, GridCell]:
+def _shared_year_columns(
+    rows: list[list[GridCell]], annual: GridCell, label: GridCell, *, shared_row: bool,
+) -> dict[date, GridCell]:
     match = SHARED_YEAR_HEADER.fullmatch(annual.cell.text)
     assert match is not None
-    candidates = [
-        [cell for cell in row if cell.cell.text and cell.columns.start in annual.columns]
-        for row in rows[annual.row:]
-    ]
-    headers = _one([row for row in candidates if row and all(re.fullmatch(r"(?:19|20)\d{2}", cell.cell.text)
-                                                            for cell in row)],
-                   "Expected one row of fiscal years below the shared year-end.")
-    periods = {_displayed_date(f"{match[1]}, {cell.cell.text}"): cell for cell in headers}
+    if shared_row:
+        headers = [cell for cell in rows[annual.row - 1]
+                   if cell.cell.text and cell.columns.start >= label.columns.stop]
+        if not all(FISCAL_YEAR.fullmatch(cell.cell.text) for cell in headers):
+            raise UnsupportedLayout("Expected fiscal year columns beside the shared year-end.")
+        if any(FISCAL_YEAR.fullmatch(cell.cell.text) and cell.columns.stop > label.columns.stop
+               for row in rows if row is not rows[annual.row - 1] for cell in row):
+            raise UnsupportedLayout("More than one row displays fiscal years above the consolidated revenue.")
+    else:
+        candidates = [
+            [cell for cell in row if cell.cell.text and cell.columns.start in annual.columns]
+            for row in rows[annual.row:]
+        ]
+        headers = _one([row for row in candidates if row and all(FISCAL_YEAR.fullmatch(cell.cell.text)
+                                                                for cell in row)],
+                       "Expected one row of fiscal years below the shared year-end.")
+    periods = {_displayed_date(f"{match[2]}, {cell.cell.text}"): cell for cell in headers}
     if (len(periods) != len(headers) or len(periods) < 2
-            or not all(set(cell.columns) <= set(annual.columns) for cell in headers)):
+            or (not shared_row and not all(set(cell.columns) <= set(annual.columns) for cell in headers))):
         raise UnsupportedLayout("The displayed fiscal year columns are ambiguous.")
     return periods
 
 
 def _normalized_company(name: str) -> str:
     return " ".join(re.sub(r"[,\.]", "", name).casefold().split())
+
+
+def _company_words(name: str, *, statement: bool = False) -> str:
+    name = _normalized_company(name.replace("-", " "))
+    if statement:
+        name = re.sub(r"^[0-9]+ ", "", name).removesuffix(" and subsidiaries")
+    return re.sub(r"\bco$", "company", name.removeprefix("the "))
 
 
 def _shared_source_requirements(source: dict[str, Any], company: str, cik: str, end: date) -> list[str]:

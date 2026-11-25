@@ -8,7 +8,7 @@ from frag.income_html import (
 )
 
 NOTES_HEADING = "notes to consolidated financial statements"
-NOTE_HEADING = re.compile(r"note\s+(\d+)\s*[.\-–—:]\s*\w", re.I)
+NOTE_HEADING = re.compile(r"note\s+(\d+)(?:\s*[.\-–—:]\s*\w|$)", re.I)
 CONSOLIDATION = re.compile(r"(?:principles|basis) of consolidation", re.I)
 REVENUE = re.compile(r"revenue(?: recognition)?", re.I)
 CONSOLIDATED_ACCOUNTS = re.compile(r"\bconsolidated financial statements(?: of [^.]+)? include the accounts\b", re.I)
@@ -17,7 +17,7 @@ ELIMINATIONS = re.compile(
     r"(?: between consolidated entities)? (?:are|have been) eliminated\b", re.I,
 )
 NET_REVENUE = re.compile(
-    r"\b(?:revenue (?:also )?excludes[^.]*\btaxes|net of sales taxes|taxes are excluded from revenues?)\b",
+    r"\b(?:revenue (?:also )?excludes[^.]*\btaxes|net of sales (?:and other )?taxes|taxes are excluded from revenues?)\b",
     re.I,
 )
 RECOGNITION = re.compile(r"\b(?:recogniz\w+|measured)\b", re.I)
@@ -173,6 +173,105 @@ def dated_policy_notes(
     return [note for note in evidence if note is not None], weeks, qualified_years
 
 
+def cross_section_policy_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int], years: set[int],
+) -> tuple[list[dict[str, Any]], list[str], set[int]] | None:
+    """Resolve policy evidence for split note titles and cross-referenced revenue notes."""
+    blocks = [block for block in document.blocks if block.position > after]
+    sections = [i for i, block in enumerate(blocks[:-1]) if block.text.casefold() == NOTES_HEADING
+                and re.match(r"note 1\b", blocks[i + 1].text, re.I)]
+    if not sections:
+        return None
+    if len(sections) != 1:
+        return [], [], set()
+    heading = sections[0] + 1
+    split_title = blocks[heading].text.casefold() == "note 1"
+    cross_referenced = re.fullmatch(
+        r"note 1:\s*business and summary of significant accounting policies", blocks[heading].text, re.I,
+    )
+    if not split_title and not cross_referenced:
+        return None
+    qualified_years = _revenue_basis_gaps(blocks[heading:])
+    if qualified_years is None:
+        return [], [], set()
+    end = next((i for i in range(heading + 1, len(blocks)) if NOTE_HEADING.match(blocks[i].text)), None)
+    if end is None:
+        return [], [], set()
+    policy = blocks[heading + 1:end]
+    if split_title:
+        if not policy or policy[0].text.casefold() != "summary of significant accounting policies":
+            return [], [], set()
+        notes = _split_policy_note(lines, policy)
+        return notes, [], qualified_years
+    notes = _cross_referenced_revenue_notes(lines, policy, blocks[end:], years)
+    return notes, ["Reported net operating revenues reflect bottling refranchising."] if notes else [], qualified_years
+
+
+def _split_policy_note(lines: list[str], policy: list[TextBlock]) -> list[dict[str, Any]]:
+    basis = _unique_heading(policy, re.compile(r"Basis of Presentation", re.I))
+    revenue = _unique_heading(policy, REVENUE)
+    if basis is None or revenue is None or revenue + 2 >= len(policy):
+        return []
+    scope, recognition, promotions = policy[basis + 1], policy[revenue + 1], policy[revenue + 2]
+    if not (
+        re.search(r"consolidated financial statements include the company and its controlled subsidiaries", scope.text, re.I)
+        and re.search(r"intercompany transactions are eliminated", scope.text, re.I)
+        and re.search(r"revenue is recognized .* when .* transfer\b", recognition.text, re.I)
+        and NET_REVENUE.search(recognition.text)
+        and re.search(r"sales are recorded net of trade promotion spending", promotions.text, re.I)
+    ):
+        return []
+    return _complete_notes(
+        _note(lines, "consolidation", policy[basis], scope.end),
+        _note(lines, "revenue", policy[revenue], promotions.end),
+    )
+
+
+def _cross_referenced_revenue_notes(
+    lines: list[str], policy: list[TextBlock], rest: list[TextBlock], years: set[int],
+) -> list[dict[str, Any]]:
+    consolidation = _unique_heading(policy, CONSOLIDATION)
+    recognition = _unique_heading(policy, REVENUE)
+    if consolidation is None or recognition is None or consolidation >= recognition:
+        return []
+    scope = policy[consolidation + 1:recognition]
+    primary_beneficiary = [block for block in scope if re.search(
+        r"for which we were determined to be the primary beneficiary\. As a result, we have consolidated", block.text, re.I,
+    )]
+    eliminations = [block for block in scope if re.search(
+        r"we eliminate from our financial results all significant intercompany transactions", block.text, re.I,
+    )]
+    reference = re.search(r"\bRefer to Note (\d+)\.", policy[recognition + 1].text, re.I)
+    if len(primary_beneficiary) != 1 or len(eliminations) != 1 or reference is None:
+        return []
+    revenue_number = int(reference[1])
+    revenue = _unique_heading(rest, re.compile(rf"note {revenue_number}:\s*net operating revenues", re.I))
+    changes = _unique_heading(rest, re.compile(r"NOTE 2:\s*ACQUISITIONS AND DIVESTITURES", re.I))
+    if revenue is None or changes is None or changes >= revenue:
+        return []
+    changes_end = next(i for i in range(changes + 1, revenue + 1) if NOTE_HEADING.match(rest[i].text))
+    revenue_end = next((i for i in range(revenue + 1, len(rest)) if NOTE_HEADING.match(rest[i].text)), len(rest))
+    policies = [block for block in rest[revenue + 1:revenue_end] if re.match(
+        r"Revenue is recognized when performance obligations .* are satisfied\.", block.text, re.I,
+    ) and re.search(r"upon transfer of control .* revenue is recognized", block.text, re.I)]
+    divestitures = [block for block in rest[changes + 1:changes_end] if re.search(
+        r"\bcompany refranchised its bottling operations\b", block.text, re.I,
+    ) and any(re.search(rf"\b{year}\b", block.text) for year in years)]
+    if len(policies) != 1 or not divestitures:
+        return []
+    return _complete_notes(
+        _note(lines, "consolidation", policy[consolidation], eliminations[0].end),
+        _note(lines, "revenue", rest[revenue], policies[0].end, number=revenue_number),
+        _note(lines, "refranchising", divestitures[0], divestitures[-1].end, number=2,
+              title="Bottling refranchising"),
+    )
+
+
+def _complete_notes(*notes: dict[str, Any] | None) -> list[dict[str, Any]]:
+    evidence = [note for note in notes if note is not None]
+    return evidence if len(evidence) == len(notes) else []
+
+
 def numbered_policy_notes(
     document: StatementHTML, lines: list[str], *, after: tuple[int, int],
 ) -> tuple[list[dict[str, Any]], dict[int, int], set[int]]:
@@ -291,12 +390,13 @@ def _unique_heading(blocks: list[TextBlock], pattern: re.Pattern[str]) -> int | 
 
 
 def _note(
-    lines: list[str], topic: str, start: TextBlock, end: tuple[int, int] | None, *, number: int = 1,
+    lines: list[str], topic: str, start: TextBlock, end: tuple[int, int] | None, *,
+    number: int = 1, title: str | None = None,
 ) -> dict[str, Any] | None:
     locator = _disclosure_locator(lines, start, end)
     if locator is None:
         return None
-    return {"number": number, "id": f"note-{number}-{topic}", "title": start.text, "locator": locator}
+    return {"number": number, "id": f"note-{number}-{topic}", "title": title or start.text, "locator": locator}
 
 
 def _disclosure_locator(

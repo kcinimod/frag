@@ -50,6 +50,7 @@ def is_statement_heading(text: str) -> bool:
         "incomestatement", "incomestatements",
         "consolidatedincomestatement", "consolidatedincomestatements",
         "consolidatedstatementofincome", "consolidatedstatementsofincome",
+        "consolidatedstatementofearnings", "consolidatedstatementsofearnings",
         "consolidatedstatementofoperations", "consolidatedstatementsofoperations",
     }
 
@@ -203,7 +204,8 @@ class StatementHTML(HTMLParser):
         if tag == "table":
             self._depth += 1
             if self._depth == 1:
-                if self._heading and self._block and self._is_preamble(self._block):
+                if self._block and (is_statement_heading(self._block.text)
+                                    or (self._heading and self._is_preamble(self._block))):
                     self._finish_block()
                 self._table = Table(self._count, self.getpos(), self._heading,
                                     preamble=self._preamble, issuer=self._issuer, separate_title=self._separate_title,
@@ -309,10 +311,11 @@ class StatementHTML(HTMLParser):
 
     def _finish_block(self) -> None:
         if self._block and self._block.text:
+            previous = self.blocks[-1] if self.blocks else None
             if self._block.end is not None:
                 self.blocks.append(self._block)
             if is_statement_heading(self._block.text):
-                self._issuer = self.blocks[-2] if self._block.end and len(self.blocks) > 1 else None
+                self._issuer = previous
                 self._heading = self._block
                 self._preamble = None
                 self._separate_title = False

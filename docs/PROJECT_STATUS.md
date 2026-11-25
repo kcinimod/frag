@@ -157,3 +157,8 @@ Phase 2 calculator and its offline results.
   the FY2023 to FY2024 calculation returns −5.61%. Socket-blocked regression
   tests reopen the original statement cells, units, and applicable notes.
   [Cisco implementation issue](https://github.com/kcinimod/frag/issues/37)
+
+- Issue #38 verifies six annual revenue observations from the preserved
+  P&G and Coca-Cola FY2024 10-Ks. Both FY2024 lookups and FY2023 to FY2024
+  growth calculations reproduced with original citations offline.
+  [Issue #38 evidence and checks](../artifacts/phase06/PG_KO_REVENUE.md)
