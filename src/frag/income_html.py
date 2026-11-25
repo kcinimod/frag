@@ -50,6 +50,7 @@ def is_statement_heading(text: str, *, allow_short_income_heading: bool = True) 
         return True
     return compact in {
         "consolidatedstatementofincome", "consolidatedstatementsofincome",
+        "statementofconsolidatedincome", "statementsofconsolidatedincome",
         "consolidatedstatementofearnings", "consolidatedstatementsofearnings",
         "consolidatedstatementofoperations", "consolidatedstatementsofoperations",
     }
@@ -126,6 +127,7 @@ class Table:
     issuer: EvidenceText | None = None
     separate_title: bool = False
     wrapper: tuple[int, int] | None = None
+    embedded_heading: bool = False
 
     def locator(self) -> dict[str, int]:
         return {"table": self.number, **EvidenceText(self.position).locator()}
@@ -338,6 +340,11 @@ class StatementHTML(HTMLParser):
             if (table.complete and not table.nested and len(cells) == 1
                     and is_statement_heading(cells[0].text)):
                 self._heading, self._separate_title = cells[0], True
+            elif (table.heading is None and cells and cells[0].text.casefold() == "statement of earnings (loss)"
+                  and any(cell.text.casefold().startswith("for the years ended ") for cell in cells[1:])):
+                table.heading = cells[0]
+                table.embedded_heading = True
+                self.tables.append(table)
             elif table.heading or (
                 self._table.caption and is_statement_heading(self._table.caption.text)
             ):

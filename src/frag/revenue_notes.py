@@ -1,6 +1,7 @@
 """Locate accounting-policy evidence for the reported consolidated revenue lookup."""
 
 import re
+from dataclasses import dataclass, field
 from typing import Any
 
 from frag.income_html import (
@@ -52,6 +53,148 @@ FISCAL_WEEK_COUNTS = re.compile(
     r"\b(fiscal 20\d{2}(?:(?:,\s*|\s+and\s+)(?:and\s+)?fiscal 20\d{2})*) "
     r"(?:was|were) (?:each |a )?(52|53)-week fiscal years?\b", re.I,
 )
+
+
+@dataclass
+class StatementPolicies:
+    notes: list[dict[str, Any]] = field(default_factory=list)
+    weeks: dict[int, int] = field(default_factory=dict)
+    qualified_years: set[int] = field(default_factory=set)
+    comparison_notes: list[dict[str, Any]] = field(default_factory=list)
+    caveats: list[str] | None = None
+
+
+def statement_policy_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int], layout: str,
+) -> StatementPolicies:
+    blocks = [block for block in document.blocks if block.position > after]
+    if layout == "fiscal":
+        return _week_based_policy(lines, blocks)
+    if layout == "embedded":
+        return _continuing_operations_policy(lines, blocks)
+    return _transportation_policy(lines, blocks)
+
+
+def _policy_section(blocks: list[TextBlock], heading: str) -> list[TextBlock]:
+    matches = [i for i, block in enumerate(blocks) if re.match(heading, block.text, re.I)]
+    if len(matches) != 1:
+        return []
+    start = matches[0] + 1
+    end = next((i for i in range(start, len(blocks))
+                if NOTE_HEADING.match(blocks[i].text) or NUMBERED_NOTE.match(blocks[i].text)), len(blocks))
+    return blocks[start:end]
+
+
+def _policy_excerpt(
+    lines: list[str], section: list[TextBlock], topic: str, pattern: str, *, number: int = 1,
+) -> dict[str, Any] | None:
+    matches = [i for i, block in enumerate(section) if re.search(pattern, block.text, re.I)]
+    if len(matches) != 1:
+        return None
+    index = matches[0]
+    block = section[index]
+    end = block.end
+    if end is not None and index + 1 < len(section):
+        following = section[index + 1].position
+        # Include intervening whitespace when the next paragraph begins immediately after this one.
+        if following > end and not original_span(lines, EvidenceText(end).locator(),
+                                                  EvidenceText(following).locator()).strip():
+            end = following
+    return _note(lines, topic, block, end, number=number, title=topic.replace("-", " ").capitalize())
+
+
+def _week_based_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPolicies:
+    policy = _policy_section(blocks, r"^1\.\s*summary of significant accounting policies$")
+    calendar = [block.text for block in policy if re.search(
+        r"^Our consolidated financial statements include our accounts and those of our subsidiaries\. "
+        r"Intercompany balances and transactions are eliminated in consolidation\. "
+        r"Our fiscal year is a 52- or 53-week period ending on the Sunday nearest to January 31\.", block.text, re.I,
+    )]
+    if len(calendar) != 1:
+        return StatementPolicies()
+    weeks = {}
+    for years, duration in re.findall(
+        r"(fiscal 20\d{2}(?: and fiscal 20\d{2})*) includes? (52|53) weeks", calendar[0], re.I,
+    ):
+        for year in map(int, re.findall(r"20\d{2}", years)):
+            if year in weeks:
+                return StatementPolicies()
+            weeks[year] = int(duration)
+    qualified = _revenue_basis_gaps(blocks)
+    notes = _complete_notes(
+        _policy_excerpt(lines, policy, "consolidation", r"^Our consolidated financial statements include our accounts"),
+        _policy_excerpt(lines, policy, "revenue", r"^We recognize revenue, net of expected returns and sales tax,"),
+    ) if qualified is not None else []
+    return _transaction_policy(
+        lines, blocks, StatementPolicies(notes, weeks, qualified or set()),
+        heading=r"^(\d+)\.\s*acquisitions$", topic="acquisition",
+        pattern=(r"^The acquisition was accounted for .*? and (?P<business>[\w .,&'-]+?)[’']s results of operations "
+                 r"have been consolidated .*? effective [A-Za-z]+ \d+, (?P<year>20\d{2})\."),
+        caveat="{business} results are included from the acquisition date in {year}.",
+    )
+
+
+def _continuing_operations_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPolicies:
+    policy = _policy_section(blocks, r"^note 1\. basis of presentation and summary of significant accounting policies$")
+    discontinued = _policy_section(blocks, r"^note 2\. businesses held for sale and discontinued operations\b")
+    qualified = _revenue_basis_gaps(blocks)
+    if qualified is None:
+        return StatementPolicies()
+    notes = _complete_notes(
+        _policy_excerpt(lines, policy, "basis",
+                        r"^We have reclassified certain prior-year amounts .*? tables are presented in U\.S\. dollars in millions"),
+        _policy_excerpt(lines, policy, "separations",
+                        r"have been excluded from both continuing operations and segment results for all periods presented"),
+        _policy_excerpt(lines, policy, "consolidation",
+                        r"^Consolidation\. Our financial statements consolidate all of our affiliates.*"
+                        r"All intercompany balances and transactions have been eliminated"),
+        _policy_excerpt(lines, policy, "equipment-revenue", r"^Revenue from the sale of equipment\. We recognize revenue"),
+        _policy_excerpt(lines, policy, "services-revenue", r"^Revenue from the sale of services\..*We recognize revenue"),
+        _policy_excerpt(lines, policy, "service-arrangements",
+                        r"^We recognize revenue as we perform under the arrangements using the percentage of completion method"),
+        _policy_excerpt(lines, policy, "insurance-revenue", r"^Insurance\..*Insurance revenue is comprised"),
+        _policy_excerpt(lines, discontinued, "discontinued-operations",
+                        r"^Discontinued operations primarily comprise .*reported as discontinued operations for all periods"
+                        r" presented .*adjusted on a retrospective basis", number=2),
+    )
+    return StatementPolicies(notes=notes, qualified_years=qualified, caveats=[
+        "Both periods use the filing's continuing-operations basis after retrospective presentation of discontinued operations.",
+    ])
+
+
+def _transportation_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPolicies:
+    policy = _policy_section(blocks, r"^note 1\. summary of accounting policies$")
+    revenue = _policy_section(blocks, r"^note 2\. revenue recognition$")
+    qualified = _revenue_basis_gaps(blocks)
+    notes = _complete_notes(
+        _policy_excerpt(lines, policy, "consolidation", r"^The accompanying consolidated financial statements .*?"
+                        r"include the accounts .*? consolidated subsidiaries .*?All intercompany balances and transactions"
+                        r" have been eliminated"),
+        _policy_excerpt(lines, revenue, "revenue", r"^We generally recognize revenue over time as we perform services", number=2),
+        _policy_excerpt(lines, revenue, "forwarding-and-logistics", r"^For our freight forwarding contracts, .*?"
+                        r"In our Logistics business .*?we recognize revenue", number=2),
+    ) if qualified is not None else []
+    return _transaction_policy(
+        lines, blocks, StatementPolicies(notes=notes, qualified_years=qualified or set()),
+        heading=r"^note (\d+)\. acquisitions & dispositions$", topic="divestiture",
+        pattern=r"^On [A-Za-z]+ \d+, (?P<year>20\d{2}), we completed the divestiture of (?P<business>[\w .,&'-]+?),",
+        caveat="Reported growth includes the effect of the {business} divestiture in {year}.",
+    )
+
+
+def _transaction_policy(
+    lines: list[str], blocks: list[TextBlock], policy: StatementPolicies, *,
+    heading: str, topic: str, pattern: str, caveat: str,
+) -> StatementPolicies:
+    section = _policy_section(blocks, heading)
+    matches = [match for block in section if (match := re.search(pattern, block.text, re.I))]
+    numbers = [match[1] for block in blocks if (match := re.match(heading, block.text, re.I))]
+    if len(matches) == len(numbers) == 1:
+        note = _policy_excerpt(lines, section, topic, pattern, number=int(numbers[0]))
+        if note:
+            policy.comparison_notes = [note]
+            policy.caveats = [caveat.format(business=matches[0]["business"], year=matches[0]["year"])]
+    return policy
 
 
 def comparison_disclosures(

@@ -162,3 +162,9 @@ Phase 2 calculator and its offline results.
   P&G and Coca-Cola FY2024 10-Ks. Both FY2024 lookups and FY2023 to FY2024
   growth calculations reproduced with original citations offline.
   [Issue #38 evidence and checks](../artifacts/phase06/PG_KO_REVENUE.md)
+
+- Issue #39 matches ten reviewed observations across four preserved GE,
+  Home Depot, and UPS filings. The nine current observations verify, and
+  the historical GE observation remains provisional. Six numeric answers,
+  two evidence gaps, and 42 opened citation responses reproduced offline.
+  [Issue #39 evidence and checks](../artifacts/phase06/GE_HD_UPS_REVENUE.md)

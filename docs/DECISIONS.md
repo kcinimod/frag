@@ -352,3 +352,14 @@ the original. Resolve split or cross-referenced accounting notes from
 their visible headings and cited text. Carry the refranchising disclosure
 into Coca-Cola's reported growth caveats.
 [Issue #38 evidence and checks](../artifacts/phase06/PG_KO_REVENUE.md)
+
+### Preserve fiscal labels and week-based reporting dates (#39)
+
+Keep a displayed fiscal label with its observation even when the period ends
+in the next calendar year. For the split Fiscal header, associate labels by
+column and derive the periods from the cover date and disclosed fiscal
+calendar. Require the inline context to agree with those periods. Use the
+shared visible statement path for titles inside or outside the table and
+retain visible observations with an explicit verification gap when the inline
+evidence is missing.
+[Issue #39 evidence and checks](../artifacts/phase06/GE_HD_UPS_REVENUE.md)

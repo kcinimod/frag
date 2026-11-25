@@ -60,3 +60,4 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 
 - [x] Freeze the pre-change production revision, planner and retrieval settings. Audit both development cohorts and replay all 60 cold and warm results and citation sets with sockets blocked. [Run records and reproduction](artifacts/phase06/README.md) · [Issuer and layout inventory](artifacts/phase06/DEVELOPMENT_LAYOUTS.md)
 - [x] Verify all six reviewed P&G and Coca-Cola observations and reproduce both filings' lookup and growth answers with original citations offline. [Issue #38 evidence and checks](artifacts/phase06/PG_KO_REVENUE.md)
+- [x] Match all ten reviewed GE, Home Depot, and UPS observations. Verify nine current observations, retain the historical GE observation as provisional, and replay six answers and both evidence gaps offline. [Issue #39 evidence and checks](artifacts/phase06/GE_HD_UPS_REVENUE.md)

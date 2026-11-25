@@ -1,0 +1,853 @@
+{
+  "hd-20250202.htm": {
+    "source": {
+      "accession": "0000354950-25-000085",
+      "byte_length": 2199383,
+      "cik": "0000354950",
+      "filing_date": "2025-03-21",
+      "form": "10-K",
+      "issuer": "HOME DEPOT, INC.",
+      "original_filename": "hd-20250202.htm",
+      "path": "originals/0000354950-25-000085/hd-20250202.htm",
+      "report_end": "2025-02-02",
+      "sha256": "32532d3995ebeec9a1404d97ad3cfb1b72900b61c6928cb50481b203233eab84",
+      "source_id": "0000354950-25-000085",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/354950/000035495025000085/hd-20250202.htm"
+    },
+    "evidence": {
+      "applicable_notes": [
+        {
+          "label": "Note 1: consolidation and fiscal year",
+          "locator": {
+            "end_byte": 1053937,
+            "sha256": "d6c6920ca3d4d6e76e27a23b152df36a42482e370c988bb7a856bbac413f6f62",
+            "start_byte": 1053306
+          },
+          "meaning": "Subsidiaries are consolidated with intercompany eliminations. FY2024 is 53 weeks and FY2023 and FY2022 are 52 weeks."
+        },
+        {
+          "label": "Note 1: revenue recognition",
+          "locator": {
+            "end_byte": 1109197,
+            "sha256": "a4f2ddbb1b8edd0247095708e5279aacd8e25fbc67fd56b8329ebf5b83e41ae0",
+            "start_byte": 1108433
+          },
+          "meaning": "Net of returns and sales taxes, recognized upon possession or performance."
+        },
+        {
+          "label": "Acquisition note: SRS",
+          "locator": {
+            "end_byte": 1988999,
+            "sha256": "3e86d52cbe07778c791fc133fae487f79774059bd8af13cc7657cc9ea47f6d8a",
+            "start_byte": 1988510
+          },
+          "meaning": "SRS results enter consolidated earnings starting June 18, 2024."
+        }
+      ],
+      "facts": {
+        "2022": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-7",
+          "currency": "USD",
+          "element_id": "f-131",
+          "fiscal_year": 2022,
+          "locators": {
+            "context": {
+              "end_byte": 6506,
+              "sha256": "dd50cc1c366dce571621d961af999989a5b92bd95e17781cc447a0d45e3c0423",
+              "start_byte": 6243
+            },
+            "inline_fact": {
+              "end_byte": 862335,
+              "sha256": "1ed7fb636b4af9dee33713dd02a57f1d21838bf7fcfaa4db628d89a83430e3ab",
+              "start_byte": 862133
+            },
+            "statement_cell": {
+              "end_byte": 862353,
+              "sha256": "921f5286d1e1eb80b23ebeaae50cafeed06725dd021dc7e960ee041eb6b07cbd",
+              "start_byte": 861907
+            },
+            "unit": {
+              "end_byte": 3765,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 3689
+            }
+          },
+          "normalized_amount": "157403000000",
+          "period_days": 364,
+          "period_end": "2023-01-29",
+          "period_start": "2022-01-31",
+          "precision_decimals": -6,
+          "raw_amount": "157,403",
+          "scale": 1000000,
+          "scope": "consolidated"
+        },
+        "2023": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-6",
+          "currency": "USD",
+          "element_id": "f-130",
+          "fiscal_year": 2023,
+          "locators": {
+            "context": {
+              "end_byte": 6243,
+              "sha256": "5107187daf66583d443e38ff817b4ac1dd9e83aa9b73ccaf6546edaf2626665d",
+              "start_byte": 5980
+            },
+            "inline_fact": {
+              "end_byte": 861451,
+              "sha256": "4fe1e878ccd5671867220477b762c88f8997a1501449377517401b3689be668a",
+              "start_byte": 861249
+            },
+            "statement_cell": {
+              "end_byte": 861469,
+              "sha256": "1419e944386dae77fb2fa4a7cfe623896ece580f513c9506702af42ad2bbc28e",
+              "start_byte": 861023
+            },
+            "unit": {
+              "end_byte": 3765,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 3689
+            }
+          },
+          "normalized_amount": "152669000000",
+          "period_days": 364,
+          "period_end": "2024-01-28",
+          "period_start": "2023-01-30",
+          "precision_decimals": -6,
+          "raw_amount": "152,669",
+          "scale": 1000000,
+          "scope": "consolidated"
+        },
+        "2024": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-1",
+          "currency": "USD",
+          "element_id": "f-129",
+          "fiscal_year": 2024,
+          "locators": {
+            "context": {
+              "end_byte": 5108,
+              "sha256": "786496e7b0df3cd03de370930df5ba0fbfa460a9b6181cb36bffc2501ab907d7",
+              "start_byte": 4845
+            },
+            "inline_fact": {
+              "end_byte": 860567,
+              "sha256": "42279c8d24e4c16c65eccaa5a566d9a033db5065e699d39f39f5cf40b716ba52",
+              "start_byte": 860365
+            },
+            "statement_cell": {
+              "end_byte": 860585,
+              "sha256": "e60b2b21b8ad6a9d2b1b7ebcc592a4e25d6c7af19c6e2203f0822aee3feeeb4b",
+              "start_byte": 860139
+            },
+            "unit": {
+              "end_byte": 3765,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 3689
+            }
+          },
+          "normalized_amount": "159514000000",
+          "period_days": 371,
+          "period_end": "2025-02-02",
+          "period_start": "2024-01-29",
+          "precision_decimals": -6,
+          "raw_amount": "159,514",
+          "scale": 1000000,
+          "scope": "consolidated"
+        }
+      },
+      "incorporation": "Delaware",
+      "layout": "split-fiscal-year-header",
+      "locators": {
+        "incorporation": {
+          "end_byte": 167787,
+          "sha256": "c4a1f08d00132747e8f114d5a1823ecc88d90701b65723aedaaaf41672333dbd",
+          "start_byte": 167642
+        },
+        "period_header": {
+          "end_byte": 859658,
+          "sha256": "4b97c9736a65a32ae62d02d633d06113b0f68c8a550e48f2433f56a4973ce99d",
+          "start_byte": 857389
+        },
+        "revenue_row": {
+          "end_byte": 862486,
+          "sha256": "86fed2ba4ca66a1f1956de2e248680272caa8436589ac222ef155860312a0c2a",
+          "start_byte": 859658
+        },
+        "statement": {
+          "end_byte": 898395,
+          "sha256": "ded88f323f8a48af9dc734febc7ddf93d1408e1252abd5d5b1d2a420069eb05d",
+          "start_byte": 857389
+        },
+        "statement_title_and_units": {
+          "end_byte": 859658,
+          "sha256": "69e9870cca55eed8b90bf300ab73029f59ea620b8832986f26c2ca37285f56dd",
+          "start_byte": 856131
+        }
+      },
+      "statement_row": "Net sales"
+    },
+    "cases": [
+      {
+        "case_id": "P5-01",
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000354950-25-000085",
+        "kind": "lookup",
+        "outcome": "answerable",
+        "years": [
+          2024
+        ]
+      },
+      {
+        "case_id": "P5-02",
+        "question": "How did reported consolidated revenue change from FY2023 to FY2024?",
+        "source_id": "0000354950-25-000085",
+        "absolute_change": "6845000000",
+        "caveat": "As reported, FY2024 contains 53 weeks versus 52 in FY2023 and includes SRS from acquisition.",
+        "kind": "growth",
+        "outcome": "answerable",
+        "percent": "4.48",
+        "years": [
+          2023,
+          2024
+        ]
+      },
+      {
+        "case_id": "P5-03",
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 using equal-length fiscal years?",
+        "source_id": "0000354950-25-000085",
+        "evidence": [
+          "context",
+          "Note 1: consolidation and fiscal year"
+        ],
+        "kind": "growth",
+        "outcome": "incompatible_periods",
+        "partial_years": [
+          2023,
+          2024
+        ],
+        "period_weeks": [
+          52,
+          53
+        ],
+        "reason": "Note 1 and the undimensioned inline contexts establish 52 versus 53 weeks. Both reported totals can be cited. The reported annual series does not supply equal-length operands. Do not substitute an adjusted or annualized estimate.",
+        "years": [
+          2023,
+          2024
+        ]
+      }
+    ]
+  },
+  "ge-20241231.htm": {
+    "source": {
+      "accession": "0000040545-25-000015",
+      "byte_length": 3436297,
+      "cik": "0000040545",
+      "filing_date": "2025-02-03",
+      "form": "10-K",
+      "issuer": "GENERAL ELECTRIC CO",
+      "original_filename": "ge-20241231.htm",
+      "path": "originals/0000040545-25-000015/ge-20241231.htm",
+      "report_end": "2024-12-31",
+      "sha256": "52a88621912de82629ca4cdde57d874becb1026918680c3f08794e6b1122d48f",
+      "source_id": "0000040545-25-000015",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/40545/000004054525000015/ge-20241231.htm"
+    },
+    "evidence": {
+      "applicable_notes": [
+        {
+          "label": "Note 1: basis, currency and rounding",
+          "locator": {
+            "end_byte": 1340766,
+            "sha256": "2b8af1182a1b66648b3aad895e5090306a6d8bfe72eaa0bcc993cb1145032d09",
+            "start_byte": 1339521
+          },
+          "meaning": "US dollars in millions with rounding. Prior years reclassified where needed."
+        },
+        {
+          "label": "Note 1: separations",
+          "locator": {
+            "end_byte": 1342234,
+            "sha256": "cafcb8e3c37efbfa32255f6001880f48e78cad53c1e8a5399801024ebc30dc16",
+            "start_byte": 1340795
+          },
+          "meaning": "GE Vernova and GE HealthCare are excluded from continuing operations across all presented periods."
+        },
+        {
+          "label": "Note 1: consolidation",
+          "locator": {
+            "end_byte": 1343134,
+            "sha256": "7ea72c80bc716cb756b4442d1c737dad06b8d778d964bf3e885b2351b0932af4",
+            "start_byte": 1342364
+          },
+          "meaning": "Controlled affiliates are consolidated and intercompany balances and transactions eliminated."
+        },
+        {
+          "label": "Note 1: equipment revenue",
+          "locator": {
+            "end_byte": 1344117,
+            "sha256": "583bf7111f24c9f54957dcc8f4164dfa2dae6eace96cf0ff052a621260738f48",
+            "start_byte": 1343320
+          },
+          "meaning": "Revenue reflects transfer of control."
+        },
+        {
+          "label": "Note 1: services revenue",
+          "locator": {
+            "end_byte": 1347374,
+            "sha256": "e3db6aae9f1fd8c65b1ac3a2f510ab5ca769f756cb89974f1d91c5e3a2f7d2a4",
+            "start_byte": 1346465
+          },
+          "meaning": "Spare parts transfer and transaction price policy."
+        },
+        {
+          "label": "Note 1: service arrangements",
+          "locator": {
+            "end_byte": 1349833,
+            "sha256": "3577c7d0ae6f19b19aefb1acaf136fc375d2499f03c0291889224209f1a3536d",
+            "start_byte": 1349104
+          },
+          "meaning": "Recognizes revenue as performance occurs for these arrangements."
+        },
+        {
+          "label": "Note 1: insurance",
+          "locator": {
+            "end_byte": 1382733,
+            "sha256": "acd9becaa473d6849719f7337837a408931b1e7bf63a4609defc69efb762306a",
+            "start_byte": 1381482
+          },
+          "meaning": "Insurance revenues include premiums and investment income."
+        },
+        {
+          "label": "Note 2: discontinued operations",
+          "locator": {
+            "end_byte": 1418020,
+            "sha256": "eb0869a3641d588dc2bfc00129297e30b3f04da50ee76bf1e058ea836547e946",
+            "start_byte": 1417336
+          },
+          "meaning": "Discontinued operations reported for all periods and notes retrospectively adjusted."
+        }
+      ],
+      "facts": {
+        "2022": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-17",
+          "currency": "USD",
+          "element_id": "f-80",
+          "fiscal_year": 2022,
+          "locators": {
+            "context": {
+              "end_byte": 13820,
+              "sha256": "1a0083d36ede3895c1eb7cb7b32d8556b783c605162854061a3eaab8b74f475c",
+              "start_byte": 13556
+            },
+            "inline_fact": {
+              "end_byte": 1028958,
+              "sha256": "c20a5dd4eed90685e3dbff0630325052428e006d8ad343cf1b73e105c9b98f69",
+              "start_byte": 1028800
+            },
+            "statement_cell": {
+              "end_byte": 1028976,
+              "sha256": "e08edd4b519bf0545b46fd28853f05c26883e887fa5dd3c53c4574e505233dd0",
+              "start_byte": 1028583
+            },
+            "unit": {
+              "end_byte": 6647,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 6571
+            }
+          },
+          "normalized_amount": "29139000000",
+          "period_days": 365,
+          "period_end": "2022-12-31",
+          "period_start": "2022-01-01",
+          "precision_decimals": -6,
+          "raw_amount": "29,139",
+          "scale": 1000000,
+          "scope": "consolidated"
+        },
+        "2023": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-16",
+          "currency": "USD",
+          "element_id": "f-79",
+          "fiscal_year": 2023,
+          "locators": {
+            "context": {
+              "end_byte": 13556,
+              "sha256": "d6680334800d2d140d3b78d33c3abb19698c4c4d0e5497a2e2efe0d102c90941",
+              "start_byte": 13292
+            },
+            "inline_fact": {
+              "end_byte": 1028465,
+              "sha256": "e458d51a7f6a67ae45647883d12930c7fb3928dba2a478e2045447823f706cb9",
+              "start_byte": 1028307
+            },
+            "statement_cell": {
+              "end_byte": 1028483,
+              "sha256": "c28147aba69a6c6c4076fb8730d120f2b2cf64656e2f6a5895d2da8fa462e1e6",
+              "start_byte": 1028090
+            },
+            "unit": {
+              "end_byte": 6647,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 6571
+            }
+          },
+          "normalized_amount": "35348000000",
+          "period_days": 365,
+          "period_end": "2023-12-31",
+          "period_start": "2023-01-01",
+          "precision_decimals": -6,
+          "raw_amount": "35,348",
+          "scale": 1000000,
+          "scope": "consolidated"
+        },
+        "2024": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-1",
+          "currency": "USD",
+          "element_id": "f-78",
+          "fiscal_year": 2024,
+          "locators": {
+            "context": {
+              "end_byte": 7954,
+              "sha256": "f012c013c2663d357353636bb91e837964e974c02e26611bfb086feedc092431",
+              "start_byte": 7691
+            },
+            "inline_fact": {
+              "end_byte": 1027972,
+              "sha256": "3ecd00d8c18d0fbf898d644405c8e655220610e99d2a4e28600725e2886ab013",
+              "start_byte": 1027815
+            },
+            "statement_cell": {
+              "end_byte": 1027990,
+              "sha256": "bff3e6dbae38c3c4cf83752e8b8ff7da99a0adb31541eb52401fc8240399ce92",
+              "start_byte": 1027598
+            },
+            "unit": {
+              "end_byte": 6647,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 6571
+            }
+          },
+          "normalized_amount": "38702000000",
+          "period_days": 366,
+          "period_end": "2024-12-31",
+          "period_start": "2024-01-01",
+          "precision_decimals": -6,
+          "raw_amount": "38,702",
+          "scale": 1000000,
+          "scope": "consolidated"
+        }
+      },
+      "incorporation": "New York",
+      "layout": "shared-end-date-in-period-row",
+      "locators": {
+        "incorporation": {
+          "end_byte": 343364,
+          "sha256": "ee30655182d3e2890773ed5ee0e0103158b6fdda1bcd09832f41dfd4666aafb1",
+          "start_byte": 343219
+        },
+        "period_header": {
+          "end_byte": 1027245,
+          "sha256": "337ab846d41371a7614b068904ed6e96c50bd34532a16083a1ba3f34661b8bc1",
+          "start_byte": 1019140
+        },
+        "revenue_row": {
+          "end_byte": 1029081,
+          "sha256": "99d4b3e4b84e7df85df9169f9719f6ae84cdb66dcccc85f82a8a6dd70df04ad8",
+          "start_byte": 1027245
+        },
+        "statement": {
+          "end_byte": 1096468,
+          "sha256": "d1cbf322201cf47f56c4986424647e979d430636dd974d8f879d243958659dff",
+          "start_byte": 1019140
+        },
+        "statement_title_and_units": {
+          "end_byte": 1027245,
+          "sha256": "022e699f509040b0187df1d30126269e90fabfe465b61e693ef5aaef1b27ece9",
+          "start_byte": 1018289
+        }
+      },
+      "statement_row": "Total revenue"
+    },
+    "cases": [
+      {
+        "case_id": "P5-04",
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000040545-25-000015",
+        "kind": "lookup",
+        "outcome": "answerable",
+        "years": [
+          2024
+        ]
+      },
+      {
+        "case_id": "P5-05",
+        "question": "How did reported consolidated revenue change from FY2023 to FY2024?",
+        "source_id": "0000040545-25-000015",
+        "absolute_change": "3354000000",
+        "caveat": "Both periods use the filing\u2019s continuing-operations basis after retrospective presentation of businesses as discontinued.",
+        "kind": "growth",
+        "outcome": "answerable",
+        "percent": "9.49",
+        "years": [
+          2023,
+          2024
+        ]
+      }
+    ]
+  },
+  "ups-20241231.htm": {
+    "source": {
+      "accession": "0001090727-25-000019",
+      "byte_length": 4432794,
+      "cik": "0001090727",
+      "filing_date": "2025-02-18",
+      "form": "10-K",
+      "issuer": "UNITED PARCEL SERVICE INC",
+      "original_filename": "ups-20241231.htm",
+      "path": "originals/0001090727-25-000019/ups-20241231.htm",
+      "report_end": "2024-12-31",
+      "sha256": "0037db0b11b94778747a68aabe261b0af3e9749d420a35f1b19bfc8cce691819",
+      "source_id": "0001090727-25-000019",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1090727/000109072725000019/ups-20241231.htm"
+    },
+    "evidence": {
+      "applicable_notes": [
+        {
+          "label": "Note 1: basis of presentation",
+          "locator": {
+            "end_byte": 1870204,
+            "sha256": "9e0bce4f536817b842077f4669c1cc0f9241f24ee7ad3266820d54a7263c1fc7",
+            "start_byte": 1869665
+          },
+          "meaning": "US GAAP consolidated company and subsidiaries with intercompany eliminations."
+        },
+        {
+          "label": "Note 2: revenue recognition",
+          "locator": {
+            "end_byte": 1993148,
+            "sha256": "8b19de0cd8f7ba1e6a2243cbd72ac0b82428b042bac328669920232be147a0f2",
+            "start_byte": 1992658
+          },
+          "meaning": "Package services generally recognized over time."
+        },
+        {
+          "label": "Note 2: forwarding and logistics",
+          "locator": {
+            "end_byte": 1994664,
+            "sha256": "07938690c4643de59b5e414f73030ff70e7cefc7b1b57eb25023455466eef3db",
+            "start_byte": 1994023
+          },
+          "meaning": "Progress or right-to-invoice methods establish recognition for these services."
+        },
+        {
+          "label": "Note 8: Coyote divestiture",
+          "locator": {
+            "end_byte": 3053104,
+            "sha256": "d0851cca67f83fb44a1467308b2c04d6ea8a65647657f614451762019b53e975",
+            "start_byte": 3051266
+          },
+          "meaning": "2024 divestiture affected the reported comparison. The divestiture gain is in other expenses."
+        }
+      ],
+      "facts": {
+        "2022": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-15",
+          "currency": "USD",
+          "element_id": "f-148",
+          "fiscal_year": 2022,
+          "locators": {
+            "context": {
+              "end_byte": 12407,
+              "sha256": "3ef6ecbc4bc0f36e8b6d6866ba6cfd60372232d2aee85c8d3d36e212263d99cb",
+              "start_byte": 12143
+            },
+            "inline_fact": {
+              "end_byte": 1731041,
+              "sha256": "8bc91147dbb85facad24944147e1c47ef603763d456f562f60ed6c15088fff14",
+              "start_byte": 1730838
+            },
+            "statement_cell": {
+              "end_byte": 1731059,
+              "sha256": "2e706b5f38bfc419df982788e6ea3711fdb532ac7750e667d4a86be5ecd17fa7",
+              "start_byte": 1730602
+            },
+            "unit": {
+              "end_byte": 5955,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 5879
+            }
+          },
+          "normalized_amount": "100338000000",
+          "period_days": 365,
+          "period_end": "2022-12-31",
+          "period_start": "2022-01-01",
+          "precision_decimals": -6,
+          "raw_amount": "100,338",
+          "scale": 1000000,
+          "scope": "consolidated"
+        },
+        "2023": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-14",
+          "currency": "USD",
+          "element_id": "f-147",
+          "fiscal_year": 2023,
+          "locators": {
+            "context": {
+              "end_byte": 12143,
+              "sha256": "775cc338086dd953adc57e429b2bb9e77e6a8c60c63727915350814ec530d21b",
+              "start_byte": 11879
+            },
+            "inline_fact": {
+              "end_byte": 1730136,
+              "sha256": "e2a3b6c69b822b229f1da4826a1e96e2fcb4695de7ceff11a44c936cd7d16d7a",
+              "start_byte": 1729934
+            },
+            "statement_cell": {
+              "end_byte": 1730154,
+              "sha256": "b50679fea44931148e641d83e336c8fa84908fc6d543098f531aea431fe50451",
+              "start_byte": 1729698
+            },
+            "unit": {
+              "end_byte": 5955,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 5879
+            }
+          },
+          "normalized_amount": "90958000000",
+          "period_days": 365,
+          "period_end": "2023-12-31",
+          "period_start": "2023-01-01",
+          "precision_decimals": -6,
+          "raw_amount": "90,958",
+          "scale": 1000000,
+          "scope": "consolidated"
+        },
+        "2024": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-1",
+          "currency": "USD",
+          "element_id": "f-146",
+          "fiscal_year": 2024,
+          "locators": {
+            "context": {
+              "end_byte": 7778,
+              "sha256": "c84947dfc7b8501bdaf77e185f7851051bd69871dfb346f132e4b931d56895ef",
+              "start_byte": 7515
+            },
+            "inline_fact": {
+              "end_byte": 1729235,
+              "sha256": "f56e14f5ba454fbd8ec2b6e7896fd7434ca6f15f25c9673babe9746dcfbf2dc4",
+              "start_byte": 1729034
+            },
+            "statement_cell": {
+              "end_byte": 1729253,
+              "sha256": "f2236b742c4fff2fde124babc48c793d2b453021d0362a4994908b6ae2b46646",
+              "start_byte": 1728801
+            },
+            "unit": {
+              "end_byte": 5955,
+              "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+              "start_byte": 5879
+            }
+          },
+          "normalized_amount": "91070000000",
+          "period_days": 366,
+          "period_end": "2024-12-31",
+          "period_start": "2024-01-01",
+          "precision_decimals": -6,
+          "raw_amount": "91,070",
+          "scale": 1000000,
+          "scope": "consolidated"
+        }
+      },
+      "incorporation": "Delaware",
+      "layout": "shared-end-date-above-years",
+      "locators": {
+        "incorporation": {
+          "end_byte": 593245,
+          "sha256": "c4a1f08d00132747e8f114d5a1823ecc88d90701b65723aedaaaf41672333dbd",
+          "start_byte": 593100
+        },
+        "period_header": {
+          "end_byte": 1728305,
+          "sha256": "d4c4069e395bc2f17cf1d63b7e6e16890c2d9019c21f33bf085b3672999e0e9f",
+          "start_byte": 1726203
+        },
+        "revenue_row": {
+          "end_byte": 1731192,
+          "sha256": "ba5bfb9650624bb569db722bfea08e218e9ea871030c7b273c7be195b3a9af8c",
+          "start_byte": 1728305
+        },
+        "statement": {
+          "end_byte": 1767520,
+          "sha256": "7fe630b4bce889dc6550f6762c0e7d72dc9dc137a87358816827f79549ba0ef8",
+          "start_byte": 1726203
+        },
+        "statement_title_and_units": {
+          "end_byte": 1728305,
+          "sha256": "a7a4cc523e3a035d3916cf271c6be1a8c79a4d46ce7deeca79769144fdad1d99",
+          "start_byte": 1724691
+        }
+      },
+      "statement_row": "Revenue"
+    },
+    "cases": [
+      {
+        "case_id": "P5-10",
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001090727-25-000019",
+        "kind": "lookup",
+        "outcome": "answerable",
+        "years": [
+          2024
+        ]
+      },
+      {
+        "case_id": "P5-11",
+        "question": "How did reported consolidated revenue change from FY2023 to FY2024?",
+        "source_id": "0001090727-25-000019",
+        "absolute_change": "112000000",
+        "caveat": "As-reported change includes the effect of the Coyote divestiture.",
+        "kind": "growth",
+        "outcome": "answerable",
+        "percent": "0.12",
+        "years": [
+          2023,
+          2024
+        ]
+      }
+    ]
+  },
+  "ge10-k2018.htm": {
+    "source": {
+      "accession": "0000040545-19-000014",
+      "byte_length": 6977651,
+      "cik": "0000040545",
+      "filing_date": "2019-02-26",
+      "form": "10-K",
+      "issuer": "GENERAL ELECTRIC CO",
+      "original_filename": "ge10-k2018.htm",
+      "path": "originals/0000040545-19-000014/ge10-k2018.htm",
+      "report_end": "2018-12-31",
+      "sha256": "b59da1c0ff38c92e7daa6c96ea5bc49315fcd3e782224e6ab653376c834dc6a2",
+      "source_id": "0000040545-19-000014",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/40545/000004054519000014/ge10-k2018.htm"
+    },
+    "evidence": {
+      "applicable_notes": [
+        {
+          "label": "Note 1: consolidated scope",
+          "locator": {
+            "end_byte": 3184126,
+            "sha256": "4880c1cb7445a825fb3ab1b6e28549a92e37cb5c045af27d2e86a117e9e82869",
+            "start_byte": 3183668
+          },
+          "meaning": "Consolidates GE and GE Capital after eliminating intercompany transactions."
+        },
+        {
+          "label": "Note 1: basis and discontinued operations",
+          "locator": {
+            "end_byte": 3185566,
+            "sha256": "1a4eef64d31548a8867ce49947b40cbef322e81e17204a796330358533c59a49",
+            "start_byte": 3184876
+          },
+          "meaning": "The notes relate to continuing operations unless otherwise indicated."
+        },
+        {
+          "label": "Note 1: rounding",
+          "locator": {
+            "end_byte": 3181433,
+            "sha256": "c541f41122cb478c3fb8613440f4728797ad0a3ca8c317ae4933f78558f4b5b2",
+            "start_byte": 3180975
+          },
+          "meaning": "The filing uses amounts in millions and discusses rounding."
+        },
+        {
+          "label": "Note 9: revenue",
+          "locator": {
+            "end_byte": 3788487,
+            "sha256": "7dd63a8698321205276db5864310d857001bd5a226935d12e119ba07821e996a",
+            "start_byte": 3786842
+          },
+          "meaning": "Disaggregates revenues and directs the reader to the related accounting policy."
+        }
+      ],
+      "facts": {},
+      "incorporation": "New York",
+      "layout": "shared-end-date-in-period-row",
+      "locators": {
+        "incorporation": {
+          "end_byte": 5851,
+          "sha256": "be0cf9ebbb973dcc6b110cd414bb23afee7f866e23337758c09b8bf0f919d833",
+          "start_byte": 5133
+        },
+        "period_header": {
+          "end_byte": 2485176,
+          "sha256": "d7688b8842bc03ff59fff4e11288ee5f4dafc357a8f6c73a8ea3819bf1ced7c9",
+          "start_byte": 2475227
+        },
+        "revenue_row": {
+          "end_byte": 2486970,
+          "sha256": "e11b823b8e09add5bbfa8236fcc0b2da31c66eaf61ab36f16f6483d60b905392",
+          "start_byte": 2485176
+        },
+        "statement": {
+          "end_byte": 2555469,
+          "sha256": "3ea998bcaf8a16eb8da7d354962c1a5e0e73be1d323e8b9263d64aad75cb6b54",
+          "start_byte": 2475227
+        },
+        "statement_title_and_units": {
+          "end_byte": 2485176,
+          "sha256": "d7688b8842bc03ff59fff4e11288ee5f4dafc357a8f6c73a8ea3819bf1ced7c9",
+          "start_byte": 2475227
+        }
+      },
+      "provisional_observation": {
+        "concept": "us-gaap:Revenues",
+        "currency": "USD",
+        "fiscal_year": 2018,
+        "locators": {
+          "statement_cell": {
+            "end_byte": 2485772,
+            "sha256": "7ab440c5dd44a65bd42c21a30b55b21ae6a004b88e5f4ff7465bb8d7acfeb11e",
+            "start_byte": 2485495
+          }
+        },
+        "missing_evidence": "matching inline XBRL fact, context and unit in the supplied original",
+        "normalized_amount": "121615000000",
+        "period_end": "2018-12-31",
+        "period_start": "2018-01-01",
+        "raw_amount": "121,615",
+        "scale": 1000000,
+        "scope": "consolidated"
+      },
+      "statement_row": "Total revenues (Note 9)"
+    },
+    "cases": [
+      {
+        "case_id": "P5-06",
+        "question": "What was reported consolidated revenue in FY2018?",
+        "source_id": "0000040545-19-000014",
+        "evidence": [
+          "period_header",
+          "revenue_row",
+          "statement_cell",
+          "Note 1: consolidated scope"
+        ],
+        "kind": "lookup",
+        "outcome": "present_unverifiable",
+        "reason": "The FY2018 audited consolidated statement visibly reports total revenues. This original HTML has no inline XBRL, so agreement of the visible amount, context and unit with an inline fact cannot be established from the supplied source. An external SEC structured record corroborates the amount for the scorer only. Report a verification evidence gap, never an absent year or a verified numeric answer.",
+        "years": [
+          2018
+        ]
+      }
+    ]
+  }
+}
