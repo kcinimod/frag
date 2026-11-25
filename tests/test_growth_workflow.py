@@ -43,6 +43,23 @@ def test_retained_microsoft_growth_through_offline_cli(tmp_path: Path) -> None:
     assert missing["operands"][0]["status"] == "verified"
 
 
+def test_microsoft_2022_headers_support_absence_without_a_reviewed_reference(tmp_path: Path) -> None:
+    original = ARCHIVE.parents[2] / "phase03/originals/msft-10k_20220630.htm.gz"
+    filing = tmp_path / "microsoft-2022.html"
+    filing.write_bytes(gzip.decompress(original.read_bytes()))
+    store = str(tmp_path / "store")
+    source = success("ingest", str(filing), "--store", store, "--provenance", "local_original",
+                     "--accession", "0001564590-22-026876")
+    for year, reason in ((2019, "absent"), (2020, "unverified")):
+        outcome = success("ask", source["source_id"], f"What was revenue in FY{year}?", "--store", store)
+        assert outcome["reason"] == reason
+        if reason == "absent":
+            assert "The statement shows FY2020, FY2021, FY2022." in outcome["message"]
+            assert outcome["citations"][0]["id"] == "statement-periods"
+        else:
+            assert "The statement shows this year" in outcome["message"]
+
+
 def test_browser_growth_api_resolves_only_published_citations(tmp_path: Path) -> None:
     store = SourceStore(tmp_path / "store")
     source = store.ingest_bytes(gzip.decompress(ARCHIVE.read_bytes()), provenance="local_original")

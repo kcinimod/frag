@@ -3,7 +3,6 @@
 import gzip
 import json
 from pathlib import Path
-import re
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
@@ -16,6 +15,7 @@ from werkzeug.serving import make_server
 from frag.store import SourceStore
 from frag.web import create_app
 from growth_browser import OFFLINE_CLI, ROOT
+from score import audit
 
 PHASE = ROOT / "artifacts/phase05"
 ABSENT = "What was revenue growth from FY2020 to FY2023?"
@@ -67,14 +67,21 @@ def check_browser(store: SourceStore, sources: list[dict[str, Any]], results: li
                     expect(chat.get_by_text(f'FY2023 · USD {fact["normalized_amount"]}', exact=False)).to_be_visible()
                     expect(chat.locator(".growth-value")).to_have_count(0)
                     source_hash = source["source_hash"]
-                    check_citation(context, chat.get_by_role("link", name=re.compile(r"^FY2023 .* cell$")),
-                                   source_hash, fact["raw_amount"], "2023")
+                    for citation in result["citations"]:
+                        title, identifier = citation["title"], citation["id"]
+                        evidence = ()
+                        if identifier == "current":
+                            evidence = (fact["raw_amount"], "2023", "iso4217:USD")
+                        if identifier == "statement-periods":
+                            evidence = ("CONSOLIDATED STATEMENTS OF OPERATIONS", "Total net sales",
+                                        "September 25, 2021", "September 24, 2022", "September 30, 2023")
+                        check_citation(context, chat.get_by_role("link", name=title, exact=True), source_hash, *evidence)
                     if issue["code"] == "absent":
+                        chat.get_by_role("textbox").fill("What was revenue in FY2020?")
+                        chat.get_by_role("button", name="Ask", exact=True).click()
+                        expect(chat.get_by_text(issue["detail"], exact=True)).to_be_visible()
                         check_citation(context, chat.get_by_role("link", name="Consolidated revenue statement periods"),
-                                       source_hash, "CONSOLIDATED STATEMENTS OF OPERATIONS", "Total net sales",
-                                       "September 25, 2021", "September 24, 2022", "September 30, 2023")
-                    else:
-                        expect(chat.get_by_role("link", name="Consolidated revenue statement periods")).to_have_count(0)
+                                       source_hash, "Total net sales", "September 25, 2021", "September 30, 2023")
                 print(f"Chrome {browser.version} matched all three offline CLI explanations.")
                 print("Apple FY2020 absence and Microsoft FY2021 extraction gap kept cited FY2023 amounts.")
                 print("Apple FY2024 remained an evidence gap for disclosure verification.")
@@ -86,6 +93,7 @@ def check_browser(store: SourceStore, sources: list[dict[str, Any]], results: li
 
 def main() -> None:
     manifest = json.loads((PHASE / "inputs.json").read_bytes())
+    expected = json.loads((PHASE / "expected.json").read_bytes())["sources"]
     filings = {filing["accession"]: filing for filing in manifest["sources"]}
     with TemporaryDirectory() as work:
         store = SourceStore(Path(work) / "store")
@@ -94,7 +102,9 @@ def main() -> None:
                                     ("0000320193-24-000123", VERIFICATION_GAP)):
             filing = filings[accession]
             original = Path(work) / filing["original_filename"]
-            original.write_bytes(gzip.decompress((ROOT / filing["archive"]).read_bytes()))
+            original_bytes = gzip.decompress((ROOT / filing["archive"]).read_bytes())
+            original.write_bytes(original_bytes)
+            audit(original_bytes, filing, expected[accession])
             cli = [sys.executable, "-c", OFFLINE_CLI]
             store_args = ["--store", str(store.root)]
             source = json.loads(subprocess.check_output([
@@ -107,10 +117,17 @@ def main() -> None:
                 *cli, "ask", source["source_id"], question, "--record", str(record), *store_args,
             ]))
             assert result == json.loads(subprocess.check_output([*cli, "replay-ask", str(record), *store_args]))
+            if "operands" in result:
+                companion, = result["operands"]
+                assert companion["normalized_amount"] == expected[accession]["facts"]["2023"]["normalized_amount"]
             sources.append(source)
             results.append(result)
         assert [result["issues"][0]["code"] for result in results[:2]] == ["absent", "unverified"]
+        assert results[0]["issues"][0]["detail"].endswith("The statement shows FY2021, FY2022, FY2023.")
+        assert "The statement shows this year" in results[1]["issues"][0]["detail"]
         assert results[2]["reason"] == "unverified"
+        assert "reviewed verification reference" in results[2]["message"]
+        assert "The applicable filing disclosures need verification." in results[2]["message"]
         check_browser(store, sources, results)
 
 

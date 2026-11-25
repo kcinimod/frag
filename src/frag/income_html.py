@@ -387,9 +387,9 @@ def statement_periods(
     if any(entry.cell.text and entry is not annual and entry.columns.start >= label.columns.stop
            and entry not in headers.values() for entry in header_row):
         return None
-    if any(entry.cell.text and entry is not label
+    if any(entry.cell.text and entry is not annual and entry.columns.start >= label.columns.stop
            and not any(set(entry.columns) <= set(header.columns) for header in headers.values())
-           for entry in rows[label.row - 1]):
+           for row in rows[:label.row] for entry in row):
         return None
     return {
         "heading": heading.locator(), "annual_header": annual.locator(table),

@@ -6,6 +6,7 @@ from fractions import Fraction
 from typing import Any
 
 from frag.citations import has_citable_amount, revenue_cell_citation, statement_period_citation
+from frag.dated_revenue import PARSER_VERSION as REVIEWED_DATED_PARSER
 from frag.revenue import PARSER_VERSION as LEGACY_STATEMENT_PARSER
 from frag.store import SourceError
 
@@ -74,7 +75,7 @@ def assess_growth(
         comparison_evidence = comparison if (
             comparison.get("status") == "unresolved" and _matches_comparison_pair(comparison.get("fact_ids", []), supported)
         ) else {}
-        result["citations"] = _citations(supported, comparison_evidence)
+        result["citations"] = _citations(supported, comparison_evidence, include_statement_context=not legacy_gaps)
         if any(issue["code"] == "absent" for issue in result["issues"]):
             result["citations"].append(statement_period_citation(source))
     else:
@@ -103,9 +104,18 @@ def observation_gap(source: dict[str, Any], year: int, candidates: list[dict[str
         and (source.get("parser_version") != LEGACY_STATEMENT_PARSER or "fiscal_year" in item)
     ]
     for fact in candidates:
+        requirements = fact.get("unresolved_requirements", [])
+        if (source.get("parser_version") in {REVIEWED_DATED_PARSER, LEGACY_STATEMENT_PARSER}
+                and "source_identity_verification" in requirements):
+            reasons.append("The filing has not been matched to the reviewed verification reference.")
+            # A metadata mismatch with the reviewed filing does not establish a mismatch with this original.
+            requirements = [
+                item for item in requirements if item != "source_identity_verification"
+                and not item.startswith("supplied_")
+            ]
         reasons.extend({
             "applicable_notes": "The applicable filing disclosures need verification.",
-        }.get(item, item.replace("_", " ") + ".") for item in fact.get("unresolved_requirements", []))
+        }.get(item, item.replace("_", " ").capitalize() + ".") for item in requirements)
     detail = " ".join(dict.fromkeys([explanation, *reasons]))
     return "unverified", f"FY{year} revenue evidence gap. {detail}"
 
@@ -203,9 +213,13 @@ def _equal_length_issue(prior: dict[str, Any], current: dict[str, Any]) -> str |
     return f"{spans[0]} and {spans[1]}. The reported annual amounts do not meet the requested equal-length comparison."
 
 
-def _citations(operands: list[dict[str, Any]], comparison: dict[str, Any]) -> list[dict[str, Any]]:
+def _citations(
+    operands: list[dict[str, Any]], comparison: dict[str, Any], *, include_statement_context: bool = False,
+) -> list[dict[str, Any]]:
     return [
-        *(revenue_cell_citation(fact, fact["role"]) for fact in operands),
+        *(revenue_cell_citation(fact, fact["role"], include_statement_context=(
+            include_statement_context and fact.get("parser_version") == LEGACY_STATEMENT_PARSER
+        )) for fact in operands),
         *disclosure_citations(operands, comparison).values(),
     ]
 

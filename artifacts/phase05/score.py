@@ -113,6 +113,8 @@ def score_statement_periods(lines: list[bytes], review: dict[str, Any], run: dic
         len(year_locators) == len(review["facts"])
         and len({position(lines, locator) for locator in year_locators}) == len(year_locators)
         and all(within(position(lines, locator), period_span) for locator in year_locators)
+        and within(position(lines, context["annual_header"]), period_span)
+        and within(position(lines, context["statement_heading"]), review["locators"]["statement_title_and_units"])
         and within(position(lines, context["metric_label"]), review["locators"]["revenue_row"])
         and review["statement_row"].casefold() in excerpt.casefold()
         and set(re.findall(r"\b(?:19|20)\d{2}\b", excerpt)) == set(review["facts"])
@@ -185,7 +187,7 @@ def score_case(
         verified_roles = {role for role, passed in verified.items() if passed}
         partial_supported = (
             verified_roles <= actual.keys() and correct_facts
-            and (citations["supported"] if actual else not citations["links"])
+            and (citations["supported"] if actual else set(citations["links"]) <= {"statement-periods"})
         )
         if label["outcome"] == "absent_year":
             reason_supported = missing_years == [int(year) for year in roles.values() if year not in review["facts"]]

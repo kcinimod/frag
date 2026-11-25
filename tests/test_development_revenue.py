@@ -11,7 +11,7 @@ from test_chat_growth import QUESTION, growth_plan
 from test_source_workflow import success
 
 from frag.lookup import ask_revenue
-from frag.store import SourceStore
+from frag.store import SourceMetadata, SourceStore
 from frag.web import create_app
 
 ARCHIVE = Path(__file__).parents[1] / "artifacts/phase04/development/originals/aapl-20230930.htm.gz"
@@ -114,7 +114,9 @@ def test_apple_lookup_distinguishes_absent_and_unverified_years(tmp_path: Path) 
     source = store.ingest_bytes(gzip.decompress(ARCHIVE.read_bytes()), provenance="local_original")
     later = store.ingest_bytes(gzip.decompress(
         (ARCHIVE.parents[3] / "phase05/originals/aapl-20240928.htm.gz").read_bytes()
-    ), provenance="local_original")
+    ), provenance="local_original", metadata=SourceMetadata(
+        company="Apple Inc.", form="10-K", accession="0000320193-24-000123", filing_date="2024-11-01",
+    ))
     for filing, year, code in ((source, 2020, "absent"), (later, 2024, "unverified")):
         saved = tmp_path / f"lookup-gap-{year}.json"
         question = f"What was revenue in FY{year}?"
@@ -129,16 +131,22 @@ def test_apple_lookup_distinguishes_absent_and_unverified_years(tmp_path: Path) 
         assert headers.status_code == (200 if code == "absent" else 404)
         if code == "unverified":
             assert "disclosures" in result["message"]
+            assert "reviewed verification reference" in result["message"]
+            assert "accession conflict" not in result["message"]
             assert result["citations"] == []
 
 
 def test_incomplete_period_headers_cannot_establish_absence(tmp_path: Path) -> None:
     original = gzip.decompress(ARCHIVE.read_bytes())
     header = b"September 24,<br/>2022</span></td>"
-    # A synthetic mutation leaves the FY2022 revenue cell under a blank header.
-    # The consolidated statement has the first occurrence of this header.
-    original = original.replace(header, b"</span></td>", 1)
-    assert b"394,328</ix:nonFraction>" in original
+    # A synthetic mutation moves FY2022 to a separate header row and blanks its total.
+    header_position = original.index(header)
+    end_of_row = original.index(b"</tr>", header_position) + len(b"</tr>")
+    original = (
+        original[:end_of_row].replace(header, b"</span></td>", 1)
+        + b'<tr><td colspan="9"></td><td colspan="3">Fiscal year ending September 24, 2022</td></tr>'
+        + original[end_of_row:]
+    ).replace(b"394,328</ix:nonFraction>", b"</ix:nonFraction>", 1)
     store = SourceStore(tmp_path / "store")
     source = store.ingest_bytes(original, provenance="local_original")
     result = success("ask", source["source_id"], "What was revenue in FY2022?", "--store", str(store.root))
@@ -236,7 +244,7 @@ def test_apple_lookup_opens_the_original_dated_statement_offline(
     (b'383,285</ix:nonFraction>&#160;</span>', b'383,285</ix:nonFraction>8&#160;</span>',
      "displayed revenue amount"),
     (b"Basis of Presentation and Preparation", b"Basis of Presentation and Reporting",
-     "note 1 boundary or content"),
+     "Note 1 boundary or content"),
 ])
 def test_synthetic_disagreement_returns_a_specific_lookup_gap(
     tmp_path: Path, before: bytes, after: bytes, gap: str,
