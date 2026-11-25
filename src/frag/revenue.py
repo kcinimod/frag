@@ -9,7 +9,7 @@ from typing import Any
 
 from frag.income_html import (
     EvidenceText, GridCell, GridRow, StatementHTML, Table, UnsupportedLayout,
-    is_statement_heading, table_grid,
+    is_statement_heading, statement_periods, table_grid,
 )
 
 PARSER_VERSION = "annual-revenue-v4"
@@ -57,13 +57,15 @@ def extract_revenue(
         result["parser_version"] = parser_version
         if len(document.tables) != 1:
             raise UnsupportedLayout("Expected exactly one table headed Income Statements.")
-        facts, diagnostics = _extract_table(document, document.tables[0], source, target_years)
+        facts, diagnostics, coverage = _extract_table(document, document.tables[0], source, target_years)
         for fact in facts:
             fact["parser_version"] = parser_version
     except (UnsupportedLayout, UnicodeDecodeError) as exc:
         result["diagnostics"] = [{"code": "unsupported_layout", "message": str(exc)}]
         return result
     result.update(facts=facts, diagnostics=diagnostics)
+    if coverage and source["provenance"]["kind"] != "synthetic":
+        result["statement_periods"] = coverage
     if not diagnostics:
         result["unresolved_requirements"].remove("extraction")
     return result
@@ -97,7 +99,7 @@ def matches_microsoft_company(company: str | None) -> bool:
 def _extract_table(
     document: StatementHTML, table: Table, source: dict[str, Any],
     target_years: tuple[int, int],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any] | None]:
     rows = table_grid(table)
     labels = [
         entry for row in rows for entry in row.cells
@@ -114,6 +116,7 @@ def _extract_table(
         raise UnsupportedLayout("Expected one annual period header above Total revenue.")
     annual = annual_headers[0]
     year_cells = _year_headers(header_rows, annual, target_years)
+    coverage = statement_periods(table, annual, year_cells, label, [row.cells for row in rows])
     value_row = rows[label.row - 1]
     # Unit disclosures may appear in a distinct row or in a merged header.
     unit_cells = [entry for row in header_rows for entry in row.cells if SCALE.search(entry.cell.text)]
@@ -144,7 +147,7 @@ def _extract_table(
                 })
     if not facts and diagnostics:
         raise UnsupportedLayout(diagnostics[0]["message"])
-    return facts, diagnostics
+    return facts, diagnostics, coverage
 
 
 def _year_headers(

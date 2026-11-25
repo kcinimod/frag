@@ -36,8 +36,9 @@ def test_retained_microsoft_growth_through_offline_cli(tmp_path: Path) -> None:
     missing = success("growth", source["source_id"], "2021", "2023", "--store", store)
     assert missing["percent"] is None
     issue, = missing["issues"]
-    assert (issue["code"], issue["role"], issue["fiscal_year"]) == ("missing", "prior", 2021)
+    assert (issue["code"], issue["role"], issue["fiscal_year"]) == ("unverified", "prior", 2021)
     assert "FY2021 revenue evidence gap" in issue["detail"]
+    assert "The statement shows this year" in issue["detail"]
     assert missing["operands"][0]["fact_id"] == source["facts"][1]["fact_id"]
     assert missing["operands"][0]["status"] == "verified"
 
@@ -122,7 +123,7 @@ def test_synthetic_unavailable_growth_preserves_verified_current_revenue(reason:
 
     assert result["status"] == "unavailable"
     assert result["percent"] is None and result["absolute_change"] is None
-    assert [issue["code"] for issue in result["issues"]] == [reason]
+    assert [issue["code"] for issue in result["issues"]] == ["incompatible" if reason == "incompatible" else "unverified"]
     if reason == "incompatible":
         assert "segment recast" in result["issues"][0]["detail"]
     assert result["operands"][-1]["fact_id"] == "synthetic:2023"

@@ -99,6 +99,26 @@ def score_citations(
     }
 
 
+def score_statement_periods(lines: list[bytes], review: dict[str, Any], run: dict[str, Any]) -> bool:
+    citation = next((item for item in run["result"].get("citations", [])
+                     if item["id"] == "statement-periods"), None)
+    opened = run["citations"].get("statement-periods", {})
+    if citation is None or opened.get("http_status") != 200:
+        return False
+    context = citation["context_locators"]
+    year_locators = [context[key] for key in context if key.startswith("year_")] + [citation["locator"]]
+    _, _, excerpt = opened["text"].partition("\n\n")
+    period_span = review["locators"]["period_header"]
+    return (
+        len(year_locators) == len(review["facts"])
+        and len({position(lines, locator) for locator in year_locators}) == len(year_locators)
+        and all(within(position(lines, locator), period_span) for locator in year_locators)
+        and within(position(lines, context["metric_label"]), review["locators"]["revenue_row"])
+        and review["statement_row"].casefold() in excerpt.casefold()
+        and set(re.findall(r"\b(?:19|20)\d{2}\b", excerpt)) == set(review["facts"])
+    )
+
+
 def original_observation(actual: dict[str, Any], expected: dict[str, Any], lines: list[bytes]) -> bool:
     value = actual.get("locators", {}).get("value")
     return bool(value and fact_matches(actual, expected)
@@ -149,7 +169,7 @@ def score_case(
     accurate = None
     grounded = None
     issues = result.get("issues", [])
-    missing_years = [issue["fiscal_year"] for issue in issues if issue["code"] == "missing"]
+    missing_years = [issue["fiscal_year"] for issue in issues if issue["code"] in {"missing", "absent"}]
     if answerable:
         accurate = numeric and set(actual) == set(wanted) and correct_facts
         if accurate and growth:
@@ -169,6 +189,9 @@ def score_case(
         )
         if label["outcome"] == "absent_year":
             reason_supported = missing_years == [int(year) for year in roles.values() if year not in review["facts"]]
+            if record.get("version") == 5:
+                reason_supported = (reason_supported and any(issue["code"] == "absent" for issue in issues)
+                                    and score_statement_periods(lines, review, run))
         else:
             reason_supported = not missing_years and any(
                 issue["code"] == "incompatible"

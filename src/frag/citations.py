@@ -18,6 +18,21 @@ def has_citable_amount(fact: dict[str, Any]) -> bool:
     )
 
 
+def statement_period_citation(source: dict[str, Any]) -> dict[str, Any]:
+    statement = source["statement_periods"]
+    *earlier, last = sorted(statement["period_headers"].items())
+    return {
+        "id": "statement-periods", "title": "Consolidated revenue statement periods",
+        "locator": last[1],
+        "context_locators": {
+            "statement_heading": statement["heading"],
+            "metric_label": statement["metric_label"],
+            "annual_header": statement["annual_header"],
+            **{f"year_{year}": locator for year, locator in earlier},
+        },
+    }
+
+
 def revenue_cell_citation(
     fact: dict[str, Any], citation_id: str, *, include_statement_context: bool = False,
 ) -> dict[str, Any]:
@@ -145,7 +160,7 @@ def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
     fragment = _fragment_at(lines, locator)
     if key == "statement_heading" and re.match(r"<(?:td|th)[\s>]", fragment, re.IGNORECASE):
         return _cell_text(lines, locator)
-    tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]"
+    tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]|caption"
     start = re.match(rf"<({tags})[\s>]", fragment, re.IGNORECASE)
     boundary = r"|(?=<table[\s>])" if key == "unit_header" else ""
     if not start:

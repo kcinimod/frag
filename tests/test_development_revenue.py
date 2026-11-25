@@ -72,7 +72,8 @@ def test_apple_growth_question_opens_both_original_cells_and_replays(tmp_path: P
 
 
 @pytest.mark.parametrize(("prior", "gap", "supported", "citation_ids"), [
-    (2020, "No unique annual revenue observation", [2023], ["current", "note-1", "note-2", "note-13"]),
+    (2020, "FY2020 is absent from the consolidated revenue statement", [2023],
+     ["current", "note-1", "note-2", "note-13", "statement-periods"]),
     (2021, "verified comparative and current pair", [2021, 2023], ["prior", "current", "note-1", "note-2", "note-13"]),
 ])
 def test_apple_unsupported_growth_keeps_verified_observations_and_replays(
@@ -99,7 +100,51 @@ def test_apple_unsupported_growth_keeps_verified_observations_and_replays(
     query = f"?prior={prior}&current=2023"
     assert "383,285" in client.get(base + "/current" + query).text
     if prior == 2020:
+        assert result["issues"][0]["code"] == "absent"
         assert client.get(base + "/prior" + query).status_code == 404
+        headers = client.get(base + "/statement-periods" + query)
+        assert headers.status_code == 200
+        for text in ("CONSOLIDATED STATEMENTS OF OPERATIONS", "Total net sales", "September 25, 2021",
+                     "September 24, 2022", "September 30, 2023", source["source_hash"]):
+            assert text in " ".join(headers.text.split())
+
+
+def test_apple_lookup_distinguishes_absent_and_unverified_years(tmp_path: Path) -> None:
+    store = SourceStore(tmp_path / "store")
+    source = store.ingest_bytes(gzip.decompress(ARCHIVE.read_bytes()), provenance="local_original")
+    later = store.ingest_bytes(gzip.decompress(
+        (ARCHIVE.parents[3] / "phase05/originals/aapl-20240928.htm.gz").read_bytes()
+    ), provenance="local_original")
+    for filing, year, code in ((source, 2020, "absent"), (later, 2024, "unverified")):
+        saved = tmp_path / f"lookup-gap-{year}.json"
+        question = f"What was revenue in FY{year}?"
+        result = success("ask", filing["source_id"], question, "--store", str(store.root), "--record", str(saved))
+        assert result["status"] == "evidence_unavailable"
+        assert result["reason"] == code
+        assert success("replay-ask", str(saved), "--store", str(store.root)) == result
+        client = create_app(store, tmp_path, planner=lambda _: pytest.fail("Evidence gap reached the planner")).test_client()
+        base = f'/api/sources/{filing["source_id"]}/lookup'
+        assert client.post(base, json={"question": question}, headers={"X-Frag-Ask": "1"}).get_json() == result
+        headers = client.get(f"{base}/citations/{year}/statement-periods")
+        assert headers.status_code == (200 if code == "absent" else 404)
+        if code == "unverified":
+            assert "disclosures" in result["message"]
+            assert result["citations"] == []
+
+
+def test_incomplete_period_headers_cannot_establish_absence(tmp_path: Path) -> None:
+    original = gzip.decompress(ARCHIVE.read_bytes())
+    header = b"September 24,<br/>2022</span></td>"
+    # A synthetic mutation leaves the FY2022 revenue cell under a blank header.
+    # The consolidated statement has the first occurrence of this header.
+    original = original.replace(header, b"</span></td>", 1)
+    assert b"394,328</ix:nonFraction>" in original
+    store = SourceStore(tmp_path / "store")
+    source = store.ingest_bytes(original, provenance="local_original")
+    result = success("ask", source["source_id"], "What was revenue in FY2022?", "--store", str(store.root))
+    assert result["reason"] == "unverified"
+    assert "did not establish the statement periods" in result["message"]
+    assert result["citations"] == []
 
 
 def test_pre_growth_apple_question_and_collection_records_still_replay(tmp_path: Path) -> None:
@@ -191,7 +236,7 @@ def test_apple_lookup_opens_the_original_dated_statement_offline(
     (b'383,285</ix:nonFraction>&#160;</span>', b'383,285</ix:nonFraction>8&#160;</span>',
      "displayed revenue amount"),
     (b"Basis of Presentation and Preparation", b"Basis of Presentation and Reporting",
-     "note_1_boundary_or_content"),
+     "note 1 boundary or content"),
 ])
 def test_synthetic_disagreement_returns_a_specific_lookup_gap(
     tmp_path: Path, before: bytes, after: bytes, gap: str,

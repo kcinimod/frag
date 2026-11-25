@@ -129,6 +129,8 @@ def inspect_revenue(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
         "basis": None, "evidence": [], "scope_caveats": [],
         "unresolved_requirements": ["supported_FY2022_and_FY2023"],
     }
+    if source["source_hash"] != REFERENCE["identity"]["source_hash"]:
+        result.pop("statement_periods", None)
     result.update(evidence_version=EVIDENCE_VERSION, comparison=comparison)
     result["unresolved_requirements"] = [
         *result["unresolved_requirements"], "comparison_compatibility",

@@ -5,25 +5,31 @@ from decimal import Context, Decimal
 from fractions import Fraction
 from typing import Any
 
-from frag.citations import has_citable_amount, revenue_cell_citation
+from frag.citations import has_citable_amount, revenue_cell_citation, statement_period_citation
+from frag.revenue import PARSER_VERSION as LEGACY_STATEMENT_PARSER
 from frag.store import SourceError
 
 FORMULA = "(current revenue - prior revenue) / prior revenue × 100"
+METRIC = "reported_consolidated_revenue"
+
+
+def annual_revenue_facts(source: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        fact for fact in source.get("facts", [])
+        if fact["source_id"] == source["source_id"] and fact["metric"] == METRIC
+        and fact["reporting_period"]["kind"] == "annual"
+    ]
 
 
 def assess_growth(
     source: dict[str, Any], prior_year: int, current_year: int, *, equal_length: bool = False,
+    legacy_gaps: bool = False,
 ) -> dict[str, Any]:
     """Resolve operands and check eligibility without executing a calculation."""
     if not 1 <= prior_year < current_year <= 9999:
         raise SourceError("Choose fiscal years with the prior year before the current year.")
 
-    facts = [
-        fact for fact in source.get("facts", [])
-        if fact["source_id"] == source["source_id"]
-        and fact["metric"] == "reported_consolidated_revenue"
-        and fact["reporting_period"]["kind"] == "annual"
-    ]
+    facts = annual_revenue_facts(source)
     comparison = source.get("comparison") or {}
     result: dict[str, Any] = {
         **{key: source.get(key) for key in ("source_id", "source_hash", "parser_version", "evidence_version")},
@@ -42,22 +48,15 @@ def assess_growth(
     selected = []
     for role, year in (("prior", prior_year), ("current", current_year)):
         candidates = [fact for fact in facts if fact["reporting_period"]["fiscal_year"] == year]
-        if len(candidates) != 1:
-            issue = {"code": "missing" if not candidates else "incompatible", "role": role, "fiscal_year": year}
-            if candidates:
-                issue["detail"] = f"Multiple reported consolidated revenue observations match FY{year}."
-            else:
-                issue["detail"] = _observation_gap(source, year)
-            result["issues"].append(issue)
-            continue
-        fact = candidates[0]
-        result["operands"].append({"role": role, **fact})
-        selected.append(fact)
-        if fact["status"] != "verified" or not has_citable_amount(fact):
-            result["issues"].append({
-                "code": "unverified", "role": role, "fiscal_year": year,
-                "detail": _observation_gap(source, year, fact),
-            })
+        fact = candidates[0] if len(candidates) == 1 else None
+        supported = fact is not None and fact["status"] == "verified" and has_citable_amount(fact)
+        if fact is not None and (supported or legacy_gaps):
+            result["operands"].append({"role": role, **fact})
+            selected.append(fact)
+        if not supported:
+            code, reason = (_legacy_growth_gap(source, year, candidates) if legacy_gaps
+                            else observation_gap(source, year, candidates))
+            result["issues"].append({"code": code, "role": role, "fiscal_year": year, "detail": reason})
 
     if not result["issues"]:
         prior, current = selected
@@ -76,13 +75,45 @@ def assess_growth(
             comparison.get("status") == "unresolved" and _matches_comparison_pair(comparison.get("fact_ids", []), supported)
         ) else {}
         result["citations"] = _citations(supported, comparison_evidence)
+        if any(issue["code"] == "absent" for issue in result["issues"]):
+            result["citations"].append(statement_period_citation(source))
     else:
         result.update(status="ready", comparison_basis=comparison.get("basis"),
                       scope_caveats=comparison.get("scope_caveats", []))
     return result
 
 
-def _observation_gap(source: dict[str, Any], year: int, fact: dict[str, Any] | None = None) -> str:
+def observation_gap(source: dict[str, Any], year: int, candidates: list[dict[str, Any]]) -> tuple[str, str]:
+    periods = (source.get("statement_periods") or {}).get("period_headers")
+    if periods and str(year) not in periods and not candidates:
+        listed = ", ".join(f"FY{period}" for period in sorted(periods))
+        return ("absent", f"FY{year} is absent from the consolidated revenue statement. "
+                f"The statement shows {listed}.")
+    if len(candidates) > 1:
+        explanation = "Multiple reported consolidated revenue observations match the requested year."
+    elif candidates:
+        explanation = "The extracted observation could not be verified."
+    elif periods:
+        explanation = "The statement shows this year, but extraction did not produce a revenue observation."
+    else:
+        explanation = "The available evidence did not establish the statement periods or a revenue observation."
+    reasons = [
+        item["message"] for item in source.get("diagnostics", [])
+        if item.get("fiscal_year", year) == year
+        and (source.get("parser_version") != LEGACY_STATEMENT_PARSER or "fiscal_year" in item)
+    ]
+    for fact in candidates:
+        reasons.extend({
+            "applicable_notes": "The applicable filing disclosures need verification.",
+        }.get(item, item.replace("_", " ") + ".") for item in fact.get("unresolved_requirements", []))
+    detail = " ".join(dict.fromkeys([explanation, *reasons]))
+    return "unverified", f"FY{year} revenue evidence gap. {detail}"
+
+
+def _legacy_growth_gap(source: dict[str, Any], year: int, candidates: list[dict[str, Any]]) -> tuple[str, str]:
+    if len(candidates) > 1:
+        return "incompatible", f"Multiple reported consolidated revenue observations match FY{year}."
+    fact = candidates[0] if candidates else None
     reasons = [
         item["message"] for item in source.get("diagnostics", [])
         if item.get("fiscal_year", year) == year
@@ -92,7 +123,7 @@ def _observation_gap(source: dict[str, Any], year: int, fact: dict[str, Any] | N
     if not reasons:
         reasons.append("No unique annual revenue observation was found." if fact is None
                        else "The annual revenue observation has not passed verification.")
-    return f"FY{year} revenue evidence gap. " + " ".join(reasons)
+    return ("unverified" if fact is not None else "missing"), f"FY{year} revenue evidence gap. " + " ".join(reasons)
 
 
 def calculate_growth(

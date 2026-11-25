@@ -297,7 +297,7 @@ def test_dated_statement_disclosures_qualify_the_affected_observations(
     if 2023 not in verified_years:
         result = ask_revenue(source, "What was revenue in FY2023?", propose)
         assert result["status"] == "evidence_unavailable"
-        assert "applicable_notes" in result["message"]
+        assert "applicable filing disclosures" in result["message"]
 
 
 def test_unseen_issuer_lookup_opens_original_evidence_offline(
@@ -369,15 +369,15 @@ def test_unseen_issuer_lookup_opens_original_evidence_offline(
      b'contextRef="c-8" decimals="-6" name="us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax"'
      b' format="ixt:num-dot-decimal" scale="6" id="f-137"',
      "displayed fiscal year-end"),
-    (b"including sales and indirect taxes", b"including unrelated charges", "applicable_notes"),
+    (b"including sales and indirect taxes", b"including unrelated charges", "applicable filing disclosures"),
     (b"transactions between consolidated entities are eliminated",
-     b"transactions between consolidated entities are not eliminated", "applicable_notes"),
+     b"transactions between consolidated entities are not eliminated", "applicable filing disclosures"),
     (b"(in millions, except per share data)",
      b"(in millions of Canadian dollars, except per share data)", "currency or scale declaration"),
     (b"FINANCIAL INSTRUMENTS</ix:nonNumeric></span></div>",
      b"FINANCIAL INSTRUMENTS</ix:nonNumeric></span></div>"
      b"<div>FY2023 net sales were on a different basis and should not be used until corrected.</div>",
-     "applicable_notes"),
+     "applicable filing disclosures"),
 ])
 def test_synthetic_evidence_conflicts_block_lookup(
     tmp_path: Path, original_text: bytes, changed_text: bytes, reason: str,
@@ -395,7 +395,7 @@ def test_synthetic_evidence_conflicts_block_lookup(
     result = ask_revenue(source, "What was revenue in FY2023?", propose)
     assert result["status"] == "evidence_unavailable"
     assert reason in result["message"]
-    if reason in {"applicable_notes", "visible statement scale"}:
+    if reason in {"applicable filing disclosures", "visible statement scale"}:
         fact = next(item for item in source["facts"] if item["reporting_period"]["fiscal_year"] == 2023)
         assert fact["status"] == "provisional"
         assert fact["normalized_amount"] == "574785000000"

@@ -7,18 +7,19 @@ from time import perf_counter
 from typing import Any, Literal, NotRequired, TypedDict
 
 from frag import dated_revenue
-from frag.citations import has_citable_amount, revenue_cell_citation
-from frag.growth import assess_growth, calculate_growth, disclosure_citations
+from frag.citations import has_citable_amount, revenue_cell_citation, statement_period_citation
+from frag.growth import METRIC as METRIC
+from frag.growth import annual_revenue_facts, assess_growth, calculate_growth, disclosure_citations, observation_gap
 from frag.local_model import MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable
 from frag.revenue import PARSER_VERSION as LEGACY_STATEMENT_PARSER
 from frag.store import SourceError
 
 Planner = Callable[[dict[str, Any]], str]
-METRIC = "reported_consolidated_revenue"
 RECORD_VERSION = 1
 DATED_GROWTH_RECORD_VERSION = 2
 STATEMENT_LOOKUP_RECORD_VERSION = 3
 ORIGINAL_GROWTH_RECORD_VERSION = 4
+EVIDENCE_GAP_RECORD_VERSION = 5
 REVENUE = r"(?:(?:annual|reported|consolidated|total) )*revenue"
 YEAR = r"(?:fy ?|fiscal year )?([1-9][0-9]{3})"
 LOOKUP = re.compile(
@@ -77,12 +78,8 @@ def resolve_request(question: str) -> ResolvedRequest | None:
 
 def _eligible_facts(source: dict[str, Any]) -> list[dict[str, Any]]:
     return [
-        fact for fact in source.get("facts", [])
-        if fact["source_id"] == source["source_id"]
-        and fact["metric"] == METRIC
-        and fact["reporting_period"]["kind"] == "annual"
-        and fact["status"] == "verified"
-        and has_citable_amount(fact)
+        fact for fact in annual_revenue_facts(source)
+        if fact["status"] == "verified" and has_citable_amount(fact)
     ]
 
 
@@ -91,7 +88,11 @@ def _facts_for_year(facts: list[dict[str, Any]], year: int) -> list[dict[str, An
 
 
 def lookup_citation(source: dict[str, Any], year: int, citation_id: str) -> dict[str, Any] | None:
-    facts = _facts_for_year(_eligible_facts(source), year)
+    eligible = _eligible_facts(source)
+    if citation_id == "statement-periods":
+        gap = _lookup_gap(source, eligible, year)
+        return gap["citations"][0] if gap and gap["reason"] == "absent" else None
+    facts = _facts_for_year(eligible, year)
     if len(facts) != 1:
         return None
     return next((item for item in _lookup_citations(facts[0]) if item["id"] == citation_id), None)
@@ -313,7 +314,7 @@ def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
     return RECORD_VERSION
 
 
-def _dated_lookup_gap(
+def _legacy_dated_lookup_gap(
     source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
 ) -> dict[str, Any] | None:
     if request["operation"] != "lookup" or source.get("parser_version") not in dated_revenue.FILING_SCOPED_PARSERS:
@@ -329,13 +330,27 @@ def _dated_lookup_gap(
     return {"status": "evidence_unavailable", "message": f"FY{year} revenue evidence gap. " + " ".join(reasons)}
 
 
+def _lookup_gap(source: dict[str, Any], eligible: list[dict[str, Any]], year: int) -> dict[str, Any] | None:
+    if len(_facts_for_year(eligible, year)) == 1:
+        return None
+    candidates = _facts_for_year(annual_revenue_facts(source), year)
+    reason, message = observation_gap(source, year, candidates)
+    return {
+        "status": "evidence_unavailable", "fiscal_year": year, "reason": reason, "message": message,
+        "citations": [statement_period_citation(source)] if reason == "absent" else [],
+    }
+
+
 def _question_gap(
     source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest,
+    *, legacy: bool = False,
 ) -> dict[str, Any] | None:
     if request["operation"] == "lookup":
-        return _dated_lookup_gap(source, facts, request)
+        if legacy:
+            return _legacy_dated_lookup_gap(source, facts, request)
+        return _lookup_gap(source, facts, request["fiscal_year"])
     growth = assess_growth(source, request["prior_year"], request["current_year"],
-                           equal_length=request.get("equal_length", False))
+                           equal_length=request.get("equal_length", False), legacy_gaps=legacy)
     if growth["status"] == "unavailable":
         return {"operation": "growth", **growth}
     return None
@@ -357,6 +372,7 @@ def ask_revenue(
     model_ms = None
     execution_start: float | None = perf_counter()
     outcome = _question_gap(source, facts, request)
+    version = EVIDENCE_GAP_RECORD_VERSION if outcome is not None else _record_version(source, request)
     if outcome is None:
         execution_start = None
         model_start = perf_counter()
@@ -376,7 +392,7 @@ def ask_revenue(
     result = {**_identity(source), **outcome}
     if record is not None:
         record.update({
-            "version": _record_version(source, request),
+            "version": version,
             "question": question,
             "resolved_request": request,
             "source": _identity(source),
@@ -420,7 +436,7 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
     expected_version = _record_version(source, request)
     old_original_growth = (version == DATED_GROWTH_RECORD_VERSION
                            and expected_version == ORIGINAL_GROWTH_RECORD_VERSION)
-    if version not in (RECORD_VERSION, expected_version) and not old_original_growth:
+    if version not in (RECORD_VERSION, expected_version, EVIDENCE_GAP_RECORD_VERSION) and not old_original_growth:
         raise SourceError("The validation record must contain a supported saved question.")
     if old_original_growth:
         source = source | {"comparison": dated_revenue.legacy_comparison()}
@@ -432,8 +448,13 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         raise SourceError("The saved source or evidence does not match the current filing evidence.")
     saved_payload = record.get("model_request")
     # Older records may contain a model proposal for a growth question with missing evidence.
-    gap = (_question_gap(source, facts, request) if saved_payload is None
-           else _dated_lookup_gap(source, facts, request))
+    if version == EVIDENCE_GAP_RECORD_VERSION:
+        gap = _question_gap(source, facts, request)
+        if gap is None:
+            raise SourceError("The saved evidence gap does not match the current filing evidence.")
+    else:
+        gap = (_question_gap(source, facts, request, legacy=True) if saved_payload is None
+               else _legacy_dated_lookup_gap(source, facts, request))
     if gap is not None:
         if "proposed_plan" not in record or proposal is not None or "model_request" not in record or saved_payload is not None:
             raise SourceError("The saved evidence gap must record that no model request was made.")

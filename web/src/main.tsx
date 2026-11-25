@@ -97,10 +97,10 @@ function secRequest<T>(path: string, data?: Record<string, string>): Promise<T> 
 }
 
 type GrowthIssue = {
-  code: 'missing' | 'unverified' | 'incompatible';
+  code: 'absent' | 'unverified' | 'incompatible';
   role: 'prior' | 'current' | null;
   fiscal_year: number | null;
-  detail?: string;
+  detail: string;
 };
 
 type GrowthResult = {
@@ -117,16 +117,6 @@ type GrowthResult = {
   scope_caveats: string[];
   evidence_version: string | null;
 };
-
-function growthIssueText(issue: GrowthIssue) {
-  if (issue.detail) return issue.detail;
-  const period = issue.role ? `FY${issue.fiscal_year} (${issue.role})` : 'The selected fiscal years';
-  switch (issue.code) {
-    case 'missing': return `Missing reported consolidated revenue for ${period}.`;
-    case 'unverified': return `Unverified reported consolidated revenue for ${period}.`;
-    case 'incompatible': return `Comparison evidence is incompatible or unresolved for ${period}.`;
-  }
-}
 
 function GrowthCalculator({ source }: { source: Source }) {
   const comparativeYears = source.facts.filter(fact => fact.comparative).map(fact => fact.reporting_period.fiscal_year);
@@ -200,7 +190,7 @@ function GrowthAnswer({ result, path }: { result: GrowthResult; path?: string })
         </>
       )}
       {result.issues.map(issue => (
-        <p key={issue.role ?? 'comparison'}>{growthIssueText(issue)}</p>
+        <p key={issue.role ?? 'comparison'}>{issue.detail}</p>
       ))}
       {result.trace.length > 0 && (
         <>
@@ -240,8 +230,9 @@ function GrowthAnswer({ result, path }: { result: GrowthResult; path?: string })
 
 type RevenueAnswer =
   | { status: 'answered'; fiscal_year: number; fact: RevenueFact; citations: { id: string; title: string }[] }
+  | { status: 'evidence_unavailable'; fiscal_year: number; message: string; citations: { id: string; title: string }[] }
   | (GrowthResult & { status: 'calculated' | 'undefined_zero_baseline' | 'unavailable'; operation: 'growth' })
-  | { status: 'clarify' | 'model_unavailable' | 'model_timeout' | 'invalid_plan' | 'evidence_unavailable'; message: string };
+  | { status: 'clarify' | 'model_unavailable' | 'model_timeout' | 'invalid_plan'; message: string };
 
 type CitationLink = { title: string; href: string };
 
@@ -313,14 +304,16 @@ function RevenueChat({ source }: { source: Source }) {
           <>
             <p><strong>FY{result.fiscal_year} reported consolidated revenue</strong></p>
             <p className="growth-value">{revenueAmount(result.fact)}</p>
-            <LookupCitations citations={result.citations.map(citation => ({
-              title: citation.title,
-              href: `${path}/citations/${result.fiscal_year}/${encodeURIComponent(citation.id)}`,
-            }))} />
           </>
         )}
         {result && 'operation' in result && <GrowthAnswer result={result} path={`${sourcePath}/growth`} />}
         {result && 'message' in result && <p>{result.message}</p>}
+        {(result?.status === 'answered' || result?.status === 'evidence_unavailable') && (
+          <LookupCitations citations={result.citations.map(citation => ({
+            title: citation.title,
+            href: `${path}/citations/${result.fiscal_year}/${encodeURIComponent(citation.id)}`,
+          }))} />
+        )}
       </div>
     </section>
   );

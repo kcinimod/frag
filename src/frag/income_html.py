@@ -3,6 +3,7 @@
 import re
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
+from typing import Any
 
 BASIS_NOTE_HEADING = re.compile(r"Note 1\s*:\s*Basis of Presentation", re.I)
 ACCOUNTING_POLICIES_HEADING = re.compile(r"Note 2\s*:\s*Accounting Policies", re.I)
@@ -371,6 +372,30 @@ class GridCell:
 class GridRow:
     cells: list[GridCell]
     width: int
+
+
+def statement_periods(
+    table: Table, annual: GridCell, headers: dict[int, GridCell], label: GridCell,
+    rows: list[list[GridCell]],
+) -> dict[str, Any] | None:
+    """Capture the complete displayed period inventory independently of extracted facts."""
+    heading = table.caption if table.caption and is_statement_heading(table.caption.text) else table.heading
+    header_rows = {entry.row for entry in headers.values()}
+    if heading is None or len(headers) < 2 or len(header_rows) != 1:
+        return None
+    header_row = rows[next(iter(header_rows)) - 1]
+    if any(entry.cell.text and entry is not annual and entry.columns.start >= label.columns.stop
+           and entry not in headers.values() for entry in header_row):
+        return None
+    if any(entry.cell.text and entry is not label
+           and not any(set(entry.columns) <= set(header.columns) for header in headers.values())
+           for entry in rows[label.row - 1]):
+        return None
+    return {
+        "heading": heading.locator(), "annual_header": annual.locator(table),
+        "metric_label": label.locator(table),
+        "period_headers": {str(year): header.locator(table) for year, header in sorted(headers.items())},
+    }
 
 
 def table_grid(table: Table) -> list[GridRow]:

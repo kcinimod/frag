@@ -237,15 +237,6 @@ class SourceStore:
             "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'extractions'"
         ).fetchone() is None:
             return None
-        legacy_row = connection.execute(
-            "SELECT result FROM extractions WHERE source_id = ? AND parser_version = ?",
-            (source_id, RESULT_VERSION),
-        ).fetchone()
-        if legacy_row is not None:
-            legacy: dict[str, Any] = json.loads(legacy_row[0])
-            if legacy["facts"]:
-                return legacy
-        # Previously unsupported inputs can now resolve under the dated layout.
         row = connection.execute(
             "SELECT result FROM extractions WHERE source_id = ? AND parser_version = ?",
             (source_id, _extraction_cache_version()),

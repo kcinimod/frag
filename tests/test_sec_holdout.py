@@ -47,7 +47,7 @@ else:
     live = control("run")
     assert live["result"]["status"] == "unavailable"
     assert live["result"]["percent"] is None
-    assert any("FY2020 revenue evidence gap" in issue["detail"] for issue in live["result"]["issues"])
+    assert any(issue["code"] == "absent" and issue["fiscal_year"] == 2020 for issue in live["result"]["issues"])
     assert live["record"]["model_request"] is None
     assert "383,285" in live["citations"]["current"]["text"]
     assert control("replay") == {"status": "matched"}

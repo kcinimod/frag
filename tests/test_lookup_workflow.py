@@ -102,24 +102,21 @@ def test_one_attempt_and_distinct_lookup_failures(tmp_path: Path, proposal: str 
     assert growth.get_json()["percent"]["value"] == "6.88"
 
 
-@pytest.mark.parametrize("valid_shape", [True, False])
 def test_provisional_synthetic_revenue_never_reaches_the_planner_as_evidence(
-    tmp_path: Path, valid_shape: bool,
+    tmp_path: Path,
 ) -> None:
     store = SourceStore(tmp_path / "store")
     source = store.ingest(FIXTURE.with_name("synthetic_income.html"), provenance="synthetic")
-    fact_id = source["facts"][1]["fact_id"]
-
     def propose(payload: dict[str, Any]) -> str:
-        assert json.loads(payload["messages"][1]["content"])["evidence"] == []
-        return json.dumps({"operation": "lookup", "fact_id": fact_id}) if valid_shape else "{"
+        pytest.fail("Provisional evidence reached the planner")
 
     client = create_app(store, tmp_path, planner=propose).test_client()
     base = f'/api/sources/{source["source_id"]}/lookup'
     response = client.post(
         base, json={"question": "What was FY2023 revenue?"}, headers={"X-Frag-Ask": "1"},
     )
-    assert response.get_json()["status"] == ("evidence_unavailable" if valid_shape else "invalid_plan")
+    assert response.get_json()["status"] == "evidence_unavailable"
+    assert response.get_json()["reason"] == "unverified"
     assert client.get(base + "/citations/2023/revenue").status_code == 404
 
 
