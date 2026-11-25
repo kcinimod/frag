@@ -129,3 +129,11 @@ Phase 2 calculator and its offline results.
   19 corroborated annual observations, and zero issuer overlap with either
   prior cohort. The separate runner and scorer archives are in local custody.
   [Phase 5 holdout handoff](../artifacts/phase05/SEC_HOLDOUT.md)
+
+- Issue #33 validated the stricter scorer on the 15 development questions.
+  All 30 saved results and citations reproduced offline. Altering one saved
+  result and one saved excerpt produced exactly two replay mismatches. The
+  scorer rejected the contradicted missing-year control and the existing
+  Microsoft growth citation gap. The cold and warm passes each completed
+  13 of 15 cases.
+  [Scorer and offline replay controls](../artifacts/phase05/ACCEPTANCE_SCORER.md)
