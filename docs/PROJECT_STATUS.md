@@ -116,3 +116,10 @@ Phase 2 calculator and its offline results.
   the percentage and retains both cited amounts. The fixed development run
   recorded 12/13 correct numeric answers and 30/30 offline replay matches.
   [Verified growth checkpoint](../artifacts/phase05/VERIFIED_GROWTH.md)
+
+- Issue #31 distinguishes absent statement periods from extraction and
+  verification gaps in filing-scoped lookup and growth. The CLI and Chrome
+  checked Apple and Microsoft examples against the preserved originals and
+  reopened the verified companion amounts and their disclosures. All 30
+  cold and warm development outcomes and citations matched in offline replay.
+  [Evidence gap checkpoint](../artifacts/phase05/EVIDENCE_GAPS.md)

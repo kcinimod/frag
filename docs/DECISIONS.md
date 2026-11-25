@@ -298,3 +298,13 @@ and 53-week pair can support growth on the reported calendar. A request for
 equal-length years requires matching durations. Both independently verified
 amounts remain available for lookup.
 [Verified growth checkpoint](../artifacts/phase05/VERIFIED_GROWTH.md)
+
+## Establish year absence from the statement headers
+
+Capture the displayed annual periods and source locators before verifying
+individual revenue observations. An absence claim requires a complete
+period inventory from the relevant consolidated statement. If a year is
+displayed or the period inventory is unresolved, a missing verified
+observation is an evidence gap. Retain independently verified growth
+operands with their statement and disclosure citations.
+[Evidence gap checkpoint](../artifacts/phase05/EVIDENCE_GAPS.md)
