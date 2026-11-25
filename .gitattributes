@@ -15,3 +15,6 @@ artifacts/phase05/holdout-freeze.json -text diff
 artifacts/phase05/holdout-score.json -text diff
 artifacts/phase05/custody.json -text diff
 artifacts/phase05/sec-holdout-receipt.json -text diff
+
+# Preserve the report and freeze bytes used in the Phase 6 baseline.
+artifacts/phase06/*.json -text diff

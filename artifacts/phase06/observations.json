@@ -1,0 +1,328 @@
+{
+  "opened": {
+    "reviewed_observations": 19,
+    "extraction_matches": 0,
+    "verified_facts": 0,
+    "originals": [
+      {
+        "accession": "0000354950-25-000085",
+        "cik": "0000354950",
+        "original": "hd-20250202.htm",
+        "sha256": "32532d3995ebeec9a1404d97ad3cfb1b72900b61c6928cb50481b203233eab84",
+        "observations": [
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0000040545-25-000015",
+        "cik": "0000040545",
+        "original": "ge-20241231.htm",
+        "sha256": "52a88621912de82629ca4cdde57d874becb1026918680c3f08794e6b1122d48f",
+        "observations": [
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0000021344-25-000011",
+        "cik": "0000021344",
+        "original": "ko-20241231.htm",
+        "sha256": "76aaad7db3748a585569fa92b4950461eab4a82897470fccb00aa6cd7596eca5",
+        "observations": [
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0001090727-25-000019",
+        "cik": "0001090727",
+        "original": "ups-20241231.htm",
+        "sha256": "0037db0b11b94778747a68aabe261b0af3e9749d420a35f1b19bfc8cce691819",
+        "observations": [
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0000858877-24-000017",
+        "cik": "0000858877",
+        "original": "csco-20240727.htm",
+        "sha256": "3df6a0e21e93cb933b6f5fa5684dece87d9ecbd115a59dd3960bf06db6bcb91b",
+        "observations": [
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0000080424-24-000083",
+        "cik": "0000080424",
+        "original": "pg-20240630.htm",
+        "sha256": "a4c1ce09c838abcb5050eccd2619b7f3930319c9b9b8a3d22c3628a57d631a08",
+        "observations": [
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": false,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0000040545-19-000014",
+        "cik": "0000040545",
+        "original": "ge10-k2018.htm",
+        "sha256": "b59da1c0ff38c92e7daa6c96ea5bc49315fcd3e782224e6ab653376c834dc6a2",
+        "observations": [
+          {
+            "fiscal_year": 2018,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      }
+    ]
+  },
+  "earlier": {
+    "reviewed_observations": 21,
+    "extraction_matches": 20,
+    "verified_facts": 17,
+    "originals": [
+      {
+        "accession": "0000950170-23-035122",
+        "cik": "0000789019",
+        "original": "msft-20230630.htm",
+        "sha256": "6506060f3f928e31abcbcfe46792ff4e0ae5c60bd9ad40964933c37ac854a9ea",
+        "observations": [
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2021,
+            "extraction_matched": false,
+            "verified": false
+          }
+        ]
+      },
+      {
+        "accession": "0000320193-23-000106",
+        "cik": "0000320193",
+        "original": "aapl-20230930.htm",
+        "sha256": "bda1f34435199672c16ecdf2034c650872d2cac8399ed0d179fc25450b080b90",
+        "observations": [
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2021,
+            "extraction_matched": true,
+            "verified": true
+          }
+        ]
+      },
+      {
+        "accession": "0001018724-24-000008",
+        "cik": "0001018724",
+        "original": "amzn-20231231.htm",
+        "sha256": "a469a0feca6dd5728b10c73076c2c120db58116938614c5b1b864fe13674266d",
+        "observations": [
+          {
+            "fiscal_year": 2021,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": true
+          }
+        ]
+      },
+      {
+        "accession": "0000104169-24-000056",
+        "cik": "0000104169",
+        "original": "wmt-20240131.htm",
+        "sha256": "b5d34a19ec27cb80ddda8d5140ccdaa8454bb2ba5ad4720667887238c55c0e09",
+        "observations": [
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": true
+          }
+        ]
+      },
+      {
+        "accession": "0001652044-24-000022",
+        "cik": "0001652044",
+        "original": "goog-20231231.htm",
+        "sha256": "787dd59d770312b204d144b4c78b8de23db1e1d53aae4bf37a52d6d874e903b2",
+        "observations": [
+          {
+            "fiscal_year": 2021,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": true
+          }
+        ]
+      },
+      {
+        "accession": "0000050863-24-000010",
+        "cik": "0000050863",
+        "original": "intc-20231230.htm",
+        "sha256": "3cbfebb819e981fdfaf9f4988a342aa048c924edb5c8cec2738b4883e534ee4e",
+        "observations": [
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": true
+          },
+          {
+            "fiscal_year": 2021,
+            "extraction_matched": true,
+            "verified": true
+          }
+        ]
+      },
+      {
+        "accession": "0000320193-24-000123",
+        "cik": "0000320193",
+        "original": "aapl-20240928.htm",
+        "sha256": "24a830a0f1256e371d36a1f7f72e5e85a38037d1de2f6f966eb8457db42ff6d6",
+        "observations": [
+          {
+            "fiscal_year": 2024,
+            "extraction_matched": true,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2023,
+            "extraction_matched": true,
+            "verified": false
+          },
+          {
+            "fiscal_year": 2022,
+            "extraction_matched": true,
+            "verified": false
+          }
+        ]
+      }
+    ]
+  }
+}

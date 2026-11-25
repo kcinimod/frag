@@ -1,0 +1,1088 @@
+{
+  "binding": {
+    "freeze_sha256": "1233e12a819e3596abf536b798a40e6184346bb6af5354c8ad0dcf4992d1b0f3",
+    "runner_sha256": "6fcbe48f14f1b5a8ca773ce437141605a1a62446dc1e74db750fb8f3ea925db8",
+    "manifest_sha256": "ee610feb0c307bf9cab05bd5d708c8e9bb0ba1eda1d2eae84165acc673c7ca9c"
+  },
+  "scorer_bundle_sha256": "36884eef3151e396aa023f6954eb3588f9fc22e2329d9b68f203dd5e1a14be3b",
+  "live_sha256": "f78afd7e56f533fb56d4d4dfafed6dd2ee0a72adeab50d5fca4c6183760d761a",
+  "replay_sha256": "a287a8c1d44d24fe2104552505243d6073a7fdd7c1aa23c161106adb3cbbdb3d",
+  "peak_working_set_mib": {
+    "runner": 61.59,
+    "planner": 513.16
+  },
+  "peak_device_vram_mib": 0,
+  "thresholds_per_pass": {
+    "grounded_abstentions": 3,
+    "supported_answers": 11
+  },
+  "cold": {
+    "accepted": false,
+    "metrics": {
+      "accuracy": [
+        0,
+        12
+      ],
+      "supported_answers": 0,
+      "citation_support_emitted": [
+        0,
+        0
+      ],
+      "grounded_abstentions": 1,
+      "coverage": [
+        0,
+        15
+      ],
+      "end_to_end": [
+        1,
+        15
+      ],
+      "offline_replay": [
+        15,
+        15
+      ]
+    },
+    "latency_ms": {
+      "min": 13.597,
+      "median": 20.137,
+      "max": 62.665
+    },
+    "stages": {
+      "extraction": 14,
+      "complete": 1
+    },
+    "findings": {
+      "unsupported_partial": 2,
+      "contradicted_abstention": 4,
+      "unsupported_citation": 1
+    },
+    "cases": [
+      {
+        "case_id": "P5-01",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-02",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-03",
+        "status": "unavailable",
+        "expected_outcome": "incompatible_periods",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "unsupported_partial",
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-04",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-05",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-06",
+        "status": "evidence_unavailable",
+        "expected_outcome": "present_unverifiable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": true,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": [],
+        "first_failure_stage": "complete",
+        "observations_extracted": {},
+        "observations_verified": {},
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-07",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-08",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-09",
+        "status": "unavailable",
+        "expected_outcome": "absent_year",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": false,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "unsupported_citation",
+          "unsupported_partial",
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-10",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-11",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-12",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-13",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-14",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-15",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      }
+    ]
+  },
+  "warm": {
+    "accepted": false,
+    "metrics": {
+      "accuracy": [
+        0,
+        12
+      ],
+      "supported_answers": 0,
+      "citation_support_emitted": [
+        0,
+        0
+      ],
+      "grounded_abstentions": 1,
+      "coverage": [
+        0,
+        15
+      ],
+      "end_to_end": [
+        1,
+        15
+      ],
+      "offline_replay": [
+        15,
+        15
+      ]
+    },
+    "latency_ms": {
+      "min": 12.042,
+      "median": 13.934,
+      "max": 19.625
+    },
+    "stages": {
+      "extraction": 14,
+      "complete": 1
+    },
+    "findings": {
+      "unsupported_partial": 2,
+      "contradicted_abstention": 4,
+      "unsupported_citation": 1
+    },
+    "cases": [
+      {
+        "case_id": "P5-01",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-02",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-03",
+        "status": "unavailable",
+        "expected_outcome": "incompatible_periods",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "unsupported_partial",
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-04",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-05",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-06",
+        "status": "evidence_unavailable",
+        "expected_outcome": "present_unverifiable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": true,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": [],
+        "first_failure_stage": "complete",
+        "observations_extracted": {},
+        "observations_verified": {},
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-07",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-08",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-09",
+        "status": "unavailable",
+        "expected_outcome": "absent_year",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": false,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "unsupported_citation",
+          "unsupported_partial",
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-10",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-11",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-12",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-13",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-14",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "evidence_unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      },
+      {
+        "case_id": "P5-15",
+        "status": "unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "eligible_fact_ids": [],
+        "model_request_sent": false,
+        "proposal_returned": false,
+        "validation_status": "unavailable",
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ]
+      }
+    ]
+  },
+  "accepted": false
+}

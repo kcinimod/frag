@@ -320,3 +320,14 @@ retrieval change. Replace any issuer family used in subsequent development
 before another acceptance measurement.
 [Frozen protocol](../artifacts/phase05/HOLDOUT_PROTOCOL.md) ·
 [Measured checkpoint](../artifacts/phase05/SEC_ACCEPTANCE.md)
+
+### Freeze the Phase 6 development baseline (#36)
+
+Use committed production revision `96fa9501f9f383d9586c165cfcda78e3323b4401`
+for the pre-change run. It shares the Phase 5 acceptance production bytes
+and uses the same Qwen2.5-0.5B weights, runtime, and retrieval settings.
+Keep those settings through the first comparison and retain the Phase 5
+acceptance evidence. Audit all 12 development issuer families and their
+statement, header, and unit placement combinations before opening fresh
+evaluation inputs.
+[Phase 6 freeze and measurements](../artifacts/phase06/README.md)

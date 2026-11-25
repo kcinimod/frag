@@ -1,0 +1,433 @@
+{
+  "live_sha256": "ee411a7639f97325b64d4bf5ffd8a7f371663c885ee0716f1fe2bb0f2adc6863",
+  "replay_sha256": "db45873d7f39898d8518f5b03022ef2085345154da86a1a98f8a1a35ed71de6b",
+  "replayed_live_sha256": "ee411a7639f97325b64d4bf5ffd8a7f371663c885ee0716f1fe2bb0f2adc6863",
+  "reference_sha256": "141ff5a665172121e253f7d873f6fbd3bb15200776b6fc9040acc7d292e0b4ce",
+  "text_reference_sha256": "b9d0b784f9d3052656822849d966cd477bed30e306ba255bb8e4a14677998098",
+  "scorer_sha256": "22ad3a37a9e7c679c53d6fe80e93e553ab731b66b270b8b8ff46e9aaa16859ac",
+  "audited_originals": 7,
+  "cold": {
+    "metrics": {
+      "accuracy": [
+        12,
+        13
+      ],
+      "grounded_abstention": [
+        2,
+        2
+      ],
+      "citation_support_emitted": [
+        11,
+        12
+      ],
+      "coverage": [
+        12,
+        15
+      ],
+      "end_to_end": [
+        13,
+        15
+      ],
+      "offline_replay": [
+        15,
+        15
+      ]
+    },
+    "cases": [
+      {
+        "case_id": "msft-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "msft-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": false,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "unsupported_citation"
+        ]
+      },
+      {
+        "case_id": "aapl-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "aapl-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "aapl-absent",
+        "status": "unavailable",
+        "expected_outcome": "absent_year",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": true,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "amzn-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "amzn-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "wmt-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "wmt-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "goog-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "goog-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "intc-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "intc-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "intc-incompatible",
+        "status": "unavailable",
+        "expected_outcome": "incompatible_periods",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": true,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "aapl-2024-present",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": []
+      }
+    ]
+  },
+  "warm": {
+    "metrics": {
+      "accuracy": [
+        12,
+        13
+      ],
+      "grounded_abstention": [
+        2,
+        2
+      ],
+      "citation_support_emitted": [
+        11,
+        12
+      ],
+      "coverage": [
+        12,
+        15
+      ],
+      "end_to_end": [
+        13,
+        15
+      ],
+      "offline_replay": [
+        15,
+        15
+      ]
+    },
+    "cases": [
+      {
+        "case_id": "msft-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "msft-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": false,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": [
+          "unsupported_citation"
+        ]
+      },
+      {
+        "case_id": "aapl-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "aapl-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "aapl-absent",
+        "status": "unavailable",
+        "expected_outcome": "absent_year",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": true,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "amzn-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "amzn-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "wmt-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "wmt-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "goog-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "goog-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "intc-lookup",
+        "status": "answered",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "intc-growth",
+        "status": "calculated",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "intc-incompatible",
+        "status": "unavailable",
+        "expected_outcome": "incompatible_periods",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": true,
+        "offline_replay_matched": true,
+        "end_to_end_complete": true,
+        "findings": []
+      },
+      {
+        "case_id": "aapl-2024-present",
+        "status": "evidence_unavailable",
+        "expected_outcome": "answerable",
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "citations_supported": true,
+        "grounded_abstention": false,
+        "offline_replay_matched": true,
+        "end_to_end_complete": false,
+        "findings": []
+      }
+    ]
+  }
+}

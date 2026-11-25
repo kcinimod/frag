@@ -143,3 +143,11 @@ Phase 2 calculator and its offline results.
   thresholds of 11 and 3. All 30 results and citation sets matched offline.
   Statement extraction blocked all answerable cases before the planner.
   [Phase 5 SEC acceptance checkpoint](../artifacts/phase05/SEC_ACCEPTANCE.md)
+
+- Issue #36 froze and measured the pre-change Phase 6 workflow on the 15
+  opened cases and 15 earlier regressions. Both cold and warm runs matched
+  all 60 results and citation sets offline. The opened cohort had 0/19
+  extraction matches, 0/12 supported answers, and 1/3 grounded abstentions
+  per pass. The earlier cohort retained 11/13 supported answers and 2/2
+  grounded abstentions per pass.
+  [Phase 6 baseline](../artifacts/phase06/README.md)

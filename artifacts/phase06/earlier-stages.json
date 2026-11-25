@@ -1,0 +1,2186 @@
+{
+  "live_sha256": "ee411a7639f97325b64d4bf5ffd8a7f371663c885ee0716f1fe2bb0f2adc6863",
+  "replay_sha256": "db45873d7f39898d8518f5b03022ef2085345154da86a1a98f8a1a35ed71de6b",
+  "audited_originals": 7,
+  "peak_working_set_mib": {
+    "planner": 578.67,
+    "runner": 88.97
+  },
+  "peak_device_vram_mib": 0,
+  "cold": {
+    "metrics": {
+      "accuracy": [
+        12,
+        13
+      ],
+      "citation_support_answerable": [
+        11,
+        13
+      ],
+      "citation_support_emitted": [
+        11,
+        12
+      ],
+      "coverage": [
+        12,
+        15
+      ],
+      "grounded_abstention": [
+        2,
+        2
+      ],
+      "end_to_end": [
+        13,
+        15
+      ],
+      "offline_replay": [
+        15,
+        15
+      ]
+    },
+    "latency_ms": {
+      "min": 29.845,
+      "median": 1804.239,
+      "max": 7167.254
+    },
+    "statuses": {
+      "answered": 6,
+      "calculated": 6,
+      "unavailable": 2,
+      "evidence_unavailable": 1
+    },
+    "cases": [
+      {
+        "case_id": "msft-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ],
+            "matched_fact_ids": [
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1": true,
+            "note-8": true,
+            "note-13": true,
+            "note-19": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Accounting Policies": true,
+            "Business Combinations": true,
+            "Unearned Revenue": true,
+            "Segment Information and Geographic Data": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "msft-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ],
+            "matched_fact_ids": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1": true,
+            "note-8": true,
+            "note-13": true,
+            "note-19": true,
+            "segment_recast": true,
+            "acquisition_and_exchange_rates": true,
+            "xandr_acquisition": true
+          },
+          "cells": {
+            "prior": false,
+            "current": false
+          },
+          "notes": {
+            "Accounting Policies": true,
+            "Business Combinations": true,
+            "Unearned Revenue": true,
+            "Segment Information and Geographic Data": true,
+            "segment_recast": true,
+            "acquisition_and_exchange_rates": true,
+            "xandr_acquisition": true
+          },
+          "supported": false
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": false,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ],
+            "matched_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1": true,
+            "note-2": true,
+            "note-13": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Summary of Significant Accounting Policies": true,
+            "Revenue": true,
+            "Segment Information and Geographic Data": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+              "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1"
+            ],
+            "matched_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+              "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1": true,
+            "note-2": true,
+            "note-13": true,
+            "foreign_currency_impact": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Summary of Significant Accounting Policies": true,
+            "Revenue": true,
+            "Segment Information and Geographic Data": true,
+            "foreign_currency_impact": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": true,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-absent",
+        "expected_outcome": "absent_year",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "current": true
+          },
+          "verification": {
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ],
+            "matched_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": false,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2020
+            }
+          },
+          "planning": {
+            "proposal_recorded": false
+          },
+          "execution": {
+            "trace_operations": [],
+            "validation_status": "unavailable"
+          },
+          "presentation": "unavailable"
+        },
+        "numeric_answer_emitted": false,
+        "answer_accurate": null,
+        "grounded_abstention": true,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "current": true,
+            "note-1": true,
+            "note-2": true,
+            "note-13": true,
+            "statement-periods": true
+          },
+          "cells": {
+            "current": true
+          },
+          "notes": {
+            "Summary of Significant Accounting Policies": true,
+            "Revenue": true,
+            "Segment Information and Geographic Data": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "amzn-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673"
+            ],
+            "matched_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "amzn-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673",
+              "fact:ca9569215055e0650026ab88c9badd5a2223c82e80bc2174525d39846ab37000"
+            ],
+            "matched_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673",
+              "fact:ca9569215055e0650026ab88c9badd5a2223c82e80bc2174525d39846ab37000"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "wmt-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ],
+            "matched_fact_ids": [
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2024,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: net sales and fees": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "wmt-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:70675f61a998bdd3b3af02b39c5d5486c977463a3f06ec20365aae70942d23a6",
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ],
+            "matched_fact_ids": [
+              "fact:70675f61a998bdd3b3af02b39c5d5486c977463a3f06ec20365aae70942d23a6",
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2024,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2023
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: net sales and fees": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "goog-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179"
+            ],
+            "matched_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "goog-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179",
+              "fact:aed65d4f2e70deb5ceab1c08272f7862fa17831879d41f7000f84f4208d18549"
+            ],
+            "matched_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179",
+              "fact:aed65d4f2e70deb5ceab1c08272f7862fa17831879d41f7000f84f4208d18549"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "intc-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ],
+            "matched_fact_ids": [
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-2-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: basis and fiscal calendar": true,
+            "Note 2: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "intc-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ],
+            "matched_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-2-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: basis and fiscal calendar": true,
+            "Note 2: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": true,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "intc-incompatible",
+        "expected_outcome": "incompatible_periods",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ],
+            "matched_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": false,
+            "resolved_request": {
+              "current_year": 2023,
+              "equal_length": true,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": false
+          },
+          "execution": {
+            "trace_operations": [],
+            "validation_status": "unavailable"
+          },
+          "presentation": "unavailable"
+        },
+        "numeric_answer_emitted": false,
+        "answer_accurate": null,
+        "grounded_abstention": true,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-2-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: basis and fiscal calendar": true,
+            "Note 2: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-2024-present",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": "present_unverifiable",
+        "present_unverifiable_reported": true,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": false
+          },
+          "retrieval": {
+            "eligible_fact_ids": [],
+            "matched_fact_ids": []
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": false,
+            "resolved_request": {
+              "fiscal_year": 2024,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": false
+          },
+          "execution": {
+            "trace_operations": [],
+            "validation_status": "evidence_unavailable"
+          },
+          "presentation": "evidence_unavailable"
+        },
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {},
+          "cells": {},
+          "notes": {},
+          "supported": false
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": false,
+        "offline_replay": "matched"
+      }
+    ]
+  },
+  "warm": {
+    "metrics": {
+      "accuracy": [
+        12,
+        13
+      ],
+      "citation_support_answerable": [
+        11,
+        13
+      ],
+      "citation_support_emitted": [
+        11,
+        12
+      ],
+      "coverage": [
+        12,
+        15
+      ],
+      "grounded_abstention": [
+        2,
+        2
+      ],
+      "end_to_end": [
+        13,
+        15
+      ],
+      "offline_replay": [
+        15,
+        15
+      ]
+    },
+    "latency_ms": {
+      "min": 11.659,
+      "median": 1782.692,
+      "max": 8053.052
+    },
+    "statuses": {
+      "answered": 6,
+      "calculated": 6,
+      "unavailable": 2,
+      "evidence_unavailable": 1
+    },
+    "cases": [
+      {
+        "case_id": "msft-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ],
+            "matched_fact_ids": [
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1": true,
+            "note-8": true,
+            "note-13": true,
+            "note-19": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Accounting Policies": true,
+            "Business Combinations": true,
+            "Unearned Revenue": true,
+            "Segment Information and Geographic Data": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "msft-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ],
+            "matched_fact_ids": [
+              "fact:7fd449dd6b45bf1581c92fb079d8f08b49cb742c09ec608174eceeca8a54da9a",
+              "fact:83afe58468e01af2747690d3fa4b9ce8713ec86520e3901458597c5764834d37"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1": true,
+            "note-8": true,
+            "note-13": true,
+            "note-19": true,
+            "segment_recast": true,
+            "acquisition_and_exchange_rates": true,
+            "xandr_acquisition": true
+          },
+          "cells": {
+            "prior": false,
+            "current": false
+          },
+          "notes": {
+            "Accounting Policies": true,
+            "Business Combinations": true,
+            "Unearned Revenue": true,
+            "Segment Information and Geographic Data": true,
+            "segment_recast": true,
+            "acquisition_and_exchange_rates": true,
+            "xandr_acquisition": true
+          },
+          "supported": false
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": false,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ],
+            "matched_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1": true,
+            "note-2": true,
+            "note-13": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Summary of Significant Accounting Policies": true,
+            "Revenue": true,
+            "Segment Information and Geographic Data": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+              "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1"
+            ],
+            "matched_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911",
+              "fact:96d24b164c762b70d27234be8d58910e93f72149b54968add8bcabb10cde77b1"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1": true,
+            "note-2": true,
+            "note-13": true,
+            "foreign_currency_impact": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Summary of Significant Accounting Policies": true,
+            "Revenue": true,
+            "Segment Information and Geographic Data": true,
+            "foreign_currency_impact": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": true,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-absent",
+        "expected_outcome": "absent_year",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "current": true
+          },
+          "verification": {
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ],
+            "matched_fact_ids": [
+              "fact:26bf2cfd71b55e56efe15e98f88c7e9f4ba77178c95bad15b73f996f387fb911"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": false,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2020
+            }
+          },
+          "planning": {
+            "proposal_recorded": false
+          },
+          "execution": {
+            "trace_operations": [],
+            "validation_status": "unavailable"
+          },
+          "presentation": "unavailable"
+        },
+        "numeric_answer_emitted": false,
+        "answer_accurate": null,
+        "grounded_abstention": true,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "current": true,
+            "note-1": true,
+            "note-2": true,
+            "note-13": true,
+            "statement-periods": true
+          },
+          "cells": {
+            "current": true
+          },
+          "notes": {
+            "Summary of Significant Accounting Policies": true,
+            "Revenue": true,
+            "Segment Information and Geographic Data": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": true,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "amzn-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673"
+            ],
+            "matched_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "amzn-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673",
+              "fact:ca9569215055e0650026ab88c9badd5a2223c82e80bc2174525d39846ab37000"
+            ],
+            "matched_fact_ids": [
+              "fact:09c5288f39d853c50b5aabbeb2bbee0b89737ee4303b9dbdb7bb6c3f033b7673",
+              "fact:ca9569215055e0650026ab88c9badd5a2223c82e80bc2174525d39846ab37000"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "wmt-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ],
+            "matched_fact_ids": [
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2024,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: net sales and fees": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "wmt-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:70675f61a998bdd3b3af02b39c5d5486c977463a3f06ec20365aae70942d23a6",
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ],
+            "matched_fact_ids": [
+              "fact:70675f61a998bdd3b3af02b39c5d5486c977463a3f06ec20365aae70942d23a6",
+              "fact:84f9dde6a7450d32beba6238ed76b40c4ccee1f7161fee94e538b32b6b434754"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2024,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2023
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: net sales and fees": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "goog-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179"
+            ],
+            "matched_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "goog-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179",
+              "fact:aed65d4f2e70deb5ceab1c08272f7862fa17831879d41f7000f84f4208d18549"
+            ],
+            "matched_fact_ids": [
+              "fact:8bf9ad72b6a2c1fef5a51be4924353bb51d7e1af2ca15f28f4a766bd99f4e179",
+              "fact:aed65d4f2e70deb5ceab1c08272f7862fa17831879d41f7000f84f4208d18549"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-1-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: consolidation": true,
+            "Note 1: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "intc-lookup",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ],
+            "matched_fact_ids": [
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "fiscal_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "lookup"
+            ],
+            "validation_status": "answered"
+          },
+          "presentation": "answered"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "revenue": true,
+            "note-1-consolidation": true,
+            "note-2-revenue": true
+          },
+          "cells": {
+            "revenue": true
+          },
+          "notes": {
+            "Note 1: basis and fiscal calendar": true,
+            "Note 2: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "intc-growth",
+        "expected_outcome": "answerable",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ],
+            "matched_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": true,
+            "resolved_request": {
+              "current_year": 2023,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": true
+          },
+          "execution": {
+            "trace_operations": [
+              "subtract",
+              "divide",
+              "to_percent"
+            ],
+            "validation_status": "calculated"
+          },
+          "presentation": "calculated"
+        },
+        "numeric_answer_emitted": true,
+        "answer_accurate": true,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-2-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: basis and fiscal calendar": true,
+            "Note 2: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": true,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "intc-incompatible",
+        "expected_outcome": "incompatible_periods",
+        "kind": "growth",
+        "baseline_gap": null,
+        "present_unverifiable_reported": null,
+        "stages": {
+          "extraction": {
+            "prior": true,
+            "current": true
+          },
+          "verification": {
+            "prior": true,
+            "current": true
+          },
+          "retrieval": {
+            "eligible_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ],
+            "matched_fact_ids": [
+              "fact:4e7af9bf43576b4b8b45cb23487b58d9a0b411af38190d0680df2757d9bf2b0d",
+              "fact:c3c9ae06e879f3c85c6de89f098584e145d6b959ebc69520386343cd740e398b"
+            ]
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": false,
+            "resolved_request": {
+              "current_year": 2023,
+              "equal_length": true,
+              "metric": "reported_consolidated_revenue",
+              "operation": "growth",
+              "prior_year": 2022
+            }
+          },
+          "planning": {
+            "proposal_recorded": false
+          },
+          "execution": {
+            "trace_operations": [],
+            "validation_status": "unavailable"
+          },
+          "presentation": "unavailable"
+        },
+        "numeric_answer_emitted": false,
+        "answer_accurate": null,
+        "grounded_abstention": true,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {
+            "prior": true,
+            "current": true,
+            "note-1-consolidation": true,
+            "note-2-revenue": true
+          },
+          "cells": {
+            "prior": true,
+            "current": true
+          },
+          "notes": {
+            "Note 1: basis and fiscal calendar": true,
+            "Note 2: revenue": true
+          },
+          "supported": true
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": true,
+        "offline_replay": "matched"
+      },
+      {
+        "case_id": "aapl-2024-present",
+        "expected_outcome": "answerable",
+        "kind": "lookup",
+        "baseline_gap": "present_unverifiable",
+        "present_unverifiable_reported": true,
+        "stages": {
+          "extraction": {
+            "revenue": true
+          },
+          "verification": {
+            "revenue": false
+          },
+          "retrieval": {
+            "eligible_fact_ids": [],
+            "matched_fact_ids": []
+          },
+          "context_assembly": {
+            "assembled": true,
+            "model_request_recorded": false,
+            "resolved_request": {
+              "fiscal_year": 2024,
+              "metric": "reported_consolidated_revenue",
+              "operation": "lookup"
+            }
+          },
+          "planning": {
+            "proposal_recorded": false
+          },
+          "execution": {
+            "trace_operations": [],
+            "validation_status": "evidence_unavailable"
+          },
+          "presentation": "evidence_unavailable"
+        },
+        "numeric_answer_emitted": false,
+        "answer_accurate": false,
+        "grounded_abstention": null,
+        "contradicted_missing_years": [],
+        "citations": {
+          "links": {},
+          "cells": {},
+          "notes": {},
+          "supported": false
+        },
+        "required_period_caveat_present": null,
+        "uses_reviewed_reference": false,
+        "end_to_end_complete": false,
+        "offline_replay": "matched"
+      }
+    ]
+  }
+}
