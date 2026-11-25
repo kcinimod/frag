@@ -297,6 +297,8 @@ def _annual_facts(
         prior_end = ordered[index - 1] if index else None
         fact = None
         year = statement.fiscal_labels.get(end, end.year)
+        if statement.fiscal_labels:
+            prior_end = _fiscal_week_year_end(year - 1)
         week_count = weeks.get(year)
         try:
             fact, value = _visible_fact(statement, periods[end], end, base)
@@ -307,7 +309,8 @@ def _annual_facts(
                 continue
             fact.update(status="provisional",
                         unresolved_requirements=[*fact["unresolved_requirements"], "inline_xbrl_verification"])
-        if (statement.table.separate_title or statement.original_dated_columns) and week_count is None:
+        if (statement.table.separate_title or statement.original_dated_columns
+                or statement.fiscal_labels) and week_count is None:
             fact.update(status="provisional",
                         unresolved_requirements=[*fact["unresolved_requirements"], "fiscal_calendar_verification"])
         if qualified_years and year in qualified_years:
@@ -438,9 +441,11 @@ def inspect_original_revenue(
             annual, periods, date_prefixes = _dated_columns(headers, label)
             _check_revenue_columns(rows[label.row - 1], label, periods)
         elif fiscal_header:
-            policy = statement_policy_notes(document, lines, after=table.position, layout="fiscal")
+            policy = statement_policy_notes(document, lines, after=table.position, layout="week_based")
+            if not policy.week_based_calendar:
+                raise UnsupportedLayout("The filing does not establish the calendar for its fiscal year labels.")
             annual, periods, fiscal_labels, date_prefixes = _fiscal_week_columns(
-                headers, label, _displayed_date(cover_end), policy.weeks,
+                headers, label, _displayed_date(cover_end),
             )
             _check_revenue_columns(rows[label.row - 1], label, periods)
         else:
@@ -492,12 +497,21 @@ def inspect_original_revenue(
                 })
             else:
                 acquisition_notes, caveats = acquisition
-        elif fiscal_header or table.embedded_heading or label.cell.text.casefold() == "revenue":
+        elif fiscal_header or table.embedded_heading or (
+            table.heading and re.fullmatch(r"statements? of consolidated income", table.heading.text, re.I)
+        ):
             if not fiscal_header:
-                policy = statement_policy_notes(document, lines, after=table.position,
-                                                layout="embedded" if table.embedded_heading else "revenue")
+                policy = statement_policy_notes(
+                    document, lines, after=table.position,
+                    layout="continuing_operations" if table.embedded_heading else "transportation",
+                )
             notes, weeks, qualified_years = policy.notes, policy.weeks, policy.qualified_years
             acquisition_notes, caveats = policy.comparison_notes, policy.caveats
+            if table.embedded_heading and policy.issuer and _company_words(policy.issuer) != _company_words(company):
+                requirements.append("statement_issuer_verification")
+                coverage = None
+            if not table.embedded_heading and caveats is None:
+                qualified_years.add(current_year)
         else:
             extended_notes = cross_section_policy_notes(
                 document, lines, after=table.position, comparison_years={end.year for end in pair},
@@ -589,7 +603,7 @@ def _dated_columns(
 
 
 def _fiscal_week_columns(
-    rows: list[list[GridCell]], label: GridCell, current: date, weeks: dict[int, int],
+    rows: list[list[GridCell]], label: GridCell, current: date,
 ) -> tuple[GridCell, dict[date, GridCell], dict[date, int], dict[date, GridCell]]:
     prefixes = [cell for row in rows for cell in row if cell.cell.text.casefold() == "fiscal"]
     years = [cell for row in rows for cell in row if FISCAL_YEAR.fullmatch(cell.cell.text)]
@@ -599,16 +613,20 @@ def _fiscal_week_columns(
             or prefixes[0].row + 1 != years[0].row):
         raise UnsupportedLayout(message)
     periods, labels, date_prefixes = {}, {}, {}
-    end = current
     for index, (prefix, cell) in enumerate(zip(prefixes, years, strict=True)):
         year = int(cell.cell.text)
+        end = _fiscal_week_year_end(year)
         if (prefix.columns != cell.columns or cell.columns.start < label.columns.stop
-                or year != current.year - 1 - index or year not in weeks
-                or end.weekday() != 6 or abs((end - date(year + 1, 1, 31)).days) > 3):
+                or year != current.year - 1 - index or (index == 0 and end != current)):
             raise UnsupportedLayout(message)
         periods[end], labels[end], date_prefixes[end] = cell, year, prefix
-        end -= timedelta(weeks=weeks[year])
     return prefixes[0], periods, labels, date_prefixes
+
+
+def _fiscal_week_year_end(fiscal_year: int) -> date:
+    january_end = date(fiscal_year + 1, 1, 31)
+    days_to_sunday = 6 - january_end.weekday()
+    return january_end + timedelta(days=(days_to_sunday + 3) % 7 - 3)
 
 
 def _check_revenue_columns(row: list[GridCell], label: GridCell, periods: dict[date, GridCell]) -> None:

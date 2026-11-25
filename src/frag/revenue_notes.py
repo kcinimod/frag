@@ -2,7 +2,7 @@
 
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from frag.income_html import (
     ACCOUNTING_POLICIES_HEADING, BASIS_NOTE_HEADING, EvidenceText, StatementHTML, TextBlock, original_span,
@@ -62,15 +62,18 @@ class StatementPolicies:
     qualified_years: set[int] = field(default_factory=set)
     comparison_notes: list[dict[str, Any]] = field(default_factory=list)
     caveats: list[str] | None = None
+    issuer: str | None = None
+    week_based_calendar: bool = False
 
 
 def statement_policy_notes(
-    document: StatementHTML, lines: list[str], *, after: tuple[int, int], layout: str,
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+    layout: Literal["week_based", "continuing_operations", "transportation"],
 ) -> StatementPolicies:
     blocks = [block for block in document.blocks if block.position > after]
-    if layout == "fiscal":
+    if layout == "week_based":
         return _week_based_policy(lines, blocks)
-    if layout == "embedded":
+    if layout == "continuing_operations":
         return _continuing_operations_policy(lines, blocks)
     return _transportation_policy(lines, blocks)
 
@@ -126,7 +129,8 @@ def _week_based_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPo
         _policy_excerpt(lines, policy, "revenue", r"^We recognize revenue, net of expected returns and sales tax,"),
     ) if qualified is not None else []
     return _transaction_policy(
-        lines, blocks, StatementPolicies(notes, weeks, qualified or set()),
+        lines, blocks, StatementPolicies(notes=notes, weeks=weeks, qualified_years=qualified or set(),
+                                        week_based_calendar=True),
         heading=r"^(\d+)\.\s*acquisitions$", topic="acquisition",
         pattern=(r"^The acquisition was accounted for .*? and (?P<business>[\w .,&'-]+?)[’']s results of operations "
                  r"have been consolidated .*? effective [A-Za-z]+ \d+, (?P<year>20\d{2})\."),
@@ -138,7 +142,12 @@ def _continuing_operations_policy(lines: list[str], blocks: list[TextBlock]) -> 
     policy = _policy_section(blocks, r"^note 1\. basis of presentation and summary of significant accounting policies$")
     discontinued = _policy_section(blocks, r"^note 2\. businesses held for sale and discontinued operations\b")
     qualified = _revenue_basis_gaps(blocks)
-    if qualified is None:
+    separations = [match["issuer"] for block in policy if (match := re.search(
+        r"^(?:On [A-Za-z]+ \d+, \d{4}(?: and [A-Za-z]+ \d+, \d{4})?, )"
+        r"(?P<issuer>[^,]+), (?:now operating as [^,]+, )?completed the previously announced separation of .*?"
+        r"excluded from both continuing operations and segment results for all periods presented", block.text, re.I,
+    ))]
+    if qualified is None or len(separations) != 1:
         return StatementPolicies()
     notes = _complete_notes(
         _policy_excerpt(lines, policy, "basis",
@@ -157,7 +166,7 @@ def _continuing_operations_policy(lines: list[str], blocks: list[TextBlock]) -> 
                         r"^Discontinued operations primarily comprise .*reported as discontinued operations for all periods"
                         r" presented .*adjusted on a retrospective basis", number=2),
     )
-    return StatementPolicies(notes=notes, qualified_years=qualified, caveats=[
+    return StatementPolicies(notes=notes, qualified_years=qualified, issuer=separations[0], caveats=[
         "Both periods use the filing's continuing-operations basis after retrospective presentation of discontinued operations.",
     ])
 
