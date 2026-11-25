@@ -331,3 +331,14 @@ acceptance evidence. Audit all 12 development issuer families and their
 statement, header, and unit placement combinations before opening fresh
 evaluation inputs.
 [Phase 6 freeze and measurements](../artifacts/phase06/README.md)
+
+### Establish dated revenue columns from the visible statement (#37)
+
+Associate full dates and split month/day and year cells by visible table
+columns. Preserve original locators for both parts of a split date and
+inherit the scale from the statement’s unit declaration. Check the inline
+amount, currency, and fiscal context against the visible observation. Use
+the fiscal calendar and revenue policy notes for verification. Cite the
+applicable acquisition and pro forma disclosures for the reported
+comparison. Keep the existing reviewed Apple evidence path for its issuer.
+[Cisco implementation issue](https://github.com/kcinimod/frag/issues/37)

@@ -21,6 +21,14 @@ def has_citable_amount(fact: dict[str, Any]) -> bool:
 def statement_period_citation(source: dict[str, Any]) -> dict[str, Any]:
     statement = source["statement_periods"]
     *earlier, last = sorted(statement["period_headers"].items())
+    prefixes = statement.get("date_prefixes", {})
+    period_context = {}
+    for year, locator in earlier:
+        if year in prefixes:
+            period_context[f"date_prefix_{year}"] = prefixes[year]
+        period_context[f"year_{year}"] = locator
+    if last[0] in prefixes:
+        period_context[f"date_prefix_{last[0]}"] = prefixes[last[0]]
     return {
         "id": "statement-periods", "title": "Consolidated revenue statement periods",
         "locator": last[1],
@@ -28,7 +36,7 @@ def statement_period_citation(source: dict[str, Any]) -> dict[str, Any]:
             "statement_heading": statement["heading"],
             "metric_label": statement["metric_label"],
             "annual_header": statement["annual_header"],
-            **{f"year_{year}": locator for year, locator in earlier},
+            **period_context,
         },
     }
 
@@ -46,6 +54,9 @@ def revenue_cell_citation(
         keys = ("statement_heading", "annual_header", "currency_measure", *keys)
     if "statement_issuer" in locators:
         keys = ("statement_issuer", *keys)
+    if "date_prefix" in locators:
+        index = keys.index("year_header")
+        keys = (*keys[:index], "date_prefix", *keys[index:])
     return {
         "id": citation_id,
         "title": f'FY{year} {fact["metric_label"]} cell',

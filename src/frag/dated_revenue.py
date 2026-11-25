@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 from importlib.resources import files
 from typing import Any
@@ -14,20 +14,26 @@ from frag.income_html import (
     EvidenceText, GridCell, StatementHTML, Table, UnsupportedLayout, original_span, statement_periods, table_grid,
 )
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
-from frag.revenue_notes import accounting_policy_notes, comparison_disclosures, dated_policy_notes
+from frag.revenue_notes import (
+    accounting_policy_notes, acquisition_revenue_notes, comparison_disclosures, dated_policy_notes,
+    numbered_policy_notes,
+)
 
 PARSER_VERSION = "dated-annual-revenue-v1"
 SHARED_YEAR_PARSER_VERSION = "shared-year-revenue-v1"
 TITLED_TABLE_PARSER_VERSION = "titled-table-revenue-v1"
-FILING_SCOPED_PARSERS = {PARSER_VERSION, SHARED_YEAR_PARSER_VERSION, TITLED_TABLE_PARSER_VERSION}
-ORIGINAL_EVIDENCE_PARSERS = {SHARED_YEAR_PARSER_VERSION, TITLED_TABLE_PARSER_VERSION}
+DATED_COLUMNS_PARSER_VERSION = "dated-columns-revenue-v1"
+ORIGINAL_EVIDENCE_PARSERS = {SHARED_YEAR_PARSER_VERSION, TITLED_TABLE_PARSER_VERSION, DATED_COLUMNS_PARSER_VERSION}
+FILING_SCOPED_PARSERS = ORIGINAL_EVIDENCE_PARSERS | {PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "statement-periods-v1"
+EXTRACTION_CACHE_REVISION = "statement-periods-v2"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
+MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
+FISCAL_YEAR = re.compile(r"(?:19|20)[0-9]{2}")
 SHARED_YEAR_HEADER = re.compile(r"(?:fiscal )?years? ended ([A-Za-z]+ [0-9]{1,2}),?", re.I)
 MONEY_PREAMBLE = re.compile(r"^\((?:dollars |amounts )?in (thousands|millions|billions)\b", re.I)
 SHARED_MONEY_PREAMBLE = re.compile(
@@ -48,10 +54,12 @@ class DatedStatement:
     scale: int
     unit_header: dict[str, int]
     shared_year: bool = False
+    date_prefixes: dict[date, GridCell] = field(default_factory=dict)
+    original_dated_columns: bool = False
 
     @property
     def uses_original_evidence(self) -> bool:
-        return self.shared_year or self.table.separate_title
+        return self.shared_year or self.table.separate_title or self.original_dated_columns
 
 
 def is_dated_statement(table: Table) -> bool:
@@ -71,10 +79,13 @@ def applies_to(document: StatementHTML) -> bool:
 
 
 def original_evidence_tables(document: StatementHTML) -> list[Table]:
+    reviewed_dated_filing = _cover(document, "entitycentralindexkey") == REFERENCE["identity"]["cik"]
     return [
         table for table in document.tables
         if table.heading and CONSOLIDATED_HEADING.fullmatch(table.heading.text)
-        and (table.separate_title or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row))
+        and (table.separate_title or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row)
+             or (not reviewed_dated_filing
+                 and any(cell.text.casefold() == "years ended" for row in table.rows for cell in row)))
     ]
 
 
@@ -215,8 +226,10 @@ def _visible_fact(
         "year_header": header.locator(table), "value": value.locator(table),
         "unit_header": statement.unit_header, "currency_symbol": markers[0].locator(table),
     }
-    if statement.shared_year and table.issuer:
+    if (statement.shared_year or statement.original_dated_columns) and table.issuer:
         locators["statement_issuer"] = table.issuer.locator()
+    if end in statement.date_prefixes:
+        locators["date_prefix"] = statement.date_prefixes[end].locator(table)
     start = None
     if statement.shared_year:
         try:
@@ -286,7 +299,7 @@ def _annual_facts(
                 continue
             fact.update(status="provisional",
                         unresolved_requirements=[*fact["unresolved_requirements"], "inline_xbrl_verification"])
-        if statement.table.separate_title and week_count is None:
+        if (statement.table.separate_title or statement.original_dated_columns) and week_count is None:
             fact.update(status="provisional",
                         unresolved_requirements=[*fact["unresolved_requirements"], "fiscal_calendar_verification"])
         if qualified_years and end.year in qualified_years:
@@ -396,9 +409,14 @@ def inspect_original_revenue(
         label = _one([cell for row in rows for cell in row if cell.cell.text.casefold() in labels],
                      "Expected one total revenue row in the consolidated statement.")
         headers = rows[:label.row - 1]
+        date_prefixes: dict[date, GridCell] = {}
         if table.separate_title:
             parser_version = TITLED_TABLE_PARSER_VERSION
             annual, periods = _titled_table_columns(headers)
+        elif any(cell.cell.text.casefold() == "years ended" for row in headers for cell in row):
+            parser_version = DATED_COLUMNS_PARSER_VERSION
+            annual, periods, date_prefixes = _dated_columns(headers, label)
+            _check_revenue_columns(rows[label.row - 1], label, periods)
         else:
             annual = _one([cell for row in headers for cell in row if SHARED_YEAR_HEADER.fullmatch(cell.cell.text)],
                           "Expected one shared fiscal year-end above the revenue row.")
@@ -417,14 +435,31 @@ def inspect_original_revenue(
         requirements.extend(_shared_source_requirements(source, company, cik, current))
         if not requirements:
             coverage = statement_periods(table, annual, {end.year: header for end, header in periods.items()},
-                                         label, rows)
+                                         label, rows, date_prefixes={end.year: cell for end, cell in date_prefixes.items()})
+            if parser_version == DATED_COLUMNS_PARSER_VERSION and not coverage:
+                raise UnsupportedLayout("The visible fiscal year headers do not establish an unambiguous period inventory.")
         scale, unit_locator = _original_statement_scale(table, headers, annual)
         statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
-                                   shared_year=not table.separate_title)
+                                   shared_year=parser_version == SHARED_YEAR_PARSER_VERSION,
+                                   date_prefixes=date_prefixes,
+                                   original_dated_columns=parser_version == DATED_COLUMNS_PARSER_VERSION)
         weeks: dict[int, int] = {}
         qualified_years: set[int] = set()
+        acquisition_notes: list[dict[str, Any]] = []
+        caveats: list[str] = []
         if table.separate_title:
             notes, weeks, qualified_years = dated_policy_notes(document, lines, after=table.position, issuer=company)
+        elif statement.original_dated_columns:
+            notes, weeks, qualified_years = numbered_policy_notes(document, lines, after=table.position)
+            acquisition = acquisition_revenue_notes(document, lines, after=table.position, year=current.year)
+            if acquisition is None:
+                qualified_years.add(current.year)
+                diagnostics.append({
+                    "code": "unsupported_notes", "fiscal_year": current.year,
+                    "message": "The applicable acquisition disclosures could not be established.",
+                })
+            else:
+                acquisition_notes, caveats = acquisition
         else:
             notes = accounting_policy_notes(
                 document, lines, after=table.position, includes_fees=any(
@@ -434,6 +469,9 @@ def inspect_original_revenue(
             )
         if len(notes) != 2:
             requirements.append("applicable_notes")
+            if statement.original_dated_columns:
+                diagnostics.append({"code": "unsupported_notes",
+                                    "message": "The applicable filing disclosures could not be established."})
         base = {
             "source_id": source["source_id"], "company": company or None,
             "filing_date": source["filing_date"], "parser_version": parser_version,
@@ -443,9 +481,14 @@ def inspect_original_revenue(
             "parent_table_id": f'{source["source_id"]}#table-{table.number}',
         }
         facts = _annual_facts(document, statement, periods, cik, base, diagnostics, weeks, qualified_years)
+        for fact in facts:
+            if fact["reporting_period"]["fiscal_year"] == current.year and acquisition_notes:
+                fact["applicable_notes"] = [*fact["applicable_notes"], *acquisition_notes]
         pair = sorted(periods)[-2:]
         disclosures = comparison_disclosures(document, lines, after=table.position, years={end.year for end in pair})
         comparison = _original_comparison(facts, pair, weeks, disclosures)
+        if comparison["status"] == "compatible":
+            comparison["scope_caveats"].extend(caveats)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
     unresolved = list(dict.fromkeys([*requirements, *(
@@ -459,6 +502,55 @@ def inspect_original_revenue(
         "verification_reference": None, "real_source_acceptance": False,
         **({"statement_periods": coverage} if coverage else {}),
     }
+
+
+def _dated_columns(
+    rows: list[list[GridCell]], label: GridCell,
+) -> tuple[GridCell, dict[date, GridCell], dict[date, GridCell]]:
+    annual = _one([cell for row in rows for cell in row if cell.cell.text.casefold() == "years ended"],
+                  "Expected one Years Ended header above the revenue row.")
+    dated_rows = []
+    for row in rows[annual.row - 1:]:
+        cells = [cell for cell in row if cell is not annual and cell.cell.text
+                 and cell.columns.start >= label.columns.stop]
+        if any(DATE_HEADER.fullmatch(cell.cell.text) or MONTH_DAY.fullmatch(cell.cell.text)
+               or FISCAL_YEAR.fullmatch(cell.cell.text) for cell in cells):
+            dated_rows.append(cells)
+
+    message = "The displayed fiscal year columns are ambiguous."
+    prefixes: dict[date, GridCell] = {}
+    if len(dated_rows) == 1:
+        periods = {_displayed_date(cell.cell.text): cell for cell in dated_rows[0]}
+    elif len(dated_rows) == 2:
+        month_days, years = dated_rows
+        if (len(month_days) != len(years) or not all(MONTH_DAY.fullmatch(cell.cell.text) for cell in month_days)
+                or not all(FISCAL_YEAR.fullmatch(cell.cell.text) for cell in years)):
+            raise UnsupportedLayout(message)
+        periods = {}
+        for prefix, year in zip(month_days, years, strict=True):
+            if prefix.columns != year.columns:
+                raise UnsupportedLayout(message)
+            end = _displayed_date(f"{prefix.cell.text.rstrip(',')}, {year.cell.text}")
+            periods[end], prefixes[end] = year, prefix
+    else:
+        raise UnsupportedLayout(message)
+
+    headers = dated_rows[-1]
+    if (len(periods) != len(headers) or len({end.year for end in periods}) != len(headers) or len(headers) < 2
+            or (annual.columns.stop > label.columns.stop and not all(
+                set(header.columns) <= set(annual.columns) for header in headers
+            ))):
+        raise UnsupportedLayout(message)
+    return annual, periods, prefixes
+
+
+def _check_revenue_columns(row: list[GridCell], label: GridCell, periods: dict[date, GridCell]) -> None:
+    """Reject values without one visible period column before verifying any observations."""
+    for cell in row:
+        if cell is label or not cell.cell.text:
+            continue
+        if sum(set(cell.columns) <= set(header.columns) for header in periods.values()) != 1:
+            raise UnsupportedLayout("A revenue cell cannot be associated with one displayed fiscal year column.")
 
 
 def _original_comparison(

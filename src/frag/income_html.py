@@ -379,7 +379,7 @@ class GridRow:
 
 def statement_periods(
     table: Table, annual: GridCell, headers: dict[int, GridCell], label: GridCell,
-    rows: list[list[GridCell]],
+    rows: list[list[GridCell]], *, date_prefixes: dict[int, GridCell] | None = None,
 ) -> dict[str, Any] | None:
     """Capture the complete displayed period inventory independently of extracted facts."""
     heading = table.caption if table.caption and is_statement_heading(table.caption.text) else table.heading
@@ -387,18 +387,21 @@ def statement_periods(
     if heading is None or len(headers) < 2 or len(header_rows) != 1:
         return None
     header_row = rows[next(iter(header_rows)) - 1]
+    prefixes = date_prefixes or {}
     if any(entry.cell.text and entry is not annual and entry.columns.start >= label.columns.stop
            and entry not in headers.values() for entry in header_row):
         return None
     if any(entry.cell.text and entry is not annual and entry.columns.start >= label.columns.stop
            and (not any(set(entry.columns) <= set(header.columns) for header in headers.values())
-                or entry not in headers.values() and ADDITIONAL_PERIOD_LABEL.search(entry.cell.text))
+                or entry not in headers.values() and entry not in prefixes.values()
+                and ADDITIONAL_PERIOD_LABEL.search(entry.cell.text))
            for row in rows[:label.row] for entry in row):
         return None
     return {
         "heading": heading.locator(), "annual_header": annual.locator(table),
         "metric_label": label.locator(table),
         "period_headers": {str(year): header.locator(table) for year, header in sorted(headers.items())},
+        **({"date_prefixes": {str(year): cell.locator(table) for year, cell in prefixes.items()}} if prefixes else {}),
     }
 
 

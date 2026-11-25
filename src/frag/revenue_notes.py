@@ -44,6 +44,14 @@ COMPARISON_QUALIFICATION = re.compile(
     r"\bconsolidated (?:revenues?|net sales)\b[^.!?]*\b"
     r"(?:not (?:directly )?comparable|cannot be (?:directly )?compared)\b", re.I,
 )
+NUMBERED_BASIS = re.compile(r"1\.\s*Basis of Presentation", re.I)
+NUMBERED_POLICIES = re.compile(r"2\.\s*Summary of Significant Accounting Policies", re.I)
+NUMBERED_ACQUISITIONS = re.compile(r"(\d+)\.\s*Acquisitions", re.I)
+NUMBERED_NOTE = re.compile(r"\d+\.\s*[A-Z]")
+FISCAL_WEEK_COUNTS = re.compile(
+    r"\b(fiscal 20\d{2}(?:(?:,\s*|\s+and\s+)(?:and\s+)?fiscal 20\d{2})*) "
+    r"(?:was|were) (?:each |a )?(52|53)-week fiscal years?\b", re.I,
+)
 
 
 def comparison_disclosures(
@@ -163,6 +171,95 @@ def dated_policy_notes(
         _note(lines, "revenue", policy[0], policy[3].end, number=2),
     ]
     return [note for note in evidence if note is not None], weeks, qualified_years
+
+
+def numbered_policy_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> tuple[list[dict[str, Any]], dict[int, int], set[int]]:
+    blocks = [block for block in document.blocks if block.position > after]
+    basis = _unique_heading(blocks, NUMBERED_BASIS)
+    policies = _unique_heading(blocks, NUMBERED_POLICIES)
+    if basis is None or basis == 0 or policies is None or basis >= policies:
+        return [], {}, set()
+    qualified_years = _revenue_basis_gaps(blocks[basis:])
+    scope = blocks[basis + 1].text
+    if (qualified_years is None or blocks[basis - 1].text.casefold() != NOTES_HEADING
+            or not re.search(r"consolidated financial statements include our accounts and those of our subsidiaries",
+                             scope, re.I)
+            or not re.search(r"\ball intercompany accounts and transactions have been eliminated\b", scope, re.I)):
+        return [], {}, set()
+    weeks: dict[int, int] = {}
+    for years, duration in FISCAL_WEEK_COUNTS.findall(scope):
+        for year in re.findall(r"20\d{2}", years):
+            if int(year) in weeks:
+                return [], {}, set()
+            weeks[int(year)] = int(duration)
+
+    policy = _numbered_note_body(blocks, policies)
+    recognition = [
+        (heading, paragraph) for heading, paragraph in zip(policy, policy[1:])
+        if re.match(r"\([a-z]\)\s*Revenue Recognition\b", heading.text, re.I)
+        and re.match(r"We recognize revenue upon transfer of control\b.*\bconsideration we expect to receive",
+                     paragraph.text, re.I)
+    ]
+    if len(recognition) != 1:
+        return [], {}, set()
+    heading, paragraph = recognition[0]
+    evidence = [
+        _note(lines, "consolidation", blocks[basis], blocks[policies].position),
+        _note(lines, "revenue", heading, paragraph.end, number=2),
+    ]
+    return [note for note in evidence if note is not None], weeks, qualified_years
+
+
+def acquisition_revenue_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int], year: int,
+) -> tuple[list[dict[str, Any]], list[str]] | None:
+    """Gather acquisition evidence or report that relevant disclosures could not be resolved."""
+    blocks = [block for block in document.blocks if block.position > after]
+    headings = [(index, match) for index, block in enumerate(blocks)
+                if (match := NUMBERED_ACQUISITIONS.fullmatch(block.text))]
+    if not headings:
+        return [], []
+    if len(headings) != 1:
+        return None
+    acquisition, heading = headings[0]
+    number = int(heading[1])
+    evidence = []
+    caveats = []
+    relevant = False
+    for block in _numbered_note_body(blocks, acquisition):
+        if str(year) in block.text and re.search(r"\b(?:revenue|pro forma financial information)\b", block.text, re.I):
+            relevant = True
+        contribution = re.fullmatch(
+            rf"Our Consolidated Statements of Operations for fiscal {year} includes? revenue of .+?"
+            r" attributable to ([\w][\w .,&'-]*?) since the date of acquisition\.", block.text, re.I,
+        )
+        if contribution:
+            note = _note(lines, "acquisition-revenue", block, block.end, number=number)
+            if note:
+                evidence.append(dict(note, title="Acquisition revenue in the consolidated statement"))
+                caveats.append(f"FY{year} includes {contribution[1]} revenue from the acquisition date.")
+        elif re.search(r"\bunaudited pro forma financial information\b.*\bas though the acquisition\b",
+                       block.text, re.I) and re.search(
+            rf"\bpro forma financial information for fiscal {year}\b", block.text, re.I,
+        ):
+            note = _note(lines, "pro-forma-revenue", block, block.end, number=number)
+            if note:
+                evidence.append(dict(note, title="Supplemental pro forma reporting basis"))
+    if {note["id"] for note in evidence} == {
+        f"note-{number}-acquisition-revenue", f"note-{number}-pro-forma-revenue",
+    } and len(evidence) == 2:
+        return evidence, [
+            *caveats, f"Supplemental pro forma results use the combination period described in Note {number}.",
+        ]
+    return None if relevant else ([], [])
+
+
+def _numbered_note_body(blocks: list[TextBlock], heading: int) -> list[TextBlock]:
+    end = next((index for index in range(heading + 1, len(blocks)) if NUMBERED_NOTE.match(blocks[index].text)),
+               len(blocks))
+    return blocks[heading + 1:end]
 
 
 def _revenue_basis_gaps(blocks: list[TextBlock]) -> set[int] | None:

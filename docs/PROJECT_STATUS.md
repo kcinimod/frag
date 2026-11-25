@@ -151,3 +151,9 @@ Phase 2 calculator and its offline results.
   per pass. The earlier cohort retained 11/13 supported answers and 2/2
   grounded abstentions per pass.
   [Phase 6 baseline](../artifacts/phase06/README.md)
+
+- Issue #37 adds verified Cisco FY2022–FY2024 observations from the preserved
+  FY2024 filing. The reviewed FY2024 lookup returns USD 53,803 million and
+  the FY2023 to FY2024 calculation returns −5.61%. Socket-blocked regression
+  tests reopen the original statement cells, units, and applicable notes.
+  [Cisco implementation issue](https://github.com/kcinimod/frag/issues/37)
