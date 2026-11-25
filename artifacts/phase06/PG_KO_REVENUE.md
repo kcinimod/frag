@@ -37,6 +37,7 @@ evidence spans, exercise the browser API and CLI, and replay saved plans
 with sockets blocked.
 
 ```powershell
+New-Item -ItemType Directory -Force -Path build | Out-Null
 $issue38Tests = "build/phase06-test-$([guid]::NewGuid().ToString('N'))"
 .venv/Scripts/python.exe -m pytest -q -p no:cacheprovider --basetemp $issue38Tests tests/test_shared_year_revenue.py tests/test_cisco_revenue.py
 ```
@@ -48,7 +49,7 @@ from the growth result's citation links.
 
 ```powershell
 $issue38Review = "build/phase06-review-$([guid]::NewGuid().ToString('N'))"
-.venv/Scripts/python.exe -c "import gzip, pathlib, sys; out = pathlib.Path(sys.argv[1]); out.mkdir(); src = pathlib.Path('artifacts/phase06/originals'); [(out / name).write_bytes(gzip.decompress((src / (name + '.gz')).read_bytes())) for name in ('pg-20240630.htm', 'ko-20241231.htm')]" $issue38Review
+.venv/Scripts/python.exe -c "import gzip, pathlib, sys; out = pathlib.Path(sys.argv[1]); out.mkdir(parents=True); src = pathlib.Path('artifacts/phase06/originals'); [(out / name).write_bytes(gzip.decompress((src / (name + '.gz')).read_bytes())) for name in ('pg-20240630.htm', 'ko-20241231.htm')]" $issue38Review
 Get-ChildItem -LiteralPath $issue38Review
 ```
 
@@ -76,7 +77,7 @@ phase = Path('artifacts/phase06')
 records = json.loads(gzip.decompress((phase / 'pg-ko-validation.json.gz').read_bytes()))
 refs = json.loads(Path('tests/fixtures/phase06_pg_ko_review.json').read_bytes())
 work = Path('build') / f'issue38-replay-{uuid4().hex}'
-work.mkdir()
+work.mkdir(parents=True)
 store = work / 'store'
 for filename, ref in refs.items():
     original = work / filename
