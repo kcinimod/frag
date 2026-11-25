@@ -1,6 +1,6 @@
 {
   "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
-  "created_at_utc": "2026-11-25T08:21:42.538118+00:00",
+  "created_at_utc": "2026-11-25T08:22:45.993694+00:00",
   "dependencies": {
     "blinker": "1.9.0",
     "click": "8.5.1",
@@ -14,7 +14,7 @@
   "files": {
     "artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md": "c3cd81f2d496570277973ab8201344c8b5e28e297f558721869576b1ca9b11c3",
     "artifacts/phase04/sec-holdout-receipt.json": "521d21b9c36c61bffc6208bd7b36517bb05fcec22b56ea2ff60b87e4f6c2147f",
-    "artifacts/phase04/sec_holdout_runner.py": "7668ed1ccab23c474231363a004ed6214e801d55b8ff01a0a3242e60aa4a0766",
+    "artifacts/phase04/sec_holdout_runner.py": "03ea1dd4c2551622be3328653bab97573e68402b17cfa70c2478f923d4637153",
     "artifacts/phase04/sec_holdout_score.py": "4cb7b67fab83eaa70231676d4722103899b5b539e718d34ea861a0b763f4b950",
     "artifacts/phase05/HOLDOUT_PROTOCOL.md": "fe2fe6bc7b8cec6c7f7eadf16969f6f2f6002c441e6d58d94785828aa0c75ea4",
     "artifacts/phase05/baseline.py": "c53caa4a9d0b915037b575e8a453397d31d9e7da003c41faa01a97001f737cd5",

@@ -8,6 +8,7 @@ from hashlib import sha256
 from importlib.metadata import version
 from io import StringIO
 import json
+import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
@@ -87,6 +88,8 @@ def restrict_runner(*, replay: bool, allowed_processes: tuple[str, ...] = ()) ->
             value = args[0]
             if isinstance(value, (str, bytes, Path)):
                 filename = value.decode() if isinstance(value, bytes) else str(value)
+                if event == "open" and allowed_processes and filename == os.devnull:
+                    return
                 if event == "sqlite3.connect" and filename.startswith("file:"):
                     uri = urlsplit(filename)
                     if uri.netloc:
