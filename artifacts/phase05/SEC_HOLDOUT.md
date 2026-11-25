@@ -1,5 +1,9 @@
 # Phase 5 fresh SEC holdout custody
 
+Issue #34 ran and scored this reservation after freezing the protocol.
+The acceptance checkpoint records the result and offline replay.
+[Evaluation checkpoint](SEC_ACCEPTANCE.md)
+
 Issue #32 reserves 15 cases across seven original domestic 10-Ks from six
 issuer families and four statement layouts. Each issuer contributes a
 lookup and an as-reported growth question. Three additional questions cover

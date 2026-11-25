@@ -49,3 +49,9 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 - [ ] Compare cold with cold and warm with warm; measure whole-request average/p95 latency, tokens, calls and peak memory on the actual Windows laptop. State measured versus hypothetical results.
 - [ ] Add retries, reranking, repair or fine-tuning one change at a time. Set quality/resource gates on validation, freeze configuration, then evaluate on held-out tests. Keep local and benchmark metrics distinct.
 - [ ] If training becomes justified: training-only demos, validated program targets, contrastive cases, meaningful paraphrases grouped before splitting. Verify chosen/rejected labels independently. An 8 GB GPU requires measurement; smaller batches cannot rescue an oversized single example.
+
+## Phase 5 SEC acceptance
+
+- [x] Compare the fixed development cohort across the baseline and four successive checkpoints. [Paired development results](artifacts/phase05/SEC_ACCEPTANCE.md#paired-development-comparison)
+- [x] Freeze the thresholds, protocol, code and settings, then score the full fresh holdout and replay its results offline. [Freeze](artifacts/phase05/holdout-freeze.json) and [per-case report](artifacts/phase05/holdout-score.json)
+- [ ] Meet the fresh holdout acceptance thresholds. Each pass measured 0/12 supported answers and 1/3 grounded abstentions against minimums of 11 and 3. [Acceptance checkpoint](artifacts/phase05/SEC_ACCEPTANCE.md#fresh-holdout)

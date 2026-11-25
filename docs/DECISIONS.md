@@ -308,3 +308,15 @@ displayed or the period inventory is unresolved, a missing verified
 observation is an evidence gap. Retain independently verified growth
 operands with their statement and disclosure citations.
 [Evidence gap checkpoint](../artifacts/phase05/EVIDENCE_GAPS.md)
+
+## Base SEC acceptance on cited answers and grounded abstentions
+
+Require 11 supported numeric answers and three grounded abstentions per
+pass, derived from the independent development score. Keep all cases in
+the denominator and treat wrong numbers, unsupported citations, contradicted
+reasons and replay mismatches as blocking. The fresh cohort failed the gate
+at statement extraction. The evaluation gives no basis for a planner or
+retrieval change. Replace any issuer family used in subsequent development
+before another acceptance measurement.
+[Frozen protocol](../artifacts/phase05/HOLDOUT_PROTOCOL.md) ·
+[Measured checkpoint](../artifacts/phase05/SEC_ACCEPTANCE.md)

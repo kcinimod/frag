@@ -1,5 +1,7 @@
 # Phase 5 SEC development baseline
 
+[Paired development comparison and fresh holdout acceptance](SEC_ACCEPTANCE.md)
+
 Issue #27 freezes the filing-scoped revenue workflow before Phase 5 changes.
 The baseline uses production commit `e0ca1ec304880290b03ebb193cecb88000727c0b`
 and its Qwen2.5-0.5B-Instruct Q4_K_M planner. The snapshot exports that commit

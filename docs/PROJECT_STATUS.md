@@ -137,3 +137,9 @@ Phase 2 calculator and its offline results.
   Microsoft growth citation gap. The cold and warm passes each completed
   13 of 15 cases.
   [Scorer and offline replay controls](../artifacts/phase05/ACCEPTANCE_SCORER.md)
+
+- Issue #34 measured the fresh SEC holdout. Each pass produced 0/12
+  supported numeric answers and 1/3 grounded abstentions, below the frozen
+  thresholds of 11 and 3. All 30 results and citation sets matched offline.
+  Statement extraction blocked all answerable cases before the planner.
+  [Phase 5 SEC acceptance checkpoint](../artifacts/phase05/SEC_ACCEPTANCE.md)

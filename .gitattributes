@@ -12,3 +12,6 @@ artifacts/phase05/expected.json -text diff
 artifacts/phase05/acceptance-text.json -text diff
 artifacts/phase05/HOLDOUT_PROTOCOL.md -text diff
 artifacts/phase05/holdout-freeze.json -text diff
+artifacts/phase05/holdout-score.json -text diff
+artifacts/phase05/custody.json -text diff
+artifacts/phase05/sec-holdout-receipt.json -text diff

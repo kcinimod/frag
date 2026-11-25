@@ -84,6 +84,6 @@ $warm = ($report.cases | Where-Object { $_.case.case_id -eq 'aapl-absent' }).war
 if ($cold.status -ne 'mismatch' -or $cold.result.fact.normalized_amount -ne '383285000000' -or $warm.status -ne 'mismatch' -or $warm.citations.current.text.Contains('Altered excerpt.')) { throw 'Replay did not recover the original result and citation.' }
 ```
 
-The fresh holdout remains sealed. The holdout run, numeric thresholds, and
-release decision belong to issue #34.
-[Holdout custody](SEC_HOLDOUT.md) · [Issue #34](https://github.com/kcinimod/frag/issues/34)
+Issue #34 records the numeric thresholds, fresh holdout run and acceptance
+decision. [Holdout custody](SEC_HOLDOUT.md) ·
+[Evaluation checkpoint](SEC_ACCEPTANCE.md)
