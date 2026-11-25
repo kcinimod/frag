@@ -40,6 +40,35 @@ RECAST_ASSURANCE = re.compile(
     r"^(?:this (?=did not|had no effect)|(?:this|the) (?:recast|restatement|reclassification)\b)", re.I,
 )
 AMOUNT_REFERENCE = re.compile(r"^(?:(?:the|this|that) (?:amount|figure)|it)\b", re.I)
+COMPARISON_QUALIFICATION = re.compile(
+    r"\bconsolidated (?:revenues?|net sales)\b[^.!?]*\b"
+    r"(?:not (?:directly )?comparable|cannot be (?:directly )?compared)\b", re.I,
+)
+
+
+def comparison_disclosures(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int], years: set[int],
+) -> list[dict[str, Any]]:
+    """Locate explicit qualifications of comparability for the selected annual periods."""
+    disclosures: list[dict[str, Any]] = []
+    for block in document.blocks:
+        if block.position <= after:
+            continue
+        for sentence in re.split(r"(?<=[.!?])\s+", block.text):
+            if not COMPARISON_QUALIFICATION.search(sentence):
+                continue
+            mentioned_years = {int(year) for year in re.findall(r"\b(?:19|20)\d{2}\b", sentence)}
+            if mentioned_years and years.isdisjoint(mentioned_years):
+                continue
+            locator = _disclosure_locator(lines, block, block.end)
+            if locator:
+                disclosures.append({
+                    "id": f"comparison_qualification_{len(disclosures) + 1}",
+                    "interpretation": "The disclosure qualifies the comparability of reported consolidated revenue.",
+                    "locator": locator,
+                })
+            break
+    return disclosures
 
 
 def accounting_policy_notes(
@@ -167,6 +196,15 @@ def _unique_heading(blocks: list[TextBlock], pattern: re.Pattern[str]) -> int | 
 def _note(
     lines: list[str], topic: str, start: TextBlock, end: tuple[int, int] | None, *, number: int = 1,
 ) -> dict[str, Any] | None:
+    locator = _disclosure_locator(lines, start, end)
+    if locator is None:
+        return None
+    return {"number": number, "id": f"note-{number}-{topic}", "title": start.text, "locator": locator}
+
+
+def _disclosure_locator(
+    lines: list[str], start: TextBlock, end: tuple[int, int] | None,
+) -> dict[str, Any] | None:
     if end is None:
         return None
     locator = {"start": start.locator(), "end_exclusive": EvidenceText(end).locator()}
@@ -174,4 +212,4 @@ def _note(
         original_span(lines, locator["start"], locator["end_exclusive"])
     except ValueError:
         return None
-    return {"number": number, "id": f"note-{number}-{topic}", "title": start.text, "locator": locator}
+    return locator

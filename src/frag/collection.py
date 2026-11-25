@@ -460,7 +460,8 @@ class _GrowthActions:
         if not self._start():
             return None
         evidence = operands[0].source | {"facts": facts, "comparison": selected_comparison}
-        growth = calculate_growth(evidence, action.prior_year, action.current_year)
+        growth = calculate_growth(evidence, action.prior_year, action.current_year,
+                                  equal_length=self.request.get("equal_length", False))
         result = {key: growth[key] for key in ("status", "percent", "absolute_change", "trace", "issues")}
         return growth if self._finish("calculate", action, result) else None
 
@@ -630,7 +631,7 @@ def _answer_growth(
                 break
             if actions is None:
                 evidence = entry.source | {"facts": facts, "comparison": selected_comparison}
-                growth = calculate_growth(evidence, prior, current)
+                growth = calculate_growth(evidence, prior, current, equal_length=request.get("equal_length", False))
             else:
                 action = CalculateAction(index.manifest["snapshot_id"], source_id, prior, current,
                                          _calculation_ids(facts))

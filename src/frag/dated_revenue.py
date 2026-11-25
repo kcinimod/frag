@@ -14,7 +14,7 @@ from frag.income_html import (
     EvidenceText, GridCell, StatementHTML, Table, UnsupportedLayout, original_span, table_grid,
 )
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
-from frag.revenue_notes import accounting_policy_notes, dated_policy_notes
+from frag.revenue_notes import accounting_policy_notes, comparison_disclosures, dated_policy_notes
 
 PARSER_VERSION = "dated-annual-revenue-v1"
 SHARED_YEAR_PARSER_VERSION = "shared-year-revenue-v1"
@@ -24,7 +24,7 @@ ORIGINAL_EVIDENCE_PARSERS = {SHARED_YEAR_PARSER_VERSION, TITLED_TABLE_PARSER_VER
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "original-comparison-v1"
+EXTRACTION_CACHE_REVISION = "original-comparison-v2"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
@@ -434,7 +434,9 @@ def inspect_original_revenue(
             "parent_table_id": f'{source["source_id"]}#table-{table.number}',
         }
         facts = _annual_facts(document, statement, periods, cik, base, diagnostics, weeks, qualified_years)
-        comparison = _original_comparison(facts, sorted(periods)[-2:], weeks)
+        pair = sorted(periods)[-2:]
+        disclosures = comparison_disclosures(document, lines, after=table.position, years={end.year for end in pair})
+        comparison = _original_comparison(facts, pair, weeks, disclosures)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
     unresolved = list(dict.fromkeys([*requirements, *(
@@ -450,7 +452,7 @@ def inspect_original_revenue(
 
 
 def _original_comparison(
-    facts: list[dict[str, Any]], ends: list[date], weeks: dict[int, int],
+    facts: list[dict[str, Any]], ends: list[date], weeks: dict[int, int], disclosures: list[dict[str, Any]],
 ) -> dict[str, Any]:
     prior_end, current_end = ends
     verified = {fact["reporting_period"]["fiscal_year"]: fact for fact in facts if fact["status"] == "verified"}
@@ -460,12 +462,18 @@ def _original_comparison(
         return comparison
 
     comparison["fact_ids"] = [prior["fact_id"], current["fact_id"]]
+    if disclosures:
+        comparison.update(
+            detail="The filing says reported consolidated revenue is not comparable across these fiscal years.",
+            evidence=disclosures,
+        )
+        return comparison
     if (prior_end.year + 1 != current_end.year
             or current["reporting_period"]["start"] != (prior_end + timedelta(days=1)).isoformat()):
         comparison["detail"] = "The filing does not establish consecutive annual reporting periods."
         return comparison
     if prior["inline_xbrl"]["concept"].casefold() != current["inline_xbrl"]["concept"].casefold():
-        comparison["detail"] = "The two revenue cells use different inline XBRL concepts."
+        comparison["detail"] = "The two revenue cells use different inline XBRL concepts. Their comparability is unresolved."
         return comparison
 
     caveats = ["Growth uses reported consolidated amounts, including any effects of exchange rates or acquisitions."]

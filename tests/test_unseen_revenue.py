@@ -98,22 +98,78 @@ def test_growth_requiring_equal_fiscal_years_keeps_both_cited_lookups(tmp_path: 
     assert success("replay-ask", str(saved), "--store", str(store.root)) == result
 
 
-@pytest.mark.parametrize(("prior", "percent"), [(2022, "-14.00"), (2021, None)])
+def test_explicit_comparison_disclosure_withholds_growth_and_remains_citable(tmp_path: Path) -> None:
+    original = gzip.decompress(INTEL.read_bytes())
+    marker = b"We have reclassified certain prior period amounts to conform to current period presentation."
+    disclosure = (
+        b"Consolidated revenue for fiscal 2022 is not comparable with fiscal 2023 because "
+        b"the earlier year reports certain sales gross and the later year reports them net."
+    )
+    assert marker in original
+    store = SourceStore(tmp_path / "store")
+    # Synthetic mutation exercises the verifier after intake with a local-original claim.
+    source = store.ingest_bytes(original.replace(marker, disclosure, 1), provenance="local_original")
+    result = success("growth", source["source_id"], "2022", "2023", "--store", str(store.root))
+    assert result["status"] == "unavailable"
+    assert result["percent"] is None
+    assert all(fact["status"] == "verified" for fact in result["operands"])
+    assert len(result["operands"]) == 2
+    assert "not comparable" in result["issues"][0]["detail"]
+    client = create_app(store, tmp_path).test_client()
+    url = f'/api/sources/{source["source_id"]}/growth/citations'
+    assert {"comparison_qualification_1", "prior", "current"} <= {item["id"] for item in result["citations"]}
+    assert disclosure.decode() in client.get(f"{url}/comparison_qualification_1?prior=2022&current=2023").text
+
+
+def test_unresolved_comparison_keeps_independently_verified_revenue_cells(tmp_path: Path) -> None:
+    original = gzip.decompress(AMAZON.read_bytes())
+    prior_tag = (
+        b'name="us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax"'
+        b' format="ixt:num-dot-decimal" scale="6" id="f-136"'
+    )
+    assert original.count(prior_tag) == 1
+    store = SourceStore(tmp_path / "store")
+    # This synthetic mutation keeps the cell verifiable but changes the prior revenue concept.
+    source = store.ingest_bytes(original.replace(
+        prior_tag, prior_tag.replace(b"RevenueFromContractWithCustomerExcludingAssessedTax", b"Revenues"),
+    ), provenance="local_original")
+    saved = tmp_path / "unresolved.json"
+    result = success("ask", source["source_id"], "What was revenue growth from FY2022 to FY2023?",
+                     "--store", str(store.root), "--record", str(saved))
+    assert result["status"] == "unavailable"
+    assert result["percent"] is None and result["trace"] == []
+    assert "comparability is unresolved" in result["issues"][0]["detail"]
+    assert [(fact["status"], fact["raw_amount"]) for fact in result["operands"]] == [
+        ("verified", "513,983"), ("verified", "574,785"),
+    ]
+    assert {"prior", "current"} <= {item["id"] for item in result["citations"]}
+    assert success("replay-ask", str(saved), "--store", str(store.root)) == result
+
+
+@pytest.mark.parametrize(("prior", "suffix", "mode", "percent"), [
+    (2022, "", "one-pass", "-14.00"),
+    (2021, "", "one-pass", None),
+    (2022, " using equal-length fiscal years", "one-pass", None),
+    (2022, " using equal-length fiscal years", "bounded", None),
+])
 def test_collection_growth_respects_the_original_comparison_pair(
-    tmp_path: Path, prior: int, percent: str | None,
+    tmp_path: Path, prior: int, suffix: str, mode: str, percent: str | None,
 ) -> None:
     store = SourceStore(tmp_path / "store")
     store.ingest_bytes(gzip.decompress(INTEL.read_bytes()), provenance="local_original")
     saved = tmp_path / "collection.json"
     result = success(
-        "ask-collection", f"What was Intel Corporation revenue growth from FY{prior} to FY2023?",
-        "--store", str(store.root), "--record", str(saved),
+        "ask-collection", f"What was Intel Corporation revenue growth from FY{prior} to FY2023{suffix}?",
+        "--mode", mode, "--store", str(store.root), "--record", str(saved),
     )
     client = create_app(store, tmp_path).test_client()
     if percent is None:
         assert result["status"] == "evidence_unavailable"
         assert result["percent"] is None
-        assert result["stop_reason"] == "incompatible"
+        issue, = result["issues"]
+        assert issue["code"] == "incompatible"
+        if suffix:
+            assert "FY2022 spans 53 weeks and FY2023 spans 52 weeks" in issue["detail"]
         assert {item["fact"]["reporting_period"]["fiscal_year"] for item in result["observations"]} == {prior, 2023}
         for item in result["observations"]:
             assert client.get(item["citation"]["href"]).status_code == 200

@@ -72,7 +72,10 @@ def assess_growth(
     if result["issues"]:
         result["status"] = "unavailable"
         supported = [fact for fact in result["operands"] if fact["status"] == "verified" and has_citable_amount(fact)]
-        result["citations"] = _citations(supported, {})
+        comparison_evidence = comparison if (
+            comparison.get("status") == "unresolved" and _matches_comparison_pair(comparison.get("fact_ids", []), supported)
+        ) else {}
+        result["citations"] = _citations(supported, comparison_evidence)
     else:
         result.update(status="ready", comparison_basis=comparison.get("basis"),
                       scope_caveats=comparison.get("scope_caveats", []))
@@ -131,20 +134,26 @@ def calculate_growth(
 def _comparison_issue(
     comparison: dict[str, Any], facts: list[dict[str, Any]], prior: dict[str, Any], current: dict[str, Any],
 ) -> str | None:
+    # Older verifiers reviewed their only extracted pair. Newer records identify it explicitly.
+    fact_ids = comparison.get("fact_ids", [fact["fact_id"] for fact in facts])
+    matches = _matches_comparison_pair(fact_ids, [prior, current])
+    if "fact_ids" in comparison and not matches:
+        return "The selected fiscal years do not match the filing's verified comparative and current pair."
     if comparison.get("status") != "compatible":
         if comparison.get("detail"):
             return str(comparison["detail"])
         requirements = ", ".join(item.replace("_", " ") for item in comparison.get("unresolved_requirements", []))
         message = "The filing's comparison evidence does not establish compatibility."
         return f"{message} Open requirements · {requirements}" if requirements else message
-    # Older verifiers reviewed their only extracted pair. Newer records identify it explicitly.
-    fact_ids = comparison.get("fact_ids", [fact["fact_id"] for fact in facts])
-    if (len(fact_ids) != 2 or set(fact_ids) != {prior["fact_id"], current["fact_id"]}
-            or not prior["comparative"] or current["comparative"]):
+    if not matches or not prior["comparative"] or current["comparative"]:
         return "The selected fiscal years do not match the filing's verified comparative and current pair."
     if prior["currency"] != current["currency"]:
         return f'The verified revenue amounts use different currencies ({prior["currency"]} and {current["currency"]}).'
     return None
+
+
+def _matches_comparison_pair(fact_ids: list[str], operands: list[dict[str, Any]]) -> bool:
+    return len(fact_ids) == len(operands) == 2 and set(fact_ids) == {fact["fact_id"] for fact in operands}
 
 
 def _equal_length_issue(prior: dict[str, Any], current: dict[str, Any]) -> str | None:
