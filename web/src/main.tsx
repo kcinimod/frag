@@ -18,6 +18,7 @@ type Disclosure = {
 
 type RevenueFact = {
   fact_id: string;
+  company: string | null;
   metric_label: string;
   raw_amount: string | null;
   normalized_amount: string | null;
@@ -79,6 +80,18 @@ const fields = [
 function provenanceLabel(source: Source) {
   if (source.provenance.kind === 'sec_download') return 'Downloaded from SEC EDGAR';
   return source.provenance.kind === 'synthetic' ? 'Synthetic input' : 'Declared local original';
+}
+
+function sourceCompany(source: Source) {
+  return source.company ?? source.facts.find(fact => fact.status === 'verified')?.company;
+}
+
+function savedSourceTitle(source: Source) {
+  const inputName = source.provenance.upload_name ?? source.source_hash.slice(0, 12);
+  if (source.provenance.kind === 'synthetic') return source.company ?? inputName;
+  const name = sourceCompany(source) ?? inputName;
+  const current = source.facts.find(fact => fact.status === 'verified' && !fact.comparative);
+  return current ? `${name} ? FY${current.reporting_period.fiscal_year}` : name;
 }
 
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
@@ -285,6 +298,7 @@ function RevenueChat({ source }: { source: Source }) {
   return (
     <section aria-labelledby="lookup-title">
       <h3 id="lookup-title">Ask the filing</h3>
+      <p className="muted">{savedSourceTitle(source)}</p>
       <form onSubmit={submit}>
         <label>
           Question about annual revenue or growth
@@ -439,7 +453,7 @@ function SourceDetail({ source }: { source: Source }) {
     .sort((a, b) => a - b);
   return (
     <section className="panel detail" aria-labelledby="detail-title">
-      <h2 id="detail-title">{source.company ?? 'Source record'}</h2>
+      <h2 id="detail-title">{sourceCompany(source) ?? 'Source record'}</h2>
       <p className="status">{provenanceLabel(source)} · Source preserved</p>
       <dl>
         <dt>Source ID</dt><dd className="mono">{source.source_id}</dd>
@@ -561,7 +575,7 @@ function RevenueDetail({ fact }: { fact: RevenueFact }) {
 
 function App() {
   const [sources, setSources] = useState<Source[]>([]);
-  const [selectedId, setSelectedId] = useState<string>();
+  const [selectedId, setSelectedId] = useState(() => new URLSearchParams(window.location.search).get('source'));
   const [filings, setFilings] = useState<FilingMatch[] | null>(null);
   const [chosenAccession, setChosenAccession] = useState('');
   const [listError, setListError] = useState('');
@@ -580,9 +594,16 @@ function App() {
     source.provenance.kind === 'sec_download' && source.accession === '0000950170-23-035122',
   );
 
+  function selectSource(source: Source) {
+    setSelectedId(source.source_id);
+    const url = new URL(window.location.href);
+    url.searchParams.set('source', source.source_id);
+    window.history.replaceState(null, '', url);
+  }
+
   function openSource(source: Source) {
     setSources(current => [...current.filter(item => item.source_id !== source.source_id), source]);
-    setSelectedId(source.source_id);
+    selectSource(source);
   }
 
   async function refresh() {
@@ -759,8 +780,8 @@ function App() {
             {sources.length > 0 && <ul className="sources">
               {sources.map(source => (
                 <li key={source.source_id}>
-                  <button aria-pressed={source.source_id === selectedId} onClick={() => setSelectedId(source.source_id)}>
-                    <strong>{source.company ?? source.provenance.upload_name ?? source.source_hash.slice(0, 12)}</strong>
+                  <button aria-pressed={source.source_id === selectedId} onClick={() => selectSource(source)}>
+                    <strong>{savedSourceTitle(source)}</strong>
                     <span>{provenanceLabel(source)}</span>
                   </button>
                 </li>
