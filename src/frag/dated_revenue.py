@@ -29,7 +29,7 @@ FILING_SCOPED_PARSERS = ORIGINAL_EVIDENCE_PARSERS | {PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "statement-periods-v4"
+EXTRACTION_CACHE_REVISION = "statement-periods-v5"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
@@ -507,11 +507,15 @@ def inspect_original_revenue(
                 )
             notes, weeks, qualified_years = policy.notes, policy.weeks, policy.qualified_years
             acquisition_notes, caveats = policy.comparison_notes, policy.caveats
-            if table.embedded_heading and policy.issuer and _company_words(policy.issuer) != _company_words(company):
-                requirements.append("statement_issuer_verification")
-                coverage = None
-            if not table.embedded_heading and caveats is None:
+            if table.embedded_heading:
+                if not notes or not policy.issuer:
+                    coverage = None
+                elif _company_words(policy.issuer) != _company_words(company):
+                    requirements.append("statement_issuer_verification")
+                    coverage = None
+            elif not _transaction_in_period(policy.transaction_date, pair[0], current):
                 qualified_years.add(current_year)
+                acquisition_notes, caveats = [], None
         else:
             extended_notes = cross_section_policy_notes(
                 document, lines, after=table.position, comparison_years={end.year for end in pair},
@@ -627,6 +631,15 @@ def _fiscal_week_year_end(fiscal_year: int) -> date:
     january_end = date(fiscal_year + 1, 1, 31)
     days_to_sunday = 6 - january_end.weekday()
     return january_end + timedelta(days=(days_to_sunday + 3) % 7 - 3)
+
+
+def _transaction_in_period(disclosed: str | None, prior_end: date, current_end: date) -> bool:
+    if disclosed is None:
+        return False
+    try:
+        return prior_end < _displayed_date(disclosed) <= current_end
+    except UnsupportedLayout:
+        return False
 
 
 def _check_revenue_columns(row: list[GridCell], label: GridCell, periods: dict[date, GridCell]) -> None:

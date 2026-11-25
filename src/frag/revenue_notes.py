@@ -64,6 +64,7 @@ class StatementPolicies:
     caveats: list[str] | None = None
     issuer: str | None = None
     week_based_calendar: bool = False
+    transaction_date: str | None = None
 
 
 def statement_policy_notes(
@@ -116,13 +117,15 @@ def _week_based_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPo
     if len(calendar) != 1:
         return StatementPolicies()
     weeks = {}
+    ambiguous_years = set()
     for years, duration in re.findall(
         r"(fiscal 20\d{2}(?: and fiscal 20\d{2})*) includes? (52|53) weeks", calendar[0], re.I,
     ):
         for year in map(int, re.findall(r"20\d{2}", years)):
             if year in weeks:
-                return StatementPolicies()
+                ambiguous_years.add(year)
             weeks[year] = int(duration)
+    weeks = {year: count for year, count in weeks.items() if year not in ambiguous_years}
     qualified = _revenue_basis_gaps(blocks)
     notes = _complete_notes(
         _policy_excerpt(lines, policy, "consolidation", r"^Our consolidated financial statements include our accounts"),
@@ -133,7 +136,7 @@ def _week_based_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPo
                                         week_based_calendar=True),
         heading=r"^(\d+)\.\s*acquisitions$", topic="acquisition",
         pattern=(r"^The acquisition was accounted for .*? and (?P<business>[\w .,&'-]+?)[’']s results of operations "
-                 r"have been consolidated .*? effective [A-Za-z]+ \d+, (?P<year>20\d{2})\."),
+                 r"have been consolidated .*? effective (?P<date>[A-Za-z]+ \d+, (?P<year>20\d{2}))\."),
         caveat="{business} results are included from the acquisition date in {year}.",
     )
 
@@ -186,7 +189,8 @@ def _transportation_policy(lines: list[str], blocks: list[TextBlock]) -> Stateme
     return _transaction_policy(
         lines, blocks, StatementPolicies(notes=notes, qualified_years=qualified or set()),
         heading=r"^note (\d+)\. acquisitions & dispositions$", topic="divestiture",
-        pattern=r"^On [A-Za-z]+ \d+, (?P<year>20\d{2}), we completed the divestiture of (?P<business>[\w .,&'-]+?),",
+        pattern=(r"^On (?P<date>[A-Za-z]+ \d+, (?P<year>20\d{2})), we completed the divestiture of "
+                 r"(?P<business>[\w .,&'-]+?),"),
         caveat="Reported growth includes the effect of the {business} divestiture in {year}.",
     )
 
@@ -201,6 +205,7 @@ def _transaction_policy(
     if len(matches) == len(numbers) == 1:
         note = _policy_excerpt(lines, section, topic, pattern, number=int(numbers[0]))
         if note:
+            policy.transaction_date = matches[0]["date"]
             policy.comparison_notes = [note]
             policy.caveats = [caveat.format(business=matches[0]["business"], year=matches[0]["year"])]
     return policy

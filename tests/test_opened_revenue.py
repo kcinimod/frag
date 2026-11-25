@@ -20,12 +20,18 @@ ROOT = Path(__file__).resolve().parents[1]
 REVIEWS = json.loads((ROOT / "tests/fixtures/phase06_ge_hd_ups_review.json").read_bytes())
 
 
-def test_home_depot_newer_observations_survive_missing_oldest_week_count(tmp_path: Path) -> None:
+@pytest.mark.parametrize("replacement", (
+    b"fiscal 2023 includes 52 weeks",
+    b"fiscal 2023 and fiscal 2022 include 52 weeks; fiscal 2022 includes 53 weeks",
+))
+def test_home_depot_keeps_newer_observations_when_the_oldest_week_count_is_unresolved(
+    replacement: bytes, tmp_path: Path,
+) -> None:
     original = gzip.decompress((ROOT / "artifacts/phase06/originals/hd-20250202.htm.gz").read_bytes())
-    # Synthetic mutation removes one disclosed length while preserving the fiscal calendar rule.
+    # Synthetic mutations leave the calendar rule intact and obscure the oldest period's length.
     phrase = b"fiscal 2023 and fiscal 2022 include 52 weeks"
     assert phrase in original
-    changed = original.replace(phrase, b"fiscal 2023 includes 52 weeks", 1)
+    changed = original.replace(phrase, replacement, 1)
     source = SourceStore(tmp_path).ingest_bytes(changed, provenance="local_original")
     facts = {fact["reporting_period"]["fiscal_year"]: fact for fact in source["facts"]}
     assert facts[2023]["status"] == facts[2024]["status"] == "verified"
@@ -33,28 +39,40 @@ def test_home_depot_newer_observations_survive_missing_oldest_week_count(tmp_pat
     assert "fiscal_calendar_verification" in facts[2022]["unresolved_requirements"]
 
 
-def test_embedded_statement_consolidation_policy_matches_the_cover_issuer(tmp_path: Path) -> None:
+@pytest.mark.parametrize("conflict", (True, False))
+def test_embedded_statement_requires_corroboration_of_the_cover_issuer(conflict: bool, tmp_path: Path) -> None:
     original = gzip.decompress((ROOT / "artifacts/phase06/originals/ge-20241231.htm.gz").read_bytes())
     span = REVIEWS["ge-20241231.htm"]["evidence"]["applicable_notes"][1]["locator"]
     start, end = span["start_byte"], span["end_byte"]
     paragraph = original[start:end]
     issuer = b"General Electric Company"
     assert issuer in paragraph
-    # Synthetic mutation changes the issuer's name in the scope disclosure only.
-    changed = original[:start] + paragraph.replace(issuer, b"Different Company", 1) + original[end:]
+    # Synthetic mutations remove the issuer disclosure or change the name in it.
+    replacement = paragraph.replace(issuer, b"Different Company", 1) if conflict else b""
+    changed = original[:start] + replacement + original[end:]
     source = SourceStore(tmp_path).ingest_bytes(changed, provenance="local_original")
     assert len(source["facts"]) == 3
-    assert all(fact["status"] == "provisional" and
-               "statement_issuer_verification" in fact["unresolved_requirements"] for fact in source["facts"])
+    assert all(fact["status"] == "provisional" for fact in source["facts"])
+    if conflict:
+        assert all("statement_issuer_verification" in fact["unresolved_requirements"] for fact in source["facts"])
     assert not source.get("statement_periods")
 
 
-@pytest.mark.parametrize("filename", ("hd-20250202.htm", "ups-20241231.htm"))
-def test_unresolved_transaction_disclosure_preserves_earlier_verified_lookup(filename: str, tmp_path: Path) -> None:
+@pytest.mark.parametrize(("filename", "misdated"), (
+    ("hd-20250202.htm", False), ("ups-20241231.htm", False), ("ups-20241231.htm", True),
+))
+def test_unresolved_transaction_disclosure_preserves_earlier_verified_lookup(
+    filename: str, misdated: bool, tmp_path: Path,
+) -> None:
     original = gzip.decompress((ROOT / "artifacts/phase06/originals" / (filename + ".gz")).read_bytes())
     span = REVIEWS[filename]["evidence"]["applicable_notes"][-1]["locator"]
-    # Synthetic mutation leaves the transaction note section but removes the supporting paragraph.
-    changed = original[:span["start_byte"]] + original[span["end_byte"]:]
+    start, end = span["start_byte"], span["end_byte"]
+    # Synthetic mutations remove the supporting paragraph or date the divestiture outside the period.
+    paragraph = original[start:end]
+    if misdated:
+        assert b"September 16, 2024" in paragraph
+    replacement = paragraph.replace(b"September 16, 2024", b"September 16, 2022", 1) if misdated else b""
+    changed = original[:start] + replacement + original[end:]
     source = SourceStore(tmp_path).ingest_bytes(changed, provenance="local_original")
     facts = {fact["reporting_period"]["fiscal_year"]: fact for fact in source["facts"]}
     assert facts[2023]["status"] == "verified"
