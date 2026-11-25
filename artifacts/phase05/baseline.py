@@ -68,7 +68,7 @@ def sample_gpu(stop: Event) -> list[int]:
     return observations
 
 
-def settings(data: Path) -> dict[str, Any]:
+def settings(data: Path | None) -> dict[str, Any]:
     config = freeze_inputs()
     config["files"].update({
         path.relative_to(ROOT).as_posix(): digest(path)
@@ -79,7 +79,7 @@ def settings(data: Path) -> dict[str, Any]:
         ])
     })
     return {
-        **config, "inputs_sha256": digest(data / PHASE / "inputs.json"),
+        **config, **({"inputs_sha256": digest(data / PHASE / "inputs.json")} if data is not None else {}),
         "retrieval": {
             "entry_point": "filing-scoped frag ask",
             "index": "selected filing's verified annual revenue facts",
@@ -92,16 +92,21 @@ def settings(data: Path) -> dict[str, Any]:
     }
 
 
-def start_server(model: Path, port: int) -> subprocess.Popen[bytes]:
-    with socket.socket() as probe:
-        probe.bind((local_model.HOST, port))
+def server_command(model: Path, port: int) -> list[str]:
     settings = local_model.MODEL_SETTINGS
-    return subprocess.Popen([
+    return [
         str(model / "runtime/llama-server.exe"), "--offline", "--model", str(model / "model.gguf"),
         "--alias", local_model.MODEL_ALIAS, "--host", local_model.HOST, "--port", str(port),
         "--ctx-size", str(settings["context_size"]), "--threads", str(settings["threads"]),
         "--n-gpu-layers", str(settings["gpu_layers"]), "--parallel", str(settings["parallel"]), "--log-disable",
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
+    ]
+
+
+def start_server(model: Path, port: int) -> subprocess.Popen[bytes]:
+    with socket.socket() as probe:
+        probe.bind((local_model.HOST, port))
+    return subprocess.Popen(server_command(model, port), stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL, creationflags=subprocess.CREATE_NO_WINDOW)
 
 
 def health(planner: subprocess.Popen[bytes]) -> None:

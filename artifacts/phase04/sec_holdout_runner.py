@@ -75,7 +75,7 @@ def runtime_hashes(model_directory: Path) -> dict[str, str]:
     }
 
 
-def restrict_runner(*, replay: bool) -> None:
+def restrict_runner(*, replay: bool, allowed_processes: tuple[str, ...] = ()) -> None:
     """Keep Python file access in the frozen workspace and its interpreter environment."""
     roots = [ROOT, Path(sys.prefix).resolve(), Path(sys.base_prefix).resolve()]
     if any(ROOT != root and ROOT.is_relative_to(root) for root in roots):
@@ -99,7 +99,7 @@ def restrict_runner(*, replay: bool) -> None:
             raise PermissionError("Only the frozen local planner can be resolved during a live run.")
         if event == "socket.connect" and (replay or args[1] != endpoint):
             raise PermissionError("Network connection outside the evaluation protocol.")
-        if event in {"subprocess.Popen", "os.system"}:
+        if event == "os.system" or (event == "subprocess.Popen" and args[1] not in allowed_processes):
             raise PermissionError("Evaluation must use in-process public interfaces.")
 
     sys.addaudithook(audit)
