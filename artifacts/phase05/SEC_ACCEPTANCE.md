@@ -104,12 +104,17 @@ zero requests, proposals, trace steps or returned citation links.
 
 The frozen scorer assigned four `contradicted_abstention` findings per
 pass. In the absence and unequal-period cases the displayed gaps failed to
-establish the expected reasons. The Cisco cases used parser wording outside
-the frozen scorer's allowlist. Those findings reflect unproven explanations.
-The responses made zero explicit claims that a displayed year was absent.
+establish the expected reasons. The Cisco cases used a truthful parser
+diagnostic outside the frozen scorer's allowlist, so those two findings are
+false positives. Both cases still failed extraction. The responses made zero
+explicit claims that a displayed year was absent.
 The single `unsupported_citation` code reflects the required statement-period
 citation that was missing. The two `unsupported_partial` codes reflect the
 required operands that were missing. No numeric result was emitted.
+
+The frozen scorer also treats a verified companion operand on an otherwise
+answerable growth question as an unsupported partial. No holdout case
+returned a companion operand, so that rule did not affect these results.
 
 The observed bottleneck is statement and period extraction. This run provides
 no evidence for changing retrieval or the planner. Reusable verification
@@ -125,9 +130,14 @@ local custody. For a fresh live run, the local model cache must contain the
 frozen Qwen 0.5B weights as `.frag-model/model.gguf` and the matching Windows
 runtime as `.frag-model/runtime`. The snapshot exports production
 `67dce6d2232045542c91e42b3239bc6a868534d8` and stays separate from working-tree
-production code and scorer materials. The first attempted launch stopped
-before any question because the Windows null device was blocked. Commit
-`8f789df` records the operational correction and replacement freeze.
+production code and scorer materials. The initial freeze in `e749aef`
+preceded opening the archive. That attempt staged and ingested the
+originals, then stopped at planner launch before asking any question
+because the runner blocked the Windows null device. Commit `8f789df`
+records the operational correction and replacement freeze after that
+initial intake. The replacement kept the production revision, thresholds,
+protocol, model settings and scorer hashes from the initial freeze. The
+scorer archive stayed closed until live measurement and replay finished.
 
 ```powershell
 $ErrorActionPreference = 'Stop'
@@ -159,11 +169,17 @@ if ($LASTEXITCODE -ne 0) { throw 'Holdout replay failed.' }
 ```
 
 In the scorer environment, point `PYTHONPATH` at the snapshot's production
-code. Score directly from the retained reports or substitute the live and
-replay reports created above. Exit code 1 with a written score records a
-rejected acceptance result.
+code. This command scores the retained reports and checks for byte equality.
+For fresh measurements, supply the new live and replay reports and check
+the resulting metrics and acceptance decision. Fresh reports contain new
+timings and hashes. Exit code 1 with a written score records a rejected
+acceptance result.
 
 ```powershell
+$freeze = Get-Content -Raw -LiteralPath "$snapshot/freeze.json" | ConvertFrom-Json
+foreach ($file in @('artifacts/phase05/score.py', 'artifacts/phase04/sec_holdout_score.py')) {
+    if ((Get-FileHash -LiteralPath $file).Hash -ne $freeze.files.$file) { throw "Scoring dependency differs from the freeze ($file)." }
+}
 $env:PYTHONPATH = "$snapshot/src"
 .venv/Scripts/python.exe artifacts/phase05/holdout_score.py "$snapshot/freeze.json" "$snapshot/inputs.zip" "$custody/scorer/expected.zip" artifacts/phase05/holdout-live.json.gz artifacts/phase05/holdout-replay.json.gz "$snapshot/score.json"
 if ($LASTEXITCODE -ne 1 -or -not (Test-Path "$snapshot/score.json")) { throw 'Expected the recorded acceptance rejection.' }

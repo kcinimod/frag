@@ -99,7 +99,9 @@ foreach ($name in $referenceHashes.Keys) {
         throw "Evidence reference differs for $name"
     }
 }
-Copy-Item artifacts/phase04/sec_holdout_runner.py,artifacts/phase04/sec_holdout_score.py,artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md -Destination "$snapshot/artifacts/phase04"
+git archive --format=zip --output="$snapshot/harness.zip" e296e85 -- artifacts/phase04/sec_holdout_runner.py artifacts/phase04/sec_holdout_score.py artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md
+if ($LASTEXITCODE) { throw 'Could not export the frozen evaluation harness.' }
+Expand-Archive -LiteralPath "$snapshot/harness.zip" -DestinationPath $snapshot -Force
 Expand-Archive -LiteralPath artifacts/phase04/sec-acceptance-25.zip -DestinationPath "$snapshot/recorded"
 $custody = (Resolve-Path ../FRAG-SEC-Holdout-24).Path
 Copy-Item -LiteralPath "$custody/runner/inputs.zip" -Destination "$snapshot/inputs.zip"

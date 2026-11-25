@@ -53,5 +53,5 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 ## Phase 5 SEC acceptance
 
 - [x] Compare the fixed development cohort across the baseline and four successive checkpoints. [Paired development results](artifacts/phase05/SEC_ACCEPTANCE.md#paired-development-comparison)
-- [x] Freeze the thresholds, protocol, code and settings, then score the full fresh holdout and replay its results offline. [Freeze](artifacts/phase05/holdout-freeze.json) and [per-case report](artifacts/phase05/holdout-score.json)
+- [x] Score the full fresh holdout and replay its results offline. The initial freeze preceded opening. The runner needed a Windows launch fix and a replacement freeze after initial intake. [Freeze and run record](artifacts/phase05/SEC_ACCEPTANCE.md#windows-reproduction)
 - [ ] Meet the fresh holdout acceptance thresholds. Each pass measured 0/12 supported answers and 1/3 grounded abstentions against minimums of 11 and 3. [Acceptance checkpoint](artifacts/phase05/SEC_ACCEPTANCE.md#fresh-holdout)
