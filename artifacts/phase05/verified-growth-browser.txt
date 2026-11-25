@@ -1,0 +1,10 @@
+Production revision 96cec931a40d34ce50acac2a2c04e8c91093e352
+Run on 2026-11-25
+
+npm.cmd --prefix web run build
+uv run --locked --offline --with playwright python artifacts/phase05/growth_browser.py
+
+Chrome 158.0.8127.37. CLI and browser both returned -14.00%.
+Equal-length growth withheld the percentage and showed both verified operands.
+Both results reopened the two original cells, fiscal-calendar note, and revenue note.
+Intel source SHA-256: 3cbfebb819e981fdfaf9f4988a342aa048c924edb5c8cec2738b4883e534ee4e

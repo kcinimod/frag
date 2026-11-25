@@ -109,3 +109,10 @@ Phase 2 calculator and its offline results.
   calendar, and recognition disclosures. Six filing and collection lookups
   passed with original citations, and all 30 cold and warm results replayed.
   [Development layout verification](../artifacts/phase05/DEVELOPMENT_LAYOUTS.md)
+
+- Issue #30 calculates reported revenue growth for Amazon, Alphabet, Walmart,
+  and Intel from compatible verified observations. Intel returns −14.00% and
+  explains its 53-week and 52-week periods. An equal-length request withholds
+  the percentage and retains both cited amounts. The fixed development run
+  recorded 12/13 correct numeric answers and 30/30 offline replay matches.
+  [Verified growth checkpoint](../artifacts/phase05/VERIFIED_GROWTH.md)

@@ -287,3 +287,14 @@ against the cover and inline SEC CIK, and assess the disclosed week count
 against each annual context. Keep a visible observation provisional when
 its disclosure or context does not establish agreement.
 [Development layout verification](../artifacts/phase05/DEVELOPMENT_LAYOUTS.md)
+
+## Establish original-evidence growth compatibility for a filing's latest pair
+
+Use the current and immediately preceding annual columns in the same
+consolidated statement. Require verified observations, consecutive periods,
+and agreement on the revenue concept. Preserve original disclosures that
+qualify comparability with the withheld growth result. A disclosed 52-week
+and 53-week pair can support growth on the reported calendar. A request for
+equal-length years requires matching durations. Both independently verified
+amounts remain available for lookup.
+[Verified growth checkpoint](../artifacts/phase05/VERIFIED_GROWTH.md)
