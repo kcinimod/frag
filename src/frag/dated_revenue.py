@@ -20,10 +20,11 @@ PARSER_VERSION = "dated-annual-revenue-v1"
 SHARED_YEAR_PARSER_VERSION = "shared-year-revenue-v1"
 TITLED_TABLE_PARSER_VERSION = "titled-table-revenue-v1"
 FILING_SCOPED_PARSERS = {PARSER_VERSION, SHARED_YEAR_PARSER_VERSION, TITLED_TABLE_PARSER_VERSION}
+ORIGINAL_EVIDENCE_PARSERS = {SHARED_YEAR_PARSER_VERSION, TITLED_TABLE_PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "titled-table-v2"
+EXTRACTION_CACHE_REVISION = "original-comparison-v1"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 CONSOLIDATED_HEADING = re.compile(r"consolidated statements? of (?:operations|income)", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
@@ -379,6 +380,7 @@ def inspect_original_revenue(
     diagnostics: list[dict[str, Any]] = []
     requirements: list[str] = []
     parser_version = SHARED_YEAR_PARSER_VERSION
+    comparison = legacy_comparison()
     try:
         table = _one(tables, "Expected one visible consolidated income statement.")
         if len(document.tables) != 1:
@@ -432,6 +434,7 @@ def inspect_original_revenue(
             "parent_table_id": f'{source["source_id"]}#table-{table.number}',
         }
         facts = _annual_facts(document, statement, periods, cik, base, diagnostics, weeks, qualified_years)
+        comparison = _original_comparison(facts, sorted(periods)[-2:], weeks)
     except UnsupportedLayout as exc:
         diagnostics.append({"code": "unsupported_layout", "message": str(exc)})
     unresolved = list(dict.fromkeys([*requirements, *(
@@ -439,11 +442,44 @@ def inspect_original_revenue(
     )]))
     return {
         "parser_version": parser_version, "evidence_version": SHARED_YEAR_EVIDENCE_VERSION,
-        "facts": facts, "diagnostics": diagnostics, "comparison": legacy_comparison(),
+        "facts": facts, "diagnostics": diagnostics, "comparison": comparison,
         "unresolved_requirements": [*unresolved, *(["extraction"] if diagnostics else []),
-                                    "comparison_compatibility"],
+                                    *comparison["unresolved_requirements"]],
         "verification_reference": None, "real_source_acceptance": False,
     }
+
+
+def _original_comparison(
+    facts: list[dict[str, Any]], ends: list[date], weeks: dict[int, int],
+) -> dict[str, Any]:
+    prior_end, current_end = ends
+    verified = {fact["reporting_period"]["fiscal_year"]: fact for fact in facts if fact["status"] == "verified"}
+    prior, current = verified.get(prior_end.year), verified.get(current_end.year)
+    comparison = legacy_comparison()
+    if prior is None or current is None:
+        return comparison
+
+    comparison["fact_ids"] = [prior["fact_id"], current["fact_id"]]
+    if (prior_end.year + 1 != current_end.year
+            or current["reporting_period"]["start"] != (prior_end + timedelta(days=1)).isoformat()):
+        comparison["detail"] = "The filing does not establish consecutive annual reporting periods."
+        return comparison
+    if prior["inline_xbrl"]["concept"].casefold() != current["inline_xbrl"]["concept"].casefold():
+        comparison["detail"] = "The two revenue cells use different inline XBRL concepts."
+        return comparison
+
+    caveats = ["Growth uses reported consolidated amounts, including any effects of exchange rates or acquisitions."]
+    prior_weeks, current_weeks = weeks.get(prior_end.year), weeks.get(current_end.year)
+    if prior_weeks is not None and current_weeks is not None and prior_weeks != current_weeks:
+        caveats.append(f"FY{prior_end.year} spans {prior_weeks} weeks and FY{current_end.year} spans "
+                       f"{current_weeks} weeks. Growth uses the fiscal years as reported.")
+    comparison.update(
+        status="compatible",
+        basis="Consecutive annual consolidated revenue amounts from the same statement and reporting basis.",
+        scope_caveats=caveats,
+        unresolved_requirements=[],
+    )
+    return comparison
 
 
 def _original_statement_scale(

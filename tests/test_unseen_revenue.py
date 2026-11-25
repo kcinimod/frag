@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from test_chat_growth import growth_plan
 from test_source_workflow import success
 
 from frag import cli
@@ -17,6 +18,112 @@ from frag.web import create_app
 ORIGINALS = Path(__file__).parents[1] / "artifacts/phase05/originals"
 AMAZON = ORIGINALS / "amzn-20231231.htm.gz"
 INTEL = ORIGINALS / "intc-20231230.htm.gz"
+
+
+def test_unseen_issuer_growth_uses_reported_periods_and_reopens_both_cells(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    store = SourceStore(tmp_path / "store")
+    source = store.ingest_bytes(gzip.decompress(INTEL.read_bytes()), provenance="local_original")
+    question = "What was revenue growth from FY2022 to FY2023?"
+
+    def propose(payload: dict[str, Any]) -> str:
+        prompt = json.loads(payload["messages"][1]["content"].splitlines()[0])
+        by_year = {fact["reporting_period"]["fiscal_year"]: fact["fact_id"] for fact in prompt["evidence"]}
+        return json.dumps(growth_plan(by_year[2022], by_year[2023]))
+
+    monkeypatch.setattr(cli, "propose_lookup", propose)
+    saved = tmp_path / "growth.json"
+    assert cli.main(["ask", source["source_id"], question, "--store", str(store.root),
+                     "--record", str(saved)]) == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result["status"] == "calculated"
+    assert result["percent"] == {"unit": "percent", "value": "-14.00"}
+    assert result["trace"][0]["result"] == "-8826000000"
+    assert [(fact["role"], fact["reporting_period"]["start"], fact["reporting_period"]["end"],
+             fact["normalized_amount"]) for fact in result["operands"]] == [
+        ("prior", "2021-12-26", "2022-12-31", "63054000000"),
+        ("current", "2023-01-01", "2023-12-30", "54228000000"),
+    ]
+    assert any("FY2022 spans 53 weeks" in item and "FY2023 spans 52 weeks" in item for item in result["scope_caveats"])
+    assert result["comparison_basis"]
+    client = create_app(store, tmp_path, planner=propose).test_client()
+    base = f'/api/sources/{source["source_id"]}'
+    assert client.post(base + "/lookup", json={"question": question}, headers={"X-Frag-Ask": "1"}).get_json() == result
+    for citation, phrases in {
+        "prior": ("Dec 31, 2022", "63,054", "In Millions", "iso4217:USD"),
+        "current": ("Dec 30, 2023", "54,228", "In Millions", "iso4217:USD"),
+        "note-1-consolidation": ("2022 was a 53-week fiscal year",),
+        "note-2-revenue": ("transfer of control",),
+    }.items():
+        response = client.get(f"{base}/growth/citations/{citation}?prior=2022&current=2023")
+        assert response.status_code == 200
+        assert all(phrase in response.text for phrase in phrases)
+    assert success("replay-ask", str(saved), "--store", str(store.root)) == result
+
+
+def test_growth_requiring_equal_fiscal_years_keeps_both_cited_lookups(tmp_path: Path) -> None:
+    store = SourceStore(tmp_path / "store")
+    source = store.ingest_bytes(gzip.decompress(INTEL.read_bytes()), provenance="local_original")
+
+    def propose(payload: dict[str, Any]) -> str:
+        evidence, = json.loads(payload["messages"][1]["content"])["evidence"]
+        return json.dumps({"operation": "lookup", "fact_id": evidence["fact_id"]})
+
+    client = create_app(store, tmp_path, planner=propose).test_client()
+    headers = {"X-Frag-Ask": "1"}
+    base = f'/api/sources/{source["source_id"]}/lookup'
+    for year, amount in [(2022, "63054000000"), (2023, "54228000000")]:
+        lookup = client.post(base, json={"question": f"What was revenue in FY{year}?"}, headers=headers).get_json()
+        assert lookup["status"] == "answered"
+        assert lookup["fact"]["normalized_amount"] == amount
+        assert client.get(f"{base}/citations/{year}/revenue").status_code == 200
+
+    question = "What was reported consolidated revenue growth from FY2022 to FY2023 using equal-length fiscal years?"
+    saved = tmp_path / "partial.json"
+    result = success("ask", source["source_id"], question, "--store", str(store.root), "--record", str(saved))
+    assert client.post(base, json={"question": question}, headers=headers).get_json() == result
+    assert result["status"] == "unavailable"
+    assert result["percent"] is result["absolute_change"] is None
+    assert result["trace"] == []
+    issue, = result["issues"]
+    assert issue["code"] == "incompatible"
+    assert all(text in issue["detail"] for text in ["FY2022 spans 53 weeks", "FY2023 spans 52 weeks"])
+    assert all(fact["status"] == "verified" for fact in result["operands"])
+    assert [fact["normalized_amount"] for fact in result["operands"]] == ["63054000000", "54228000000"]
+    for role, amount in [("prior", "63,054"), ("current", "54,228")]:
+        assert role in {item["id"] for item in result["citations"]}
+        url = f'/api/sources/{source["source_id"]}/growth/citations/{role}?prior=2022&current=2023'
+        assert amount in client.get(url).text
+    assert success("replay-ask", str(saved), "--store", str(store.root)) == result
+
+
+@pytest.mark.parametrize(("prior", "percent"), [(2022, "-14.00"), (2021, None)])
+def test_collection_growth_respects_the_original_comparison_pair(
+    tmp_path: Path, prior: int, percent: str | None,
+) -> None:
+    store = SourceStore(tmp_path / "store")
+    store.ingest_bytes(gzip.decompress(INTEL.read_bytes()), provenance="local_original")
+    saved = tmp_path / "collection.json"
+    result = success(
+        "ask-collection", f"What was Intel Corporation revenue growth from FY{prior} to FY2023?",
+        "--store", str(store.root), "--record", str(saved),
+    )
+    client = create_app(store, tmp_path).test_client()
+    if percent is None:
+        assert result["status"] == "evidence_unavailable"
+        assert result["percent"] is None
+        assert result["stop_reason"] == "incompatible"
+        assert {item["fact"]["reporting_period"]["fiscal_year"] for item in result["observations"]} == {prior, 2023}
+        for item in result["observations"]:
+            assert client.get(item["citation"]["href"]).status_code == 200
+    else:
+        assert result["status"] == "calculated"
+        assert result["percent"]["value"] == percent
+    assert result["citations"]
+    for citation in result["citations"]:
+        assert client.get(citation["href"]).status_code == 200
+    assert success("replay-collection", str(saved), "--store", str(store.root)) == result
 
 
 def test_lookup_with_a_separate_title_table_opens_statement_and_notes(

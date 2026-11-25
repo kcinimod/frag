@@ -4,7 +4,7 @@ import json
 import re
 from collections.abc import Callable
 from time import perf_counter
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, NotRequired, TypedDict
 
 from frag import dated_revenue
 from frag.citations import has_citable_amount, revenue_cell_citation
@@ -18,6 +18,7 @@ METRIC = "reported_consolidated_revenue"
 RECORD_VERSION = 1
 DATED_GROWTH_RECORD_VERSION = 2
 STATEMENT_LOOKUP_RECORD_VERSION = 3
+ORIGINAL_GROWTH_RECORD_VERSION = 4
 REVENUE = r"(?:(?:annual|reported|consolidated|total) )*revenue"
 YEAR = r"(?:fy ?|fiscal year )?([1-9][0-9]{3})"
 LOOKUP = re.compile(
@@ -25,10 +26,11 @@ LOOKUP = re.compile(
     rf"(?:{REVENUE} (?:in |for )?{YEAR}|{YEAR} {REVENUE})[?.]?"
 )
 GROWTH_PHRASE = rf"(?:(?:what (?:was|is)|show me) (?:the )?)?{REVENUE} growth"
+EQUAL_LENGTH = r"( using equal-length fiscal years)?[?.]?"
 GROWTH_FROM = re.compile(
-    rf"(?:how did {REVENUE} change|{GROWTH_PHRASE}) from {YEAR} to {YEAR}[?.]?"
+    rf"(?:how did {REVENUE} change|{GROWTH_PHRASE}) from {YEAR} to {YEAR}{EQUAL_LENGTH}"
 )
-GROWTH_BETWEEN = re.compile(rf"{GROWTH_PHRASE} between {YEAR} and {YEAR}[?.]?")
+GROWTH_BETWEEN = re.compile(rf"{GROWTH_PHRASE} between {YEAR} and {YEAR}{EQUAL_LENGTH}")
 CLARIFICATION = (
     "Ask for annual reported consolidated revenue for one fiscal year, such as “What was revenue in FY2023?” "
     "For growth, name both fiscal years in order, such as “How did revenue change from FY2022 to FY2023?”"
@@ -48,6 +50,7 @@ class ResolvedGrowth(TypedDict):
     metric: str
     prior_year: int
     current_year: int
+    equal_length: NotRequired[bool]
 
 
 ResolvedRequest = ResolvedLookup | ResolvedGrowth
@@ -63,10 +66,13 @@ def resolve_request(question: str) -> ResolvedRequest | None:
     match = GROWTH_FROM.fullmatch(normalized) or GROWTH_BETWEEN.fullmatch(normalized)
     if not match:
         return None
-    prior, current = map(int, match.groups())
+    prior, current = int(match[1]), int(match[2])
     if prior >= current:
         return None
-    return {"operation": "growth", "metric": METRIC, "prior_year": prior, "current_year": current}
+    growth: ResolvedGrowth = {"operation": "growth", "metric": METRIC, "prior_year": prior, "current_year": current}
+    if match[3]:
+        growth["equal_length"] = True
+    return growth
 
 
 def _eligible_facts(source: dict[str, Any]) -> list[dict[str, Any]]:
@@ -274,7 +280,9 @@ def _execute_growth(
     prior_id, current_id = prior[0]["fact_id"], current[0]["fact_id"]
     if [step["inputs"] for step in steps] != _growth_inputs(current_id, prior_id):
         return invalid
-    return {"operation": "growth", **calculate_growth(source, prior_year, current_year)}
+    return {"operation": "growth", **calculate_growth(
+        source, prior_year, current_year, equal_length=request.get("equal_length", False),
+    )}
 
 
 def _growth_inputs(current: str, prior: str) -> list[list[str]]:
@@ -299,6 +307,8 @@ def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
     if request["operation"] == "lookup" and source.get("parser_version") == LEGACY_STATEMENT_PARSER:
         return STATEMENT_LOOKUP_RECORD_VERSION
     if request["operation"] == "growth" and source.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS:
+        if source.get("parser_version") in dated_revenue.ORIGINAL_EVIDENCE_PARSERS:
+            return ORIGINAL_GROWTH_RECORD_VERSION
         return DATED_GROWTH_RECORD_VERSION
     return RECORD_VERSION
 
@@ -324,7 +334,8 @@ def _question_gap(
 ) -> dict[str, Any] | None:
     if request["operation"] == "lookup":
         return _dated_lookup_gap(source, facts, request)
-    growth = assess_growth(source, request["prior_year"], request["current_year"])
+    growth = assess_growth(source, request["prior_year"], request["current_year"],
+                           equal_length=request.get("equal_length", False))
     if growth["status"] == "unavailable":
         return {"operation": "growth", **growth}
     return None
@@ -407,8 +418,12 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         raise SourceError("The saved request does not match its question.")
     version = record.get("version")
     expected_version = _record_version(source, request)
-    if version not in (RECORD_VERSION, expected_version):
+    old_original_growth = (version == DATED_GROWTH_RECORD_VERSION
+                           and expected_version == ORIGINAL_GROWTH_RECORD_VERSION)
+    if version not in (RECORD_VERSION, expected_version) and not old_original_growth:
         raise SourceError("The validation record must contain a supported saved question.")
+    if old_original_growth:
+        source = source | {"comparison": dated_revenue.legacy_comparison()}
     legacy_growth = version == RECORD_VERSION and expected_version == DATED_GROWTH_RECORD_VERSION
     facts = _eligible_facts(source)
     evidence, expected_payload = _planner_input(source, facts, request, legacy_growth=legacy_growth)

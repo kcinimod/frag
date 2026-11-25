@@ -11,7 +11,8 @@ from urllib.parse import quote
 
 from frag import store as source_store
 from frag.citations import citation_lines, citation_text, has_citable_amount, revenue_cell_citation
-from frag.dated_revenue import PARSER_VERSION as DATED_PARSER_VERSION, legacy_comparison
+from frag.dated_revenue import ORIGINAL_EVIDENCE_PARSERS, legacy_comparison
+from frag.dated_revenue import PARSER_VERSION as DATED_PARSER_VERSION
 from frag.growth import calculate_growth, disclosure_citations, note_citation_id
 from frag.lookup import METRIC, resolve_request
 from frag.store import SourceError, SourceNotFound, SourceStore, StoreMissing
@@ -86,6 +87,7 @@ class CollectionIndex:
     @classmethod
     def build(
         cls, store: SourceStore, source_ids: set[str] | None = None, *, legacy_dated_comparison: bool = False,
+        legacy_original_comparison: bool = False,
     ) -> "CollectionIndex":
         try:
             sources = store.inspect_sources(source_ids)
@@ -103,8 +105,10 @@ class CollectionIndex:
             if identity["source_id"] != "sha256:" + identity["source_hash"]:
                 raise SourceError("Collection source identifier does not match its preserved hash.")
             inputs.append(identity | {"evidence_hash": _fingerprint(source["facts"])})
-            comparison = (legacy_comparison() if legacy_dated_comparison and identity["parser_version"] == DATED_PARSER_VERSION
-                          else source["comparison"])
+            parser = identity["parser_version"]
+            legacy = ((legacy_dated_comparison and parser == DATED_PARSER_VERSION)
+                      or (legacy_original_comparison and parser in ORIGINAL_EVIDENCE_PARSERS))
+            comparison = legacy_comparison() if legacy else source["comparison"]
             comparisons[identity["source_id"]] = {
                 "comparison": comparison,
                 "fact_ids": comparison.get("fact_ids", [fact["fact_id"] for fact in source["facts"]]),
@@ -870,7 +874,10 @@ def replay_collection(store: SourceStore, record: object) -> dict[str, Any]:
         legacy_manifest["index_version"] = "collection-index-v1"
         index = replace(index, manifest={"snapshot_id": "sha256:" + _fingerprint(legacy_manifest), **legacy_manifest})
     elif _fingerprint(index.manifest) != _fingerprint(manifest):
-        index = CollectionIndex.build(store, source_ids, legacy_dated_comparison=True)
+        index = CollectionIndex.build(store, source_ids, legacy_original_comparison=True)
+        if _fingerprint(index.manifest) != _fingerprint(manifest):
+            index = CollectionIndex.build(store, source_ids, legacy_dated_comparison=True,
+                                          legacy_original_comparison=True)
     if _fingerprint(index.manifest) != _fingerprint(manifest):
         raise SourceError("The saved collection snapshot does not match the reproduced index or versions.")
     reproduced: dict[str, Any] = {}

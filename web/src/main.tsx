@@ -46,6 +46,8 @@ type Source = {
   comparison?: {
     status: 'compatible' | 'unresolved';
     basis: string | null;
+    detail?: string;
+    fact_ids?: string[];
     evidence: (Disclosure & { id: string })[];
     scope_caveats: string[];
     unresolved_requirements: string[];
@@ -437,6 +439,11 @@ function CollectionLookup() {
 
 function SourceDetail({ source }: { source: Source }) {
   const diagnostics = source.diagnostics ?? [];
+  const comparisonIds = source.comparison?.fact_ids;
+  const comparisonYears = source.facts
+    .filter(fact => comparisonIds?.includes(fact.fact_id) ?? (source.comparison?.status === 'compatible'))
+    .map(fact => fact.reporting_period.fiscal_year)
+    .sort((a, b) => a - b);
   return (
     <section className="panel detail" aria-labelledby="detail-title">
       <h2 id="detail-title">{source.company ?? 'Source record'}</h2>
@@ -473,8 +480,9 @@ function SourceDetail({ source }: { source: Source }) {
       {source.facts.map(fact => <RevenueDetail fact={fact} key={fact.fact_id} />)}
       {source.comparison && source.facts.length > 0 && (
         <section aria-labelledby="comparison-title">
-          <h3 id="comparison-title">FY2022 and FY2023 comparison</h3>
-          <p>{source.comparison.basis ?? 'Comparison is unresolved.'}</p>
+          <h3 id="comparison-title">{comparisonYears.length === 2
+            ? `FY${comparisonYears[0]} and FY${comparisonYears[1]} comparison` : 'Revenue comparison'}</h3>
+          <p>{source.comparison.basis ?? source.comparison.detail ?? 'Comparison is unresolved.'}</p>
           {source.comparison.unresolved_requirements.length > 0 && (
             <p>Open requirements · {formatRequirements(source.comparison.unresolved_requirements)}</p>
           )}
