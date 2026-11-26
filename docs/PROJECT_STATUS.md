@@ -168,3 +168,10 @@ Phase 2 calculator and its offline results.
   the historical GE observation remains provisional. Six numeric answers,
   two evidence gaps, and 42 opened citation responses reproduced offline.
   [Issue #39 evidence and checks](../artifacts/phase06/GE_HD_UPS_REVENUE.md)
+
+- Issue #40 verifies Coca-Cola's absent-year citation and companion amount,
+  adds P&G fiscal-calendar evidence, and restores Microsoft's original USD
+  measure in both growth citations. Historical GE remains provisional and
+  the Apple FY2024 regression remains incomplete. Five results and 19
+  citation responses matched offline and in the browser.
+  [Issue #40 evidence and checks](../artifacts/phase06/GROUNDED_EVIDENCE.md)

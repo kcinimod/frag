@@ -363,3 +363,12 @@ shared visible statement path for titles inside or outside the table and
 retain visible observations with an explicit verification gap when the inline
 evidence is missing.
 [Issue #39 evidence and checks](../artifacts/phase06/GE_HD_UPS_REVENUE.md)
+
+### Cite original fiscal dates for unequal day counts (#40)
+
+When an equal-length request is withheld over different day counts, link
+the verified inline contexts alongside the two original revenue cells.
+The dates let readers check the inclusive day counts and keep the filed
+amounts available. Preserve the citation shape of earlier validation
+records through replay.
+[Issue #40 evidence and checks](../artifacts/phase06/GROUNDED_EVIDENCE.md)

@@ -114,7 +114,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.command == "inspect":
             result = store.inspect(args.source_id)
         elif args.command == "growth":
-            result = calculate_growth(store.inspect(args.source_id), args.prior_year, args.current_year)
+            result = calculate_growth(
+                store.inspect(args.source_id), args.prior_year, args.current_year, include_statement_context=True,
+            )
         elif args.command == "ask":
             record: dict[str, Any] | None = {} if args.record else None
             if args.record and args.record.exists():

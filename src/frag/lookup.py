@@ -7,7 +7,9 @@ from time import perf_counter
 from typing import Any, Literal, NotRequired, TypedDict
 
 from frag import dated_revenue
-from frag.citations import has_citable_amount, revenue_cell_citation, statement_period_citation
+from frag.citations import (
+    FISCAL_CALENDAR_CITATION, has_citable_amount, revenue_cell_citation, statement_period_citation,
+)
 from frag.growth import METRIC as METRIC
 from frag.growth import annual_revenue_facts, assess_growth, calculate_growth, disclosure_citations, observation_gap
 from frag.local_model import MODEL_ALIAS, MODEL_SETTINGS, InvalidModelResponse, ModelUnavailable
@@ -20,6 +22,8 @@ DATED_GROWTH_RECORD_VERSION = 2
 STATEMENT_LOOKUP_RECORD_VERSION = 3
 ORIGINAL_GROWTH_RECORD_VERSION = 4
 EVIDENCE_GAP_RECORD_VERSION = 5
+STATEMENT_GROWTH_RECORD_VERSION = 6
+CALENDAR_GAP_RECORD_VERSION = 7
 REVENUE = r"(?:(?:annual|reported|consolidated|total) )*revenue"
 YEAR = r"(?:fy ?|fiscal year )?([1-9][0-9]{3})"
 LOOKUP = re.compile(
@@ -256,6 +260,7 @@ def _execute_lookup(facts: list[dict[str, Any]], year: int, plan: Any, *, legacy
 
 def _execute_growth(
     source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedGrowth, plan: Any,
+    *, legacy_citations: bool,
 ) -> dict[str, Any]:
     invalid = {"status": "invalid_plan", "message": "The plan did not match the requested revenue growth calculation."}
     if not isinstance(plan, dict) or set(plan) != {"operation", "steps"} or plan["operation"] != "growth":
@@ -283,6 +288,7 @@ def _execute_growth(
         return invalid
     return {"operation": "growth", **calculate_growth(
         source, prior_year, current_year, equal_length=request.get("equal_length", False),
+        include_statement_context=not legacy_citations,
     )}
 
 
@@ -292,12 +298,12 @@ def _growth_inputs(current: str, prior: str) -> list[list[str]]:
 
 def _execute(
     source: dict[str, Any], facts: list[dict[str, Any]], request: ResolvedRequest, proposal: str,
-    *, legacy_lookup: bool = False,
+    *, legacy_citations: bool = False,
 ) -> dict[str, Any]:
     plan = _parse_plan(proposal)
     if request["operation"] == "lookup":
-        return _execute_lookup(facts, request["fiscal_year"], plan, legacy=legacy_lookup)
-    return _execute_growth(source, facts, request, plan)
+        return _execute_lookup(facts, request["fiscal_year"], plan, legacy=legacy_citations)
+    return _execute_growth(source, facts, request, plan, legacy_citations=legacy_citations)
 
 
 def _identity(source: dict[str, Any]) -> dict[str, Any]:
@@ -305,8 +311,8 @@ def _identity(source: dict[str, Any]) -> dict[str, Any]:
 
 
 def _record_version(source: dict[str, Any], request: ResolvedRequest) -> int:
-    if request["operation"] == "lookup" and source.get("parser_version") == LEGACY_STATEMENT_PARSER:
-        return STATEMENT_LOOKUP_RECORD_VERSION
+    if source.get("parser_version") == LEGACY_STATEMENT_PARSER:
+        return STATEMENT_LOOKUP_RECORD_VERSION if request["operation"] == "lookup" else STATEMENT_GROWTH_RECORD_VERSION
     if request["operation"] == "growth" and source.get("parser_version") in dated_revenue.FILING_SCOPED_PARSERS:
         if source.get("parser_version") in dated_revenue.ORIGINAL_EVIDENCE_PARSERS:
             return ORIGINAL_GROWTH_RECORD_VERSION
@@ -372,7 +378,12 @@ def ask_revenue(
     model_ms = None
     execution_start: float | None = perf_counter()
     outcome = _question_gap(source, facts, request)
-    version = EVIDENCE_GAP_RECORD_VERSION if outcome is not None else _record_version(source, request)
+    if outcome is None:
+        version = _record_version(source, request)
+    elif any(citation["id"] == FISCAL_CALENDAR_CITATION for citation in outcome["citations"]):
+        version = CALENDAR_GAP_RECORD_VERSION
+    else:
+        version = EVIDENCE_GAP_RECORD_VERSION
     if outcome is None:
         execution_start = None
         model_start = perf_counter()
@@ -436,7 +447,8 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
     expected_version = _record_version(source, request)
     old_original_growth = (version == DATED_GROWTH_RECORD_VERSION
                            and expected_version == ORIGINAL_GROWTH_RECORD_VERSION)
-    if version not in (RECORD_VERSION, expected_version, EVIDENCE_GAP_RECORD_VERSION) and not old_original_growth:
+    gap_versions = (EVIDENCE_GAP_RECORD_VERSION, CALENDAR_GAP_RECORD_VERSION)
+    if version not in (RECORD_VERSION, expected_version, *gap_versions) and not old_original_growth:
         raise SourceError("The validation record must contain a supported saved question.")
     if old_original_growth:
         source = source | {"comparison": dated_revenue.legacy_comparison()}
@@ -448,9 +460,17 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         raise SourceError("The saved source or evidence does not match the current filing evidence.")
     saved_payload = record.get("model_request")
     # Older records may contain a model proposal for a growth question with missing evidence.
-    if version == EVIDENCE_GAP_RECORD_VERSION:
+    if version in gap_versions:
         gap = _question_gap(source, facts, request)
         if gap is None:
+            raise SourceError("The saved evidence gap does not match the current filing evidence.")
+        gap["citations"] = [
+            citation for citation in gap["citations"]
+            if version == CALENDAR_GAP_RECORD_VERSION or citation["id"] != FISCAL_CALENDAR_CITATION
+        ]
+        if version == CALENDAR_GAP_RECORD_VERSION and not any(
+            citation["id"] == FISCAL_CALENDAR_CITATION for citation in gap["citations"]
+        ):
             raise SourceError("The saved evidence gap does not match the current filing evidence.")
     else:
         gap = (_question_gap(source, facts, request, legacy=True) if saved_payload is None
@@ -472,7 +492,7 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         raise SourceError("The validation record must contain a supported saved proposal.")
     if legacy_growth:
         source = source | {"comparison": dated_revenue.legacy_comparison()}
-    outcome = _execute(source, facts, request, proposal, legacy_lookup=version == RECORD_VERSION)
+    outcome = _execute(source, facts, request, proposal, legacy_citations=version == RECORD_VERSION)
     if legacy_growth and outcome["status"] == "unavailable":
         outcome["citations"] = []
     return {**identity, **outcome}

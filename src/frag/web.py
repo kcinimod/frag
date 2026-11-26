@@ -9,7 +9,7 @@ from typing import Literal, cast
 from flask import Flask, Response, jsonify, request
 from werkzeug.exceptions import RequestEntityTooLarge
 
-from frag.citations import citation_text
+from frag.citations import FISCAL_CALENDAR_CITATION, citation_text
 from frag.collection import CollectionIndex, ask_collection, collection_excerpt
 from frag.growth import calculate_growth
 from frag.local_model import propose_lookup
@@ -78,13 +78,15 @@ def create_app(store: SourceStore, assets: Path, *, planner: Planner = propose_l
     @app.get("/api/sources/<source_id>/growth")
     def growth(source_id: str) -> Response:
         years = fiscal_years()
-        return jsonify(calculate_growth(store.inspect(source_id), *years))
+        return jsonify(calculate_growth(store.inspect(source_id), *years, include_statement_context=True))
 
     @app.get("/api/sources/<source_id>/growth/citations/<citation_id>")
     def growth_citation(source_id: str, citation_id: str) -> Response:
         years = fiscal_years()
         source, original = store.inspect_with_original(source_id)
-        result = calculate_growth(source, *years)
+        result = calculate_growth(
+            source, *years, equal_length=citation_id == FISCAL_CALENDAR_CITATION, include_statement_context=True,
+        )
         for citation in result["citations"]:
             if citation["id"] == citation_id:
                 return Response(

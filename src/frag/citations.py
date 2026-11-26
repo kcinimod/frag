@@ -9,7 +9,8 @@ from frag.store import SourceError
 from frag.verification import REFERENCE
 
 CELL_END = re.compile(r"</(?:td|th)\s*>", re.IGNORECASE)
-BLOCK_TAGS = {"div", "p", "tr", "h1", "h2", "h3", "li"}
+BLOCK_TAGS = {"div", "p", "tr", "h1", "h2", "h3", "li", "xbrli:identifier", "xbrli:startdate", "xbrli:enddate"}
+FISCAL_CALENDAR_CITATION = "fiscal-calendar"
 
 
 def has_citable_amount(fact: dict[str, Any]) -> bool:
@@ -65,6 +66,19 @@ def revenue_cell_citation(
     }
 
 
+def fiscal_calendar_citation(operands: list[dict[str, Any]]) -> dict[str, Any] | None:
+    contexts = {
+        f'FY{fact["reporting_period"]["fiscal_year"]}': fact["locators"].get("inline_context")
+        for fact in operands
+    }
+    if not all(contexts.values()):
+        return None
+    return {
+        "id": FISCAL_CALENDAR_CITATION, "title": "Fiscal calendar · Original reporting periods",
+        "period_contexts": contexts,
+    }
+
+
 class _ExcerptText(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -107,8 +121,14 @@ def citation_text(original: bytes, source_hash: str, citation: dict[str, Any]) -
 
 
 def citation_lines(lines: list[str], source_hash: str, citation: dict[str, Any]) -> str:
-    locator = citation["locator"]
     heading = f'{citation["title"]}\nSource SHA-256 · {source_hash}\n'
+    if "period_contexts" in citation:
+        excerpts = [
+            f"{year} · {_position(context)}\n{_context_text(lines, 'inline_context', context)}"
+            for year, context in citation["period_contexts"].items()
+        ]
+        return heading + "\n" + "\n\n".join(excerpts) + "\n"
+    locator = citation["locator"]
     if "table_locators" in citation:
         table = _fragment_at(lines, locator)
         context = citation["table_locators"]
@@ -171,7 +191,9 @@ def _context_text(lines: list[str], key: str, locator: dict[str, int]) -> str:
     fragment = _fragment_at(lines, locator)
     if key == "statement_heading" and re.match(r"<(?:td|th)[\s>]", fragment, re.IGNORECASE):
         return _cell_text(lines, locator)
-    tags = "xbrli:measure" if key == "currency_measure" else "div|p|h[1-6]|caption"
+    tags = {"currency_measure": "xbrli:measure", "inline_context": "xbrli:context"}.get(
+        key, "div|p|h[1-6]|caption",
+    )
     start = re.match(rf"<({tags})[\s>]", fragment, re.IGNORECASE)
     boundary = r"|(?=<table[\s>])" if key in {"unit_header", "statement_heading"} else ""
     if not start:

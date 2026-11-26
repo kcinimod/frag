@@ -74,9 +74,11 @@ def test_browser_growth_api_resolves_only_published_citations(tmp_path: Path) ->
 
     prior = client.get(base + "/citations/prior" + query)
     assert prior.mimetype == "text/plain"
+    assert "iso4217:USD" in prior.text
     assert prior.text.endswith("Total revenue\n2022\n(In millions, except per share amounts)\n198,270\n")
     assert "HTML line 4403, character 5" in prior.text
     current = client.get(base + "/citations/current" + query)
+    assert "iso4217:USD" in current.text
     assert current.text.endswith("\n211,915\n")
     assert "HTML line 4399, character 5" in current.text
     note = client.get(base + "/citations/note-8" + query)

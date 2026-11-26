@@ -20,6 +20,62 @@ ROOT = Path(__file__).resolve().parents[1]
 REVIEWS = json.loads((ROOT / "tests/fixtures/phase06_pg_ko_review.json").read_bytes())
 
 
+def test_equal_length_growth_opens_reviewed_fiscal_calendar(tmp_path: Path) -> None:
+    original = gzip.decompress((ROOT / "artifacts/phase06/originals/pg-20240630.htm.gz").read_bytes())
+    store = SourceStore(tmp_path)
+    source = store.ingest_bytes(original, provenance="local_original")
+    base = f'/api/sources/{source["source_id"]}'
+    client = create_app(store, tmp_path, planner=lambda _: pytest.fail("Evidence gap reached the planner")).test_client()
+    result = client.post(base + "/lookup", headers={"X-Frag-Ask": "1"}, json={
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 using equal-length fiscal years?",
+    }).get_json()
+    assert result["status"] == "unavailable" and result["percent"] is None
+    assert [(fact["role"], fact["raw_amount"]) for fact in result["operands"]] == [
+        ("prior", "82,006"), ("current", "84,039"),
+    ]
+    assert "FY2023 spans 365 days and FY2024 spans 366 days" in result["issues"][0]["detail"]
+    citations = {}
+    for citation in result["citations"]:
+        response = client.get(base + f'/growth/citations/{citation["id"]}?prior=2023&current=2024')
+        assert response.status_code == 200
+        citations[citation["id"]] = response.text
+    assert "82,006" in citations["prior"]
+    assert "84,039" in citations["current"]
+    for dates in ("2022-07-01\n2023-06-30", "2023-07-01\n2024-06-30"):
+        assert dates in citations["fiscal-calendar"]
+
+
+@pytest.mark.parametrize("variant", ["incomplete_inventory", "displayed_year_without_inline_evidence"])
+def test_coca_cola_incomplete_evidence_cannot_establish_absence(variant: str, tmp_path: Path) -> None:
+    filename = "ko-20241231.htm"
+    original = gzip.decompress((ROOT / "artifacts/phase06/originals" / (filename + ".gz")).read_bytes())
+    review = REVIEWS[filename]["evidence"]
+    if variant == "incomplete_inventory":
+        span = review["locators"]["period_header"]
+        before, after, requested = b">2022</span>", b">Unresolved period</span>", 2021
+    else:
+        span = review["facts"]["2023"]["locators"]["statement_cell"]
+        before, after, requested = b'name="us-gaap:Revenues"', b'name="synthetic:UnsupportedRevenue"', 2023
+    start, end = span["start_byte"], span["end_byte"]
+    assert before in original[start:end]
+    # Synthetic edits exercise the original-intake verification path.
+    changed = original[:start] + original[start:end].replace(before, after, 1) + original[end:]
+    store = SourceStore(tmp_path)
+    source = store.ingest_bytes(changed, provenance="local_original")
+    base = f'/api/sources/{source["source_id"]}'
+    client = create_app(store, tmp_path, planner=lambda _: pytest.fail("Evidence gap reached the planner")).test_client()
+    result = client.post(base + "/lookup", headers={"X-Frag-Ask": "1"}, json={
+        "question": f"How did reported consolidated revenue change from FY{requested} to FY2024?",
+    }).get_json()
+    assert result["status"] == "unavailable" and result["percent"] is None
+    assert result["issues"][0]["code"] == "unverified"
+    assert all(citation["id"] != "statement-periods" for citation in result["citations"])
+    if requested == 2023:
+        assert [fact["raw_amount"] for fact in result["operands"]] == ["47,061"]
+    else:
+        assert not source.get("statement_periods")
+
+
 def byte_position(original: list[bytes], locator: dict[str, int]) -> int:
     index = locator["line"] - 1
     return (sum(len(line) + 1 for line in original[:index])
