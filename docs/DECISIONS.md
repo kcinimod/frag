@@ -390,3 +390,13 @@ extraction separately from verification. Count historical GE FY2018 as a
 matched provisional observation and keep Apple FY2024 as an incomplete
 regression while the original's identity and disclosures need verification.
 [Development gate results and replay](../artifacts/phase06/DEVELOPMENT_GATE.md)
+
+### Seal the Phase 6 fresh SEC holdout (#43)
+
+Reserve entire issuer families, including their amendments, alternate copies,
+and related questions. Keep preserved originals and questions in a runner
+archive. Keep expected results, original evidence locators, and the
+independent review in a scorer archive. Publish only aggregate findings and
+the archive digests. Release runner inputs when the acceptance freeze is
+recorded and keep the scoring references with the scorer.
+[Fresh holdout custody](../artifacts/phase06/SEC_HOLDOUT.md)

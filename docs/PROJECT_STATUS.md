@@ -188,3 +188,9 @@ Phase 2 calculator and its offline results.
   stopping at verification. Both cohorts reproduce all results and citations
   offline. The collection and filing browser checks pass.
   [Development gate results and replay](../artifacts/phase06/DEVELOPMENT_GATE.md)
+
+- Issue #43 seals the independently reviewed fresh SEC holdout. The runner
+  and scorer archives are in separate custody outside the checkout. The
+  public receipt records both SHA-256 seals. The runner release awaits the
+  issue #44 acceptance freeze.
+  [Fresh holdout custody](../artifacts/phase06/SEC_HOLDOUT.md)

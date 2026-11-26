@@ -1,0 +1,41 @@
+{
+  "case_count": 15,
+  "case_counts_by_outcome": {
+    "absent_year": 1,
+    "answerable": 12,
+    "incompatible_periods": 1,
+    "present_unverifiable": 1
+  },
+  "cohort": "sec-phase06-holdout-43-v1",
+  "custody": {
+    "acceptance_freeze": "pending",
+    "development_gate": "passed",
+    "location_relative_to_checkout": "../FRAG-SEC-Holdout-43",
+    "runner_release": "after acceptance freeze",
+    "scorer_access": "scorer only",
+    "sealed_at_utc": "2026-11-26T04:08:10+00:00"
+  },
+  "development_gate_record_sha256": "3a917343345dfb3fe7d82c462ea1cc6861984a569093392060045882b05b588b",
+  "development_layout_inventory_sha256": "13ab8c49b17136a41cc4c3da5377a1163f59fc01f1b6928a900f781830539f7e",
+  "independent_review": {
+    "overlapping_issuer_families": 0,
+    "overlapping_originals": 0,
+    "sha256": "7bc607891f04f648ea1ffa975faa1a48cd95b30b867471ac432c1eb05917e0dc",
+    "status": "passed"
+  },
+  "issuer_count": 6,
+  "new_statement_layout_count": 2,
+  "observation_count": 21,
+  "original_count": 7,
+  "preparation_base": "ac70b451e2491fe0e67e2c875e430b18e8d02b05",
+  "runner_bundle": {
+    "path": "runner/inputs.zip",
+    "sha256": "42a49717074b7f2eb299313e80e57bd2aed0ff810e24edb3b2cefc5351fcbceb"
+  },
+  "scorer_bundle": {
+    "path": "scorer/expected.zip",
+    "sha256": "2140f69d74b6546ef4bfdc0942b6e6bbd138db8d2e638150f5f54878f2c3372e"
+  },
+  "statement_layout_count": 4,
+  "version": 1
+}
