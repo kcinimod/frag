@@ -207,3 +207,8 @@ Phase 2 calculator and its offline results.
   All 30 results and citation sets match with sockets blocked. Case-level
   stops are request resolution, extraction, and verification.
   [Fresh acceptance checkpoint](../artifacts/phase06/SEC_ACCEPTANCE.md)
+
+- Issue #47 verifies Netflix's three FY2022 to FY2024 revenue observations.
+  The FY2024 lookup, 15.65% reported growth, and cited FY2021 absence with
+  the verified FY2024 companion all reproduced offline.
+  [Netflix validation](../artifacts/phase06/NETFLIX_REVENUE.md)

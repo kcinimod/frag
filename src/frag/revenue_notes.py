@@ -10,7 +10,9 @@ from frag.income_html import (
 
 NOTES_HEADING = "notes to consolidated financial statements"
 NOTE_HEADING = re.compile(r"note\s+(\d+)(?:\s*[.\-–—:]\s*\w|$)", re.I)
+NUMBERED_POLICY = re.compile(r"1\.\s*(?:Organization and )?Summary of Significant Accounting Policies", re.I)
 CONSOLIDATION = re.compile(r"(?:principles|basis) of consolidation", re.I)
+BASIS_OF_PRESENTATION = re.compile(r"Basis of Presentation", re.I)
 REVENUE = re.compile(r"revenue(?: recognition)?", re.I)
 CONSOLIDATED_ACCOUNTS = re.compile(r"\bconsolidated financial statements(?: of [^.]+)? include the accounts\b", re.I)
 ELIMINATIONS = re.compile(
@@ -18,7 +20,8 @@ ELIMINATIONS = re.compile(
     r"(?: between consolidated entities)? (?:are|have been) eliminated\b", re.I,
 )
 NET_REVENUE = re.compile(
-    r"\b(?:revenue (?:also )?excludes[^.]*\btaxes|net of sales (?:and other )?taxes|taxes are excluded from revenues?)\b",
+    r"\b(?:revenue (?:also )?excludes[^.]*\btaxes|net of sales (?:and other )?taxes|taxes are excluded from revenues?"
+    r"|net of the taxes that are collected from [^.]+ and remitted to governmental authorities)\b",
     re.I,
 )
 RECOGNITION = re.compile(r"\b(?:recogniz\w+|measured)\b", re.I)
@@ -243,20 +246,23 @@ def accounting_policy_notes(
     blocks = [block for block in document.blocks if block.position > after]
     sections = [i for i, block in enumerate(blocks[:-1])
                 if block.text.casefold() == NOTES_HEADING
-                and re.match(r"note\s+1\b", blocks[i + 1].text, re.I)
-                and "policies" in blocks[i + 1].text.casefold()]
+                and (NUMBERED_POLICY.fullmatch(blocks[i + 1].text)
+                     or (re.match(r"note\s+1\b", blocks[i + 1].text, re.I)
+                         and "policies" in blocks[i + 1].text.casefold()))]
     if len(sections) != 1:
         return []
     start = sections[0] + 2
+    numbered = NUMBERED_POLICY.fullmatch(blocks[start - 1].text) is not None
     # A later disclosure may qualify the amounts or basis established by these policies.
     basis_gaps = _revenue_basis_gaps(blocks[start:])
     if basis_gaps is None or basis_gaps:
         return []
-    end = next((i for i in range(start, len(blocks)) if NOTE_HEADING.match(blocks[i].text)), None)
+    next_note = NUMBERED_NOTE if numbered else NOTE_HEADING
+    end = next((i for i in range(start, len(blocks)) if next_note.match(blocks[i].text)), None)
     if end is None:
         return []
     policy = blocks[start:end]
-    consolidation = _unique_heading(policy, CONSOLIDATION)
+    consolidation = _unique_heading(policy, BASIS_OF_PRESENTATION if numbered else CONSOLIDATION)
     revenue = _unique_heading(policy, REVENUE)
     if consolidation is None or revenue is None:
         return []
@@ -275,6 +281,13 @@ def accounting_policy_notes(
             return []
         revenue_end = revenue + 4
     revenue_policy = " ".join(block.text for block in policy[revenue + 1:revenue_end + 1])
+    # A page footer and navigation link can interrupt one policy paragraph.
+    page_break = policy[revenue_end + 1:revenue_end + 4]
+    if (not NET_REVENUE.search(revenue_policy) and len(page_break) == 3
+            and page_break[0].text.isdecimal() and page_break[1].text.casefold() == "table of contents"
+            and page_break[2].text[:1].islower()):
+        revenue_policy += " " + page_break[2].text
+        revenue_end += 3
     if not (NET_REVENUE.search(revenue_policy) and RECOGNITION.search(revenue_policy)):
         return []
     # A following policy heading provides a visible boundary for the consolidation text.
@@ -371,7 +384,7 @@ def cross_section_policy_notes(
 
 
 def _split_policy_note(lines: list[str], policy: list[TextBlock]) -> list[dict[str, Any]]:
-    basis = _unique_heading(policy, re.compile(r"Basis of Presentation", re.I))
+    basis = _unique_heading(policy, BASIS_OF_PRESENTATION)
     revenue = _unique_heading(policy, REVENUE)
     if basis is None or revenue is None or revenue + 2 >= len(policy):
         return []

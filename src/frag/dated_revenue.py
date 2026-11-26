@@ -29,7 +29,7 @@ FILING_SCOPED_PARSERS = ORIGINAL_EVIDENCE_PARSERS | {PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "statement-periods-v5"
+EXTRACTION_CACHE_REVISION = "statement-periods-v6"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
