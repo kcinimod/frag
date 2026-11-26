@@ -182,6 +182,13 @@ Phase 2 calculator and its offline results.
   reasons, and replay mismatches still block acceptance.
   [Phase 6 scoring controls](../artifacts/phase06/README.md#phase-6-scoring-controls)
 
+- Issue #46 resolves all seven growth questions that stopped at request
+  resolution in #44. The filing workflow uses the existing growth operation
+  for “as reported” and carries an explicit equal-length requirement into
+  the comparison. Regression coverage includes a cited Microsoft calculation,
+  a cited P&G fiscal-calendar gap, and clarification before planning.
+  [Request resolution ticket](https://github.com/kcinimod/frag/issues/46)
+
 - Issue #42 passes the development gate. The opened cohort matches all 19
   reviewed observations, verifies 18, and completes 15/15 cases in both
   passes. The earlier cohort completes 14/15, with the Apple FY2024 case

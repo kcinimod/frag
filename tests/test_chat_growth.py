@@ -15,6 +15,12 @@ from frag.store import SourceStore
 from frag.web import create_app
 
 QUESTION = "How did reported consolidated revenue change from FY2022 to FY2023?"
+OPENED_CASES = {
+    case["case_id"]: case["question"]
+    for case in json.loads(
+        (Path(__file__).resolve().parents[1] / "artifacts/phase06/fresh-inputs.json").read_bytes()
+    )["cases"]
+}
 
 
 def growth_plan(prior: str, current: str) -> dict[str, Any]:
@@ -32,8 +38,9 @@ def microsoft(tmp_path: Path) -> tuple[SourceStore, dict[str, Any]]:
     return store, source
 
 
+@pytest.mark.parametrize("question", [QUESTION, OPENED_CASES["P6-02"]])
 def test_chat_calculates_growth_with_original_filing_evidence(
-    tmp_path: Path, microsoft: tuple[SourceStore, dict[str, Any]],
+    tmp_path: Path, microsoft: tuple[SourceStore, dict[str, Any]], question: str,
 ) -> None:
     store, source = microsoft
     prior, current = (fact["fact_id"] for fact in source["facts"])
@@ -46,7 +53,7 @@ def test_chat_calculates_growth_with_original_filing_evidence(
     client = create_app(store, tmp_path, planner=propose).test_client()
     base = f'/api/sources/{source["source_id"]}'
     response = client.post(base + "/lookup", json={
-        "question": QUESTION,
+        "question": question,
     }, headers={"X-Frag-Ask": "1"})
     assert response.status_code == 200
     assert response.headers["Cache-Control"] == "no-store"
@@ -69,12 +76,40 @@ def test_chat_calculates_growth_with_original_filing_evidence(
     "How did revenue change from FY2022?",
     "Revenue from FY2022 to FY2023?",
     "What was revenue guidance growth from FY2022 to FY2023?",
+    "What was revenue growth from FY2022 or FY2023 to FY2024 as reported?",
+    "What was revenue growth from FY2022 to FY2023 on a constant-currency basis?",
+    "What was revenue growth from FY2022 to FY2023 as reported? Use constant currency.",
 ])
 def test_growth_clarifies_ambiguous_requests_before_planning(question: str) -> None:
     def propose(payload: dict[str, Any]) -> str:
         pytest.fail("Ambiguous questions must be resolved before planning.")
 
     assert ask_revenue({}, question, propose)["status"] == "clarify"
+
+
+@pytest.mark.parametrize(("case_id", "prior", "current", "equal_length"), [
+    ("P6-02", 2022, 2023, {}),
+    ("P6-04", 2023, 2024, {}),
+    ("P6-06", 2023, 2024, {}),
+    ("P6-08", 2024, 2025, {}),
+    ("P6-10", 2023, 2024, {}),
+    ("P6-12", 2023, 2024, {}),
+    ("P6-15", 2022, 2023, {"equal_length": True}),
+])
+def test_opened_growth_requests_preserve_resolved_years_on_evidence_gap(
+    case_id: str, prior: int, current: int, equal_length: dict[str, bool],
+) -> None:
+    record: dict[str, Any] = {}
+    result = ask_revenue(
+        {"source_id": "synthetic", "facts": []}, OPENED_CASES[case_id],
+        lambda _: pytest.fail("Missing evidence reached the planner"), record=record,
+    )
+    assert result["status"] == "unavailable"
+    assert [issue["fiscal_year"] for issue in result["issues"]] == [prior, current]
+    assert record["resolved_request"] == {
+        "operation": "growth", "metric": "reported_consolidated_revenue",
+        "prior_year": prior, "current_year": current, **equal_length,
+    }
 
 
 @pytest.mark.parametrize(("step", "replacement"), [
@@ -131,6 +166,7 @@ def test_missing_evidence_returns_both_gaps_without_planning() -> None:
 
 
 @pytest.mark.parametrize("question", [
+    OPENED_CASES["P6-02"],
     "Revenue growth from fiscal year 2022 to fiscal year 2023.",
     "What was revenue growth between FY2022 and FY2023?",
 ])

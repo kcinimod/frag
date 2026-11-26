@@ -177,7 +177,7 @@ def _resolve(index: CollectionIndex, question: str) -> tuple[dict[str, Any] | No
         return None, "Name one company from the preserved collection."
     company_key = company_keys.pop()
     ordinary_question = re.sub(r"\s+([?.])$", r"\1", company_pattern.sub(" ", normalized).strip())
-    request = resolve_request(ordinary_question)
+    request = resolve_request(ordinary_question, filing_scope=False)
     if request is None:
         return None, LOOKUP_CLARIFICATION + " For growth, name an earlier and a later fiscal year in order."
     return {**request, "company": index.companies[company_key], "company_key": company_key}, ""

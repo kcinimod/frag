@@ -20,15 +20,17 @@ ROOT = Path(__file__).resolve().parents[1]
 REVIEWS = json.loads((ROOT / "tests/fixtures/phase06_pg_ko_review.json").read_bytes())
 
 
-def test_equal_length_growth_opens_reviewed_fiscal_calendar(tmp_path: Path) -> None:
+@pytest.mark.parametrize("question", [
+    "What was reported consolidated revenue growth from FY2023 to FY2024 using equal-length fiscal years?",
+    "What was reported consolidated revenue growth from FY2023 to FY2024? Compare equal-length fiscal periods only.",
+])
+def test_equal_length_growth_opens_reviewed_fiscal_calendar(tmp_path: Path, question: str) -> None:
     original = gzip.decompress((ROOT / "artifacts/phase06/originals/pg-20240630.htm.gz").read_bytes())
     store = SourceStore(tmp_path)
     source = store.ingest_bytes(original, provenance="local_original")
     base = f'/api/sources/{source["source_id"]}'
     client = create_app(store, tmp_path, planner=lambda _: pytest.fail("Evidence gap reached the planner")).test_client()
-    result = client.post(base + "/lookup", headers={"X-Frag-Ask": "1"}, json={
-        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 using equal-length fiscal years?",
-    }).get_json()
+    result = client.post(base + "/lookup", headers={"X-Frag-Ask": "1"}, json={"question": question}).get_json()
     assert result["status"] == "unavailable" and result["percent"] is None
     assert [(fact["role"], fact["raw_amount"]) for fact in result["operands"]] == [
         ("prior", "82,006"), ("current", "84,039"),

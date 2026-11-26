@@ -31,11 +31,15 @@ LOOKUP = re.compile(
     rf"(?:{REVENUE} (?:in |for )?{YEAR}|{YEAR} {REVENUE})[?.]?"
 )
 GROWTH_PHRASE = rf"(?:(?:what (?:was|is)|show me) (?:the )?)?{REVENUE} growth"
-EQUAL_LENGTH = r"( using equal-length fiscal years)?[?.]?"
-GROWTH_FROM = re.compile(
-    rf"(?:how did {REVENUE} change|{GROWTH_PHRASE}) from {YEAR} to {YEAR}{EQUAL_LENGTH}"
+GROWTH_SUFFIX = (
+    r"(?P<as_reported> as reported)?"
+    r"(?:(?P<equal_length> using equal-length fiscal years)?[?.]?"
+    r"|[?.] (?P<equal_length_instruction>compare equal-length fiscal periods only)[?.]?)"
 )
-GROWTH_BETWEEN = re.compile(rf"{GROWTH_PHRASE} between {YEAR} and {YEAR}{EQUAL_LENGTH}")
+GROWTH_FROM = re.compile(
+    rf"(?:how did {REVENUE} change|{GROWTH_PHRASE}) from {YEAR} to {YEAR}{GROWTH_SUFFIX}"
+)
+GROWTH_BETWEEN = re.compile(rf"{GROWTH_PHRASE} between {YEAR} and {YEAR}{GROWTH_SUFFIX}")
 CLARIFICATION = (
     "Ask for annual reported consolidated revenue for one fiscal year, such as “What was revenue in FY2023?” "
     "For growth, name both fiscal years in order, such as “How did revenue change from FY2022 to FY2023?”"
@@ -61,7 +65,7 @@ class ResolvedGrowth(TypedDict):
 ResolvedRequest = ResolvedLookup | ResolvedGrowth
 
 
-def resolve_request(question: str) -> ResolvedRequest | None:
+def resolve_request(question: str, *, filing_scope: bool = True) -> ResolvedRequest | None:
     if len(question) > 300:
         return None
     normalized = " ".join(question.lower().split())
@@ -71,11 +75,14 @@ def resolve_request(question: str) -> ResolvedRequest | None:
     match = GROWTH_FROM.fullmatch(normalized) or GROWTH_BETWEEN.fullmatch(normalized)
     if not match:
         return None
+    instruction = match["equal_length_instruction"]
+    if not filing_scope and (match["as_reported"] or instruction):
+        return None
     prior, current = int(match[1]), int(match[2])
     if prior >= current:
         return None
     growth: ResolvedGrowth = {"operation": "growth", "metric": METRIC, "prior_year": prior, "current_year": current}
-    if match[3]:
+    if match["equal_length"] or instruction:
         growth["equal_length"] = True
     return growth
 
