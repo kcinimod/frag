@@ -400,3 +400,11 @@ independent review in a scorer archive. Publish only aggregate findings and
 the archive digests. Release runner inputs when the acceptance freeze is
 recorded and keep the scoring references with the scorer.
 [Fresh holdout custody](../artifacts/phase06/SEC_HOLDOUT.md)
+
+### Preserve the first fresh acceptance decision (#44)
+
+Bind the published decision to the frozen protocol and the original cold,
+warm, and socket-blocked runs. Keep the independent references in scorer
+custody and publish the digest of the full score for exact reproduction.
+Preserve the failed decision and the evidence for each stop.
+[Fresh acceptance checkpoint](../artifacts/phase06/SEC_ACCEPTANCE.md)

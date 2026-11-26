@@ -1,0 +1,1593 @@
+{
+  "binding": {
+    "freeze_sha256": "2b1b4685d1f9790c1d70d3b4ca4fd102144b2c3efc6bdac9391d2c7a49250ee3",
+    "manifest_sha256": "e6102e562edd1af63d319acaff84df4dac4e4bf1cc39ad77f680d31182b64526",
+    "runner_sha256": "42a49717074b7f2eb299313e80e57bd2aed0ff810e24edb3b2cefc5351fcbceb"
+  },
+  "cold": {
+    "cases": [
+      {
+        "answer_accurate": false,
+        "case_id": "P6-01",
+        "citations_supported": true,
+        "elapsed_ms": 29.069,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false
+        },
+        "observations_verified": {
+          "2023": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2023?",
+        "source_id": "0000027419-24-000032",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-02",
+        "citations_supported": false,
+        "elapsed_ms": 6.997,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2022": false,
+          "2023": false
+        },
+        "observations_verified": {
+          "2022": false,
+          "2023": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023 as reported?",
+        "source_id": "0000027419-24-000032",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-03",
+        "citations_supported": true,
+        "elapsed_ms": 32.422,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "verification",
+        "grounded_abstention": false,
+        "intake_diagnostics": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "applicable_notes",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "verification"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-04",
+        "citations_supported": false,
+        "elapsed_ms": 7.692,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "applicable_notes",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001065280-25-000044",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-05",
+        "citations_supported": true,
+        "elapsed_ms": 48.417,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000037996-25-000013",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-06",
+        "citations_supported": false,
+        "elapsed_ms": 12.606,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000037996-25-000013",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-07",
+        "citations_supported": true,
+        "elapsed_ms": 29.041,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2025": false
+        },
+        "observations_verified": {
+          "2025": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2025?",
+        "source_id": "0001045810-25-000023",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-08",
+        "citations_supported": false,
+        "elapsed_ms": 7.748,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false,
+          "2025": false
+        },
+        "observations_verified": {
+          "2024": false,
+          "2025": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2024 to FY2025 as reported?",
+        "source_id": "0001045810-25-000023",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-09",
+        "citations_supported": true,
+        "elapsed_ms": 44.724,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000063908-25-000012",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-10",
+        "citations_supported": false,
+        "elapsed_ms": 14.068,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000063908-25-000012",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-11",
+        "citations_supported": true,
+        "elapsed_ms": 41.738,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001744489-24-000276",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-12",
+        "citations_supported": false,
+        "elapsed_ms": 10.248,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001744489-24-000276",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-13",
+        "citations_supported": false,
+        "elapsed_ms": 34.101,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "absent_year",
+        "findings": [
+          "unsupported_partial",
+          "contradicted_abstention",
+          "unsupported_citation"
+        ],
+        "first_failure_stage": "verification",
+        "grounded_abstention": false,
+        "intake_diagnostics": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "applicable_notes",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 1,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2021 to FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "unavailable",
+        "stop": {
+          "reasons": [
+            "absent",
+            "unverified"
+          ],
+          "stage": "verification"
+        },
+        "validation_status": "unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-14",
+        "citations_supported": true,
+        "elapsed_ms": 28.45,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "present_unverifiable",
+        "findings": [
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2018": false
+        },
+        "observations_verified": {
+          "2018": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2018?",
+        "source_id": "0001045810-18-000010",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-15",
+        "citations_supported": false,
+        "elapsed_ms": 7.789,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "incompatible_periods",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2022": false,
+          "2023": false
+        },
+        "observations_verified": {
+          "2022": false,
+          "2023": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023? Compare equal-length fiscal periods only.",
+        "source_id": "0000027419-24-000032",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      }
+    ],
+    "metrics": {
+      "accuracy": [
+        0,
+        12
+      ],
+      "citation_support_emitted": [
+        0,
+        0
+      ],
+      "coverage": [
+        0,
+        15
+      ],
+      "end_to_end": [
+        0,
+        15
+      ],
+      "grounded_abstentions": 0,
+      "latency_ms": {
+        "max": 48.417,
+        "median": 28.45,
+        "min": 6.997
+      },
+      "offline_replay": [
+        15,
+        15
+      ],
+      "planner_calls": 0,
+      "supported_answers": 0,
+      "timed_cases": 15
+    },
+    "passed": false
+  },
+  "extraction_coverage": [
+    3,
+    21
+  ],
+  "full_score_sha256": "b3b2b402b1b1bfef041fad8a0e12b3373f2d1ff48240b5dbde9f7a4746b74593",
+  "historical_phase05": {
+    "accepted": false,
+    "cold": {
+      "findings": {
+        "contradicted_abstention": 4,
+        "unsupported_citation": 1,
+        "unsupported_partial": 2
+      },
+      "latency_ms": {
+        "max": 64.714,
+        "median": 17.172,
+        "min": 11.89
+      },
+      "metrics": {
+        "accuracy": [
+          0,
+          12
+        ],
+        "citation_support_emitted": [
+          0,
+          0
+        ],
+        "coverage": [
+          0,
+          15
+        ],
+        "end_to_end": [
+          1,
+          15
+        ],
+        "grounded_abstentions": 1,
+        "offline_replay": [
+          15,
+          15
+        ],
+        "supported_answers": 0
+      },
+      "stages": {
+        "complete": 1,
+        "extraction": 14
+      }
+    },
+    "peak_device_vram_mib": 0,
+    "peak_working_set_mib": {
+      "planner": 513.11,
+      "runner": 61.29
+    },
+    "warm": {
+      "findings": {
+        "contradicted_abstention": 4,
+        "unsupported_citation": 1,
+        "unsupported_partial": 2
+      },
+      "latency_ms": {
+        "max": 18.868,
+        "median": 14.727,
+        "min": 10.435
+      },
+      "metrics": {
+        "accuracy": [
+          0,
+          12
+        ],
+        "citation_support_emitted": [
+          0,
+          0
+        ],
+        "coverage": [
+          0,
+          15
+        ],
+        "end_to_end": [
+          1,
+          15
+        ],
+        "grounded_abstentions": 1,
+        "offline_replay": [
+          15,
+          15
+        ],
+        "supported_answers": 0
+      },
+      "stages": {
+        "complete": 1,
+        "extraction": 14
+      }
+    }
+  },
+  "live_sha256": "66db47f6e5646a12d38811fff669eb154d7b868889df45d9109a3dcab1b6150e",
+  "observations": [
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2021,
+      "observed_verification_status": null,
+      "original_sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+      "reusable_verification_matched": false,
+      "source_id": "0000027419-24-000032"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2022,
+      "observed_verification_status": null,
+      "original_sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+      "reusable_verification_matched": false,
+      "source_id": "0000027419-24-000032"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2023,
+      "observed_verification_status": null,
+      "original_sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+      "reusable_verification_matched": false,
+      "source_id": "0000027419-24-000032"
+    },
+    {
+      "extraction_matched": true,
+      "fiscal_year": 2022,
+      "observed_verification_status": "provisional",
+      "original_sha256": "0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+      "reusable_verification_matched": false,
+      "source_id": "0001065280-25-000044"
+    },
+    {
+      "extraction_matched": true,
+      "fiscal_year": 2023,
+      "observed_verification_status": "provisional",
+      "original_sha256": "0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+      "reusable_verification_matched": false,
+      "source_id": "0001065280-25-000044"
+    },
+    {
+      "extraction_matched": true,
+      "fiscal_year": 2024,
+      "observed_verification_status": "provisional",
+      "original_sha256": "0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+      "reusable_verification_matched": false,
+      "source_id": "0001065280-25-000044"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2022,
+      "observed_verification_status": null,
+      "original_sha256": "98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+      "reusable_verification_matched": false,
+      "source_id": "0000037996-25-000013"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2023,
+      "observed_verification_status": null,
+      "original_sha256": "98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+      "reusable_verification_matched": false,
+      "source_id": "0000037996-25-000013"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2024,
+      "observed_verification_status": null,
+      "original_sha256": "98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+      "reusable_verification_matched": false,
+      "source_id": "0000037996-25-000013"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2023,
+      "observed_verification_status": null,
+      "original_sha256": "34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-25-000023"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2024,
+      "observed_verification_status": null,
+      "original_sha256": "34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-25-000023"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2025,
+      "observed_verification_status": null,
+      "original_sha256": "34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-25-000023"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2022,
+      "observed_verification_status": null,
+      "original_sha256": "2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+      "reusable_verification_matched": false,
+      "source_id": "0000063908-25-000012"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2023,
+      "observed_verification_status": null,
+      "original_sha256": "2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+      "reusable_verification_matched": false,
+      "source_id": "0000063908-25-000012"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2024,
+      "observed_verification_status": null,
+      "original_sha256": "2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+      "reusable_verification_matched": false,
+      "source_id": "0000063908-25-000012"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2022,
+      "observed_verification_status": null,
+      "original_sha256": "8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+      "reusable_verification_matched": false,
+      "source_id": "0001744489-24-000276"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2023,
+      "observed_verification_status": null,
+      "original_sha256": "8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+      "reusable_verification_matched": false,
+      "source_id": "0001744489-24-000276"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2024,
+      "observed_verification_status": null,
+      "original_sha256": "8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+      "reusable_verification_matched": false,
+      "source_id": "0001744489-24-000276"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2016,
+      "observed_verification_status": null,
+      "original_sha256": "d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-18-000010"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2017,
+      "observed_verification_status": null,
+      "original_sha256": "d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-18-000010"
+    },
+    {
+      "extraction_matched": false,
+      "fiscal_year": 2018,
+      "observed_verification_status": null,
+      "original_sha256": "d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-18-000010"
+    }
+  ],
+  "passed": false,
+  "peak_device_vram_mib": 0,
+  "peak_working_set_mib": {
+    "planner": 513.33,
+    "runner": 57.19
+  },
+  "replay_sha256": "60beb16ff421c8b9f3b064e1ad5559933e98aa81f246f37e2e14fb2d8380b3aa",
+  "reusable_verification_coverage": [
+    0,
+    21
+  ],
+  "scorer_bundle_sha256": "2140f69d74b6546ef4bfdc0942b6e6bbd138db8d2e638150f5f54878f2c3372e",
+  "warm": {
+    "cases": [
+      {
+        "answer_accurate": false,
+        "case_id": "P6-01",
+        "citations_supported": true,
+        "elapsed_ms": 10.282,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false
+        },
+        "observations_verified": {
+          "2023": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2023?",
+        "source_id": "0000027419-24-000032",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-02",
+        "citations_supported": false,
+        "elapsed_ms": 6.496,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2022": false,
+          "2023": false
+        },
+        "observations_verified": {
+          "2022": false,
+          "2023": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023 as reported?",
+        "source_id": "0000027419-24-000032",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-03",
+        "citations_supported": true,
+        "elapsed_ms": 9.662,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "verification",
+        "grounded_abstention": false,
+        "intake_diagnostics": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "applicable_notes",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "verification"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-04",
+        "citations_supported": false,
+        "elapsed_ms": 6.857,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "applicable_notes",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001065280-25-000044",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-05",
+        "citations_supported": true,
+        "elapsed_ms": 13.126,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000037996-25-000013",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-06",
+        "citations_supported": false,
+        "elapsed_ms": 11.313,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000037996-25-000013",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-07",
+        "citations_supported": true,
+        "elapsed_ms": 9.548,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2025": false
+        },
+        "observations_verified": {
+          "2025": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2025?",
+        "source_id": "0001045810-25-000023",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-08",
+        "citations_supported": false,
+        "elapsed_ms": 6.754,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false,
+          "2025": false
+        },
+        "observations_verified": {
+          "2024": false,
+          "2025": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2024 to FY2025 as reported?",
+        "source_id": "0001045810-25-000023",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-09",
+        "citations_supported": true,
+        "elapsed_ms": 13.257,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000063908-25-000012",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-10",
+        "citations_supported": false,
+        "elapsed_ms": 7.262,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000063908-25-000012",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-11",
+        "citations_supported": true,
+        "elapsed_ms": 12.556,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": false
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001744489-24-000276",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-12",
+        "citations_supported": false,
+        "elapsed_ms": 9.853,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2023": false,
+          "2024": false
+        },
+        "observations_verified": {
+          "2023": false,
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001744489-24-000276",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-13",
+        "citations_supported": false,
+        "elapsed_ms": 20.736,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "absent_year",
+        "findings": [
+          "unsupported_partial",
+          "contradicted_abstention",
+          "unsupported_citation"
+        ],
+        "first_failure_stage": "verification",
+        "grounded_abstention": false,
+        "intake_diagnostics": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "applicable_notes",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 1,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2021 to FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "unavailable",
+        "stop": {
+          "reasons": [
+            "absent",
+            "unverified"
+          ],
+          "stage": "verification"
+        },
+        "validation_status": "unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-14",
+        "citations_supported": true,
+        "elapsed_ms": 9.965,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "present_unverifiable",
+        "findings": [
+          "contradicted_abstention"
+        ],
+        "first_failure_stage": "extraction",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2018": false
+        },
+        "observations_verified": {
+          "2018": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "extraction",
+          "evidence_verification",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2018?",
+        "source_id": "0001045810-18-000010",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "extraction"
+        },
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-15",
+        "citations_supported": false,
+        "elapsed_ms": 7.268,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": false,
+        "expected_outcome": "incompatible_periods",
+        "findings": [],
+        "first_failure_stage": "request_resolution",
+        "grounded_abstention": false,
+        "intake_diagnostics": [
+          "unsupported_layout"
+        ],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2022": false,
+          "2023": false
+        },
+        "observations_verified": {
+          "2022": false,
+          "2023": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023? Compare equal-length fiscal periods only.",
+        "source_id": "0000027419-24-000032",
+        "status": "clarify",
+        "stop": {
+          "reasons": [],
+          "stage": "request_resolution"
+        },
+        "validation_status": null
+      }
+    ],
+    "metrics": {
+      "accuracy": [
+        0,
+        12
+      ],
+      "citation_support_emitted": [
+        0,
+        0
+      ],
+      "coverage": [
+        0,
+        15
+      ],
+      "end_to_end": [
+        0,
+        15
+      ],
+      "grounded_abstentions": 0,
+      "latency_ms": {
+        "max": 20.736,
+        "median": 9.853,
+        "min": 6.496
+      },
+      "offline_replay": [
+        15,
+        15
+      ],
+      "planner_calls": 0,
+      "supported_answers": 0,
+      "timed_cases": 15
+    },
+    "passed": false
+  }
+}

@@ -191,6 +191,12 @@ Phase 2 calculator and its offline results.
 
 - Issue #43 seals the independently reviewed fresh SEC holdout. The runner
   and scorer archives are in separate custody outside the checkout. The
-  public receipt records both SHA-256 seals. The runner release awaits the
-  issue #44 acceptance freeze.
+  public receipt records both SHA-256 seals.
   [Fresh holdout custody](../artifacts/phase06/SEC_HOLDOUT.md)
+
+- Issue #44 freezes and evaluates the fresh holdout. Both passes fail the
+  acceptance gate with 0/12 supported answers and 0/3 grounded abstentions.
+  The workflow extracts 3/21 reviewed observations and verifies 0/21.
+  All 30 results and citation sets match with sockets blocked. Case-level
+  stops are request resolution, extraction, and verification.
+  [Fresh acceptance checkpoint](../artifacts/phase06/SEC_ACCEPTANCE.md)

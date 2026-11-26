@@ -2,6 +2,8 @@
 
 [Issue #42 development gate results and replay commands](DEVELOPMENT_GATE.md)
 
+[Issue #44 fresh acceptance decision and replay commands](SEC_ACCEPTANCE.md)
+
 Issue #36 ran 30 fixed questions against 14 preserved SEC originals. In
 each cold and warm pass, the opened cohort completed 1 of 15 cases and the
 earlier development cohort completed 13 of 15. All 60 results and citation

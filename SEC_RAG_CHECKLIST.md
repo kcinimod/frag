@@ -66,3 +66,6 @@ Leave boxes unchecked until a command, test, citation or run record demonstrates
 ## Phase 6 SEC acceptance
 
 - [x] Independently audit and seal six fresh issuer families across at least four statement layouts. Preserve 12 answerable cases and three abstention cases in separate runner and scorer custody. [Issue #43 custody receipt and verification](artifacts/phase06/SEC_HOLDOUT.md)
+- [x] Freeze the fresh protocol, thresholds, production revision, runtime, retrieval, and scorer before releasing the runner archive. [Frozen configuration](artifacts/phase06/fresh-freeze.json)
+- [x] Run and score every cold and warm case, reproduce all 30 results and citation sets with sockets blocked, and record first stops, extraction, verification, timing, and Windows memory. [Issue #44 acceptance checkpoint](artifacts/phase06/SEC_ACCEPTANCE.md)
+- [ ] Meet the fresh acceptance gate in both passes. Each pass produced 0/12 supported answers and 0/3 grounded abstentions against minimums of 11 and 3. [Frozen scorer output](artifacts/phase06/fresh-score.json)
