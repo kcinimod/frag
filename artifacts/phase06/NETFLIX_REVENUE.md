@@ -29,18 +29,57 @@ fresh intake and socket-blocked replay matched all three results and their
 
 ## Reproduce in PowerShell
 
-Run the five focused checks from the repository root. The checks cover
+Run the seven focused checks from the repository root. The checks cover
 original evidence locators, the public browser API, and CLI replay with
 sockets blocked.
 
 ```powershell
+New-Item -ItemType Directory -Force -Path build | Out-Null
 $issue47Tests = "build/issue47-test-$([guid]::NewGuid().ToString('N'))"
 .venv/Scripts/python.exe -m pytest -q -p no:cacheprovider --basetemp $issue47Tests tests/test_netflix_revenue.py
+```
+
+Replay the saved local-model plans from a fresh store with sockets blocked.
+Each case should print `matched` after checking both the result and opened
+original excerpts.
+
+```powershell
+@'
+import gzip
+import json
+import socket
+import sys
+from pathlib import Path
+from uuid import uuid4
+
+sys.path.insert(0, "artifacts/phase04")
+from sec_holdout_runner import ingest, replay_case
+
+def deny_network(*args, **kwargs):
+    raise AssertionError("Offline replay opened a socket")
+
+socket.socket = socket.create_connection = socket.getaddrinfo = deny_network
+phase = Path("artifacts/phase06")
+run = json.loads(gzip.decompress((phase / "netflix-validation.json.gz").read_bytes()))
+work = Path("build") / f"issue47-replay-{uuid4().hex}"
+work.mkdir(parents=True)
+original = work / run["source"]["original_filename"]
+original.write_bytes(gzip.decompress((phase / "originals" / (original.name + ".gz")).read_bytes()))
+store = work / "store"
+source = ingest(store, original, run["source"])
+original.unlink()
+for case_id, row in run["cases"].items():
+    case = {"case_id": case_id, "question": row["question"]}
+    replay = replay_case(store, case, source, row["live"])
+    assert replay == {"status": "matched"}, replay
+    print(case_id, replay["status"])
+'@ | .venv/Scripts/python.exe -
 ```
 
 Unpack the preserved filing for browser review.
 
 ```powershell
+New-Item -ItemType Directory -Force -Path build | Out-Null
 $issue47Original = "build/issue47-nflx-$([guid]::NewGuid().ToString('N')).htm"
 .venv/Scripts/python.exe -c "import gzip, pathlib, sys; pathlib.Path(sys.argv[1]).write_bytes(gzip.decompress(pathlib.Path('artifacts/phase06/originals/nflx-20241231.htm.gz').read_bytes()))" $issue47Original
 Get-Item -LiteralPath $issue47Original

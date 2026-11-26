@@ -80,11 +80,25 @@ def test_netflix_verifies_all_reviewed_statement_periods(original: bytes, tmp_pa
             )
 
 
-def test_netflix_incomplete_revenue_policy_keeps_observations_provisional(original: bytes, tmp_path: Path) -> None:
-    # Synthetic control removes support from the continuation after the page break.
-    sentence = b"are collected from members and remitted to governmental authorities."
-    assert original.count(sentence) == 1
-    changed = original.replace(sentence, b"are collected from members.")
+@pytest.mark.parametrize("change", ("missing_continuation", "unrelated_tax_treatment", "following_note"))
+def test_netflix_incomplete_revenue_policy_keeps_observations_provisional(
+    change: str, original: bytes, tmp_path: Path,
+) -> None:
+    # Synthetic controls change or remove the revenue tax evidence.
+    if change == "missing_continuation":
+        sentence = b"are collected from members and remitted to governmental authorities."
+        assert original.count(sentence) == 1
+        changed = original.replace(sentence, b"are collected from members.")
+    elif change == "unrelated_tax_treatment":
+        sentence = b"Revenues are presented net of the taxes that "
+        assert original.count(sentence) == 1
+        changed = original.replace(sentence, b"Accounts payable are presented net of the taxes that ")
+    else:
+        notes = REVIEW["evidence"]["applicable_notes"]
+        start = notes[0]["locator"]["end_byte"]
+        end = notes[1]["locator"]["start_byte"]
+        heading = original.rindex(b"<div", start, original.index(b"Revenue Recognition</span>", start, end))
+        changed = original[:heading] + b"<div>Note 2. Unrelated Matters</div>" + original[heading:]
     source = SourceStore(tmp_path).ingest_bytes(changed, provenance="local_original")
     assert len(source["facts"]) == 3
     assert all(fact["status"] == "provisional" and "applicable_notes" in fact["unresolved_requirements"]

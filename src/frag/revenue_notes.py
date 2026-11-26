@@ -21,7 +21,8 @@ ELIMINATIONS = re.compile(
 )
 NET_REVENUE = re.compile(
     r"\b(?:revenue (?:also )?excludes[^.]*\btaxes|net of sales (?:and other )?taxes|taxes are excluded from revenues?"
-    r"|net of the taxes that are collected from [^.]+ and remitted to governmental authorities)\b",
+    r"|revenues? (?:is|are) presented net of the taxes that are collected from [^.]+ "
+    r"and remitted to governmental authorities)\b",
     re.I,
 )
 RECOGNITION = re.compile(r"\b(?:recogniz\w+|measured)\b", re.I)
@@ -257,8 +258,8 @@ def accounting_policy_notes(
     basis_gaps = _revenue_basis_gaps(blocks[start:])
     if basis_gaps is None or basis_gaps:
         return []
-    next_note = NUMBERED_NOTE if numbered else NOTE_HEADING
-    end = next((i for i in range(start, len(blocks)) if next_note.match(blocks[i].text)), None)
+    end = next((i for i in range(start, len(blocks)) if NOTE_HEADING.match(blocks[i].text)
+                or (numbered and NUMBERED_NOTE.match(blocks[i].text))), None)
     if end is None:
         return []
     policy = blocks[start:end]
