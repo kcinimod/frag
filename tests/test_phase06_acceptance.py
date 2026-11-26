@@ -11,7 +11,7 @@ import pytest
 
 from artifacts.phase06 import revenue_score
 
-PHASE = Path("artifacts/phase06")
+PHASE = Path(__file__).resolve().parents[1] / "artifacts/phase06"
 PHASE05 = PHASE.with_name("phase05")
 
 
@@ -33,7 +33,7 @@ def test_retained_cisco_diagnostic_is_incomplete(kind: str, case_id: str) -> Non
     historical = json.loads((PHASE / "opened-score.json").read_bytes())
     for mode in ("cold", "warm"):
         scored = revenue_score.score_case(run[mode], repeated[mode], source, label, review, original,
-                                          run[mode]["result"]["source_hash"])
+                                          sha256(original).hexdigest())
         assert scored["incomplete"]
         assert scored["findings"] == []
         assert not scored["end_to_end_complete"] and not scored["grounded_abstention"]
@@ -53,12 +53,18 @@ def apple_growth() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict
     return row["cold"], source, label, labels["sources"][row["case"]["source_id"]], original
 
 
+@pytest.mark.parametrize("include_diagnostic", [False, True])
 def test_cited_companion_is_supported_without_answer_credit(
     apple_growth: tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], bytes],
+    include_diagnostic: bool,
 ) -> None:
     run, evidence, label, review, original = apple_growth
     # Synthetic control derived from a retained answer. Keep the real FY2023 evidence and opened citations.
     make_prior_extraction_gap(run, evidence)
+    if include_diagnostic:
+        message = "The revenue cell is missing from the displayed fiscal year column."
+        evidence["diagnostics"].append({"code": "unsupported_observation", "fiscal_year": 2022, "message": message})
+        run["result"]["issues"][0]["detail"] += f" {message}"
     scored = revenue_score.score_case(run, {"status": "matched", **run}, evidence, label, review, original,
                                       sha256(original).hexdigest())
     assert scored["findings"] == []
@@ -89,6 +95,7 @@ def make_prior_extraction_gap(run: dict[str, Any], evidence: dict[str, Any]) -> 
         ("unopened_partial", "unsupported_citation"),
         ("wrong_citation", "unsupported_citation"),
         ("contradicted_reason", "contradicted_abstention"),
+        ("unrecorded_diagnostic", "contradicted_abstention"),
         ("verified_year_gap", "contradicted_abstention"),
         ("wrong_replay_result", "offline_replay_mismatch"),
         ("wrong_replay_citations", "offline_replay_mismatch"),
@@ -114,6 +121,8 @@ def test_acceptance_keeps_blocking_findings(
         run["citations"]["current"]["text"] += "Unsupported excerpt."
     elif fault == "contradicted_reason":
         result["issues"][0]["detail"] += " FY2022 is absent from the consolidated statement."
+    elif fault == "unrecorded_diagnostic":
+        result["issues"][0]["detail"] += " Expected one visible consolidated income statement."
     elif fault == "verified_year_gap":
         result["issues"][0].update(role="current", fiscal_year=2023,
                                    detail=result["issues"][0]["detail"].replace("FY2022", "FY2023"))

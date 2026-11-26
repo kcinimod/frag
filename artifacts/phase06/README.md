@@ -111,8 +111,8 @@ For the original scoring interpretation, see the Phase 5 checkpoint.
 
 The Phase 6 `score_case` entry point adds two fields to the per-case score.
 `incomplete` identifies a truthful gap on an answerable case that has no
-blocking findings. `supported_partial` records a verified growth operand
-whose citations support it. The Cisco lookup and growth diagnostics are
+blocking findings. `supported_partial` marks a verified, cited companion on
+an answerable growth case with a withheld calculation. The Cisco diagnostics are
 incomplete in both passes. A synthetic growth control retains Apple FY2023
 revenue and its original citations while withholding the percentage because
 the FY2022 observation was unavailable. Neither control earns supported-answer
