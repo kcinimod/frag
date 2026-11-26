@@ -94,13 +94,13 @@ For the original scoring interpretation, see the Phase 5 checkpoint.
 
 | Opened cases | Earliest evidenced outcome |
 | --- | --- |
-| P5-01, P5-02, P5-03 | Extraction. Procter & Gamble fell back to the Microsoft-specific statement rule. |
+| P5-01, P5-02, P5-03 | Extraction. The Home Depot statement layout was unsupported. |
 | P5-04, P5-05 | Extraction. GE FY2024 fell back to the Microsoft-specific cover check. |
 | P5-06 | Completed as a grounded evidence gap. GE FY2018 lacked required inline evidence. The historical observation also went unextracted. |
 | P5-07, P5-08, P5-09 | Extraction. Coca-Cola's total revenue row went unrecognized. P5-09 also lacked the required period inventory citation. |
-| P5-10, P5-11 | Extraction. Home Depot fell back to the Microsoft-specific cover check. |
+| P5-10, P5-11 | Extraction. The UPS statement layout was unsupported. |
 | P5-12, P5-13 | Extraction. Cisco's dated header failed the full-date check. |
-| P5-14, P5-15 | Extraction. UPS fell back to the Microsoft-specific cover check. |
+| P5-14, P5-15 | Extraction. The Procter & Gamble statement layout was unsupported. |
 
 | Earlier cases | Earliest evidenced outcome |
 | --- | --- |

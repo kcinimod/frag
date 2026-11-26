@@ -75,30 +75,10 @@ def opened_observations(
     return rows
 
 
-def score_pass(
-    mode: str, live: dict[str, Any], replay: dict[str, Any], baseline: dict[str, Any],
-    baseline_runs: dict[str, Any], labels: dict[str, Any], originals: dict[str, tuple[bytes, str]],
-) -> dict[str, Any]:
-    historical = {row["case_id"]: row for row in baseline[mode]["cases"]}
-    cases = []
-    for live_row, replay_row in zip(live["cases"], replay["cases"], strict=True):
-        case = live_row["case"]
-        case_id, key = case["case_id"], case["source_id"]
-        original, original_hash = originals[key]
-        run, repeated = live_row[mode], replay_row[mode]
-        evidence = live["sources"][key]["evidence"]
-        label, review = labels["cases"][case_id], labels["sources"][key]
-        scored = score_case(run, repeated, evidence, label, review, original, original_hash)
-        cases.append({
-            **case, **scored, **classify(run, evidence, review, original, label, scored),
-            "elapsed_ms": run["elapsed_ms"], "opened_citations": len(run["citations"]),
-            "baseline_completed": historical[case_id]["end_to_end_complete"],
-            "baseline_status": historical[case_id]["status"],
-            "baseline_elapsed_ms": baseline_runs[case_id][mode].get("elapsed_ms"),
-        })
+def summarize_cases(cases: list[dict[str, Any]]) -> dict[str, Any]:
     numeric = [row for row in cases if row["numeric_answer_emitted"]]
     latency = [row["elapsed_ms"] for row in cases]
-    return {"metrics": {
+    return {
         "accuracy": [sum(row["answer_accurate"] for row in cases),
                      sum(row["expected_outcome"] == "answerable" for row in cases)],
         "supported_answers": sum(row["end_to_end_complete"] for row in numeric),
@@ -109,7 +89,68 @@ def score_pass(
         "offline_replay": [sum(row["offline_replay_matched"] for row in cases), len(cases)],
         "planner_calls": sum(row["model_request_sent"] for row in cases),
         "latency_ms": {"min": min(latency), "median": median(latency), "max": max(latency)},
-    }, "baseline_metrics": baseline[mode]["metrics"], "cases": cases}
+    }
+
+
+def stop_details(run: dict[str, Any], stages: dict[str, Any]) -> dict[str, Any]:
+    result = run["result"]
+    reasons = [issue["code"] for issue in result.get("issues", [])]
+    if result.get("reason"):
+        reasons.append(result["reason"])
+    stage = stages["first_failure_stage"]
+    if stage == "complete" and reasons:
+        stage = {
+            "absent": "statement_period_inventory",
+            "incompatible": "comparison_compatibility",
+            "unverified": "verification" if any(stages["observations_extracted"].values()) else "extraction",
+        }.get(reasons[0], "abstention")
+    return {"stage": stage, "reasons": reasons}
+
+
+def score_pass(
+    mode: str, live: dict[str, Any], replay: dict[str, Any], baseline: dict[str, Any],
+    baseline_live: dict[str, Any], labels: dict[str, Any], originals: dict[str, tuple[bytes, str]],
+) -> dict[str, Any]:
+    historical = {row["case_id"]: row for row in baseline[mode]["cases"]}
+    cases, baseline_cases = [], []
+    for live_row, replay_row, baseline_row in zip(live["cases"], replay["cases"], baseline_live["cases"], strict=True):
+        case = live_row["case"]
+        case_id, key = case["case_id"], case["source_id"]
+        original, original_hash = originals[key]
+        run, repeated, baseline_run = live_row[mode], replay_row[mode], baseline_row[mode]
+        evidence = live["sources"][key]["evidence"]
+        label, review = labels["cases"][case_id], labels["sources"][key]
+        scored = score_case(run, repeated, evidence, label, review, original, original_hash)
+        # A reviewed provisional observation can establish extraction, even when it cannot support an answer.
+        stage_review = review
+        if provisional := review.get("provisional_observation"):
+            stage_review = {**review, "facts": {**review["facts"], str(provisional["fiscal_year"]): provisional}}
+        stages = classify(run, evidence, stage_review, original, label, scored)
+        baseline_scored = historical[case_id]
+        baseline_evidence = baseline_live["sources"][key]["evidence"]
+        baseline_stages = classify(baseline_run, baseline_evidence, stage_review, original, label, baseline_scored)
+        if "first_failure_stage" in baseline_scored:
+            baseline_stages["first_failure_stage"] = baseline_scored["first_failure_stage"]
+        baseline_cases.append({**baseline_scored, "elapsed_ms": baseline_run["elapsed_ms"],
+                               "model_request_sent": baseline_stages["model_request_sent"]})
+        cases.append({
+            **case, **scored, **stages,
+            "elapsed_ms": run["elapsed_ms"], "opened_citations": len(run["citations"]),
+            "stop": stop_details(run, stages),
+            "baseline_completed": baseline_scored["end_to_end_complete"],
+            "baseline_status": baseline_scored["status"],
+            "baseline_stop": stop_details(baseline_run, baseline_stages),
+            "baseline_elapsed_ms": baseline_run["elapsed_ms"],
+        })
+    return {"metrics": summarize_cases(cases), "baseline_metrics": summarize_cases(baseline_cases), "cases": cases}
+
+
+def memory_peaks(report: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "peak_working_set_mib": {name: max(row["peak_working_set_mib"][name] for row in report["cases"])
+                                 for name in ("runner", "planner")},
+        "peak_device_vram_mib": max(row["peak_device_vram_mib"] for row in report["cases"]),
+    }
 
 
 def score_cohort(
@@ -130,14 +171,11 @@ def score_cohort(
     baseline_live = json.loads(gzip.decompress((PHASE / f"{cohort}-live.json.gz").read_bytes()))
     if [row["case"] for row in baseline_live["cases"]] != manifest["cases"]:
         raise ValueError(f"{cohort} cases differ from the baseline")
-    baseline_runs = {row["case"]["case_id"]: row for row in baseline_live["cases"]}
     report = {
         "settings": live["freeze"], "live_sha256": sha256(live_bytes).hexdigest(),
         "replay_sha256": sha256(replay_bytes).hexdigest(), "baseline_score_sha256": sha256(baseline_path.read_bytes()).hexdigest(),
-        "peak_working_set_mib": {name: max(row["peak_working_set_mib"][name] for row in live["cases"])
-                                 for name in ("runner", "planner")},
-        "peak_device_vram_mib": max(row["peak_device_vram_mib"] for row in live["cases"]),
-        **{mode: score_pass(mode, live, replay, baseline, baseline_runs, labels, originals) for mode in MODES},
+        **memory_peaks(live), "baseline_memory_peaks": memory_peaks(baseline_live),
+        **{mode: score_pass(mode, live, replay, baseline, baseline_live, labels, originals) for mode in MODES},
     }
     return report, live["sources"]
 

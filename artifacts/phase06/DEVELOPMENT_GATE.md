@@ -2,7 +2,7 @@
 
 Issue #42 passed on the 15 opened cases and the 15 earlier regressions. The
 candidate was the committed production snapshot
-`d5ea2c36af63bb64b30721ceb94cb26236dc4b0a`. The opening cohort and earlier
+`d5ea2c36af63bb64b30721ceb94cb26236dc4b0a`. The opened cohort and earlier
 questions, original bytes, Python dependencies, Qwen2.5-0.5B weights, llama.cpp
 runtime, generation settings, and retrieval settings were held to the issue
 #36 baseline. The Phase 6 scorer checked the comparison caveats against the
@@ -50,8 +50,8 @@ planner and store. Question latency includes opening the cited excerpts and
 excludes intake and planner startup. The opened cohort made 12 planner calls
 per pass, up from zero. Windows RAM values are per-process peak working
 sets. VRAM is the sampled device-wide peak. The paired per-case record gives
-baseline and candidate question latencies, first evidenced stop, accuracy,
-citation support, and coverage for both passes.
+baseline and candidate question latencies, stop stages and abstention reasons,
+accuracy, citation support, and coverage for both passes.
 [Opened live run](gate-opened-live.json.gz) · [Opened replay](gate-opened-replay.json.gz)
 
 ## Filing and collection regressions
