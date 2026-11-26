@@ -372,3 +372,12 @@ The dates let readers check the inclusive day counts and keep the filed
 amounts available. Preserve the citation shape of earlier validation
 records through replay.
 [Issue #40 evidence and checks](../artifacts/phase06/GROUNDED_EVIDENCE.md)
+
+### Score truthful gaps and cited companion evidence (#41)
+
+Classify a truthful evidence gap on an answerable case as incomplete.
+Record a verified companion on incomplete growth when the observation agrees
+with reviewed original evidence and its opened citations support it. Keep
+both results outside the supported-answer and grounded-abstention counts.
+Use the frozen Phase 5 checks for numeric answers, citations, and replay.
+[Phase 6 scoring controls](../artifacts/phase06/README.md#phase-6-scoring-controls)

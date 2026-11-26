@@ -107,6 +107,25 @@ For the original scoring interpretation, see the Phase 5 checkpoint.
 | msft-lookup, aapl-lookup, aapl-growth, amzn-lookup, amzn-growth, wmt-lookup, wmt-growth, goog-lookup, goog-growth, intc-lookup, intc-growth | Complete with supported numeric answers. |
 | aapl-absent, intc-incompatible | Complete with grounded abstentions and cited companion evidence. |
 
+## Phase 6 scoring controls
+
+The Phase 6 `score_case` entry point adds two fields to the per-case score.
+`incomplete` identifies a truthful gap on an answerable case that has no
+blocking findings. `supported_partial` records a verified growth operand
+whose citations support it. The Cisco lookup and growth diagnostics are
+incomplete in both passes. A synthetic growth control retains Apple FY2023
+revenue and its original citations while withholding the percentage because
+the FY2022 observation was unavailable. Neither control earns supported-answer
+or grounded-abstention credit. Wrong amounts, unsupported citations and
+operands, contradicted reasons, and replay mismatches remain blocking.
+[Phase 6 scorer](revenue_score.py) · [Controls](../../tests/test_phase06_acceptance.py)
+
+Run the scorer controls from the repository root.
+
+```powershell
+.venv/Scripts/python.exe -m pytest -q tests/test_phase06_acceptance.py
+```
+
 ## Reproduce on Windows
 
 From the repository root, set up the locked environment with the exact

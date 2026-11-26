@@ -175,3 +175,9 @@ Phase 2 calculator and its offline results.
   the Apple FY2024 regression remains incomplete. Five results and 19
   citation responses matched offline and in the browser.
   [Issue #40 evidence and checks](../artifacts/phase06/GROUNDED_EVIDENCE.md)
+
+- Issue #41 classifies both retained Cisco diagnostics as incomplete and
+  recognizes a verified, cited companion on incomplete growth. Scorer controls
+  confirm that wrong amounts, unsupported citations and operands, contradicted
+  reasons, and replay mismatches still block acceptance.
+  [Phase 6 scoring controls](../artifacts/phase06/README.md#phase-6-scoring-controls)
