@@ -428,3 +428,11 @@ with the inline fact, entity context, and currency unit. Cite the original
 comparative presentation, consolidation, fiscal calendar, and revenue
 recognition disclosures for verified NVIDIA results.
 [NVIDIA validation](../artifacts/phase06/NVIDIA_REVENUE.md)
+
+### Verify fiscal years across three consolidated statement layouts (#50)
+
+Use the shared year-end, a full date in the first period cell, or a disclosed
+fiscal calendar to establish the visible period columns. Verify the filing
+cover, statement units, inline context, and applicable disclosures before
+answering. Preserve the names of unnumbered original disclosures in citations.
+[Ford, McDonald’s, and Disney validation](../artifacts/phase06/FORD_MCDONALDS_DISNEY_REVENUE.md)

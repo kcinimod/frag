@@ -80,6 +80,7 @@ class StatementPolicies:
     transaction_date: str | None = None
     period_ends: dict[int, str] = field(default_factory=dict)
     year_end_weekday: int | None = None
+    calendar_anchor: tuple[int, int] | None = None
 
 
 def statement_policy_notes(
@@ -329,6 +330,112 @@ def _transaction_policy(
             policy.comparison_notes = [note]
             policy.caveats = [caveat.format(business=matches[0]["business"], year=matches[0]["year"])]
     return policy
+
+
+def referenced_revenue_policy(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int], number: int,
+) -> StatementPolicies:
+    blocks = [block for block in document.blocks if block.position > after]
+    presentation = _policy_section(blocks, r"^note 1[.:\s-]+presentation$")
+    revenue = _policy_section(blocks, rf"^note {number}[.:\s-]+revenue$")
+    qualified = _revenue_basis_gaps(blocks)
+    if len(presentation) < 2 or not revenue or qualified is None:
+        return StatementPolicies()
+    opening = presentation[0]
+    text = f"{opening.text} {presentation[1].text}"
+    if not re.search(r"our consolidated subsidiaries, and our consolidated VIEs", text, re.I):
+        return StatementPolicies()
+    comparative = re.search(
+        r"reclassified certain prior year amounts in our consolidated financial statements to conform "
+        r"to the current year presentation\.", text, re.I,
+    )
+    if not comparative or not re.match(r"The following tables disaggregate our revenue by major source", revenue[0].text, re.I):
+        return StatementPolicies()
+    notes = _complete_notes(
+        _note(lines, "presentation", opening, presentation[1].end, title="Presentation and reclassifications"),
+        _note(lines, "revenue", revenue[0], revenue[0].end, number=number, title="Revenue by source"),
+    )
+    return StatementPolicies(notes=notes, qualified_years=qualified, caveats=[])
+
+
+def unnumbered_revenue_policy(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> StatementPolicies:
+    blocks = [block for block in document.blocks if block.position > after]
+    scope = _unique_heading(blocks, re.compile(r"consolidation", re.I))
+    revenue = _unique_heading(blocks, re.compile(r"revenue recognition", re.I))
+    qualified = _revenue_basis_gaps(blocks)
+    if scope is None or revenue is None or not scope < revenue < len(blocks) - 2 or qualified is None:
+        return StatementPolicies()
+    scope_text = blocks[scope + 1].text
+    sources, recognition = blocks[revenue + 1:revenue + 3]
+    if (not CONSOLIDATED_ACCOUNTS.search(scope_text) or "equity method" not in scope_text.casefold()
+            or not re.search(r"revenues consist of sales by .+? restaurants and fees from restaurants", sources.text, re.I)
+            or not re.search(r"presented net of sales tax and other sales-related taxes", recognition.text, re.I)
+            or not RECOGNITION.search(recognition.text)):
+        return StatementPolicies()
+    rounding = [block for block in blocks[scope + 2:revenue] if re.search(
+        r"changed its rounding presentation to the nearest whole number in millions.+?applied to all prior year amounts",
+        block.text, re.I,
+    )]
+    if len(rounding) != 1:
+        return StatementPolicies()
+    notes = _complete_notes(
+        _note(lines, "consolidation-and-presentation", blocks[scope], rounding[0].end,
+              number=None, title="Consolidation and rounding presentation"),
+        _note(lines, "revenue", blocks[revenue], recognition.end, number=None),
+    )
+    return StatementPolicies(notes=notes, qualified_years=qualified, caveats=[])
+
+
+def reporting_period_policy(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> StatementPolicies:
+    blocks = [block for block in document.blocks if block.position > after]
+    section = _policy_section(blocks, r"^2\s*\.?\s*summary of significant accounting policies$")
+    scope = _unique_heading(section, CONSOLIDATION)
+    calendar = _unique_heading(section, re.compile(r"reporting period", re.I))
+    comparative = _unique_heading(section, re.compile(r"reclassifications", re.I))
+    revenue = _unique_heading(section, REVENUE)
+    if scope is None or calendar is None:
+        return StatementPolicies()
+    scope_text = section[scope + 1].text
+    issuer = re.search(r"include the accounts of (.+?) and its majority-owned or controlled subsidiaries", scope_text, re.I)
+    calendar_text = section[calendar + 1].text
+    weekdays = set(re.findall(
+        r"fiscal year ends on the (saturday|sunday) closest to september 30\b", calendar_text.casefold(),
+    ))
+    counts = re.findall(
+        r"\bfiscal (20\d{2}(?:(?:,\s*(?:and\s+)?|\s+and\s+)20\d{2})*) "
+        r"(?:was|were) (?:a |each )?(fifty-two|fifty-three|52|53)[ -]week years?\b", calendar_text, re.I,
+    )
+    if len(weekdays) != 1 or not counts:
+        return StatementPolicies()
+    weeks: dict[int, int] = {}
+    for years, count in counts:
+        duration = 52 if count.casefold() in {"52", "fifty-two"} else 53
+        for year in map(int, re.findall(r"20\d{2}", years)):
+            if weeks.setdefault(year, duration) != duration:
+                return StatementPolicies()
+    qualified = _revenue_basis_gaps(blocks)
+    notes = []
+    if (issuer and ELIMINATIONS.search(scope_text) and qualified is not None and comparative is not None
+            and revenue is not None and re.search(
+                r"reclassifications have been made in .+? financial statements and notes to conform",
+                section[comparative + 1].text, re.I,
+            )):
+        notes = _complete_notes(
+            _note(lines, "consolidation", section[scope], section[scope + 1].end, number=2),
+            _note(lines, "fiscal-year", section[calendar], section[calendar + 1].end, number=2),
+            _note(lines, "comparative-presentation", section[comparative], section[comparative + 1].end, number=2),
+            _policy_excerpt(lines, section[revenue + 1:], "revenue",
+                            r"Affiliate fees are recognized as the programming is provided", number=2),
+        )
+    return StatementPolicies(
+        notes=notes, weeks=weeks, qualified_years=qualified or set(), issuer=issuer[1] if issuer else None,
+        year_end_weekday=5 if "saturday" in weekdays else 6, calendar_anchor=(9, 30),
+        caveats=[],
+    )
 
 
 def comparison_disclosures(
@@ -702,12 +809,13 @@ def _unique_heading(blocks: list[TextBlock], pattern: re.Pattern[str]) -> int | 
 
 def _note(
     lines: list[str], topic: str, start: TextBlock, end: tuple[int, int] | None, *,
-    number: int = 1, title: str | None = None,
+    number: int | None = 1, title: str | None = None,
 ) -> dict[str, Any] | None:
     locator = _disclosure_locator(lines, start, end)
     if locator is None:
         return None
-    return {"number": number, "id": f"note-{number}-{topic}", "title": title or start.text, "locator": locator}
+    prefix = "note" if number is None else f"note-{number}"
+    return {"number": number, "id": f"{prefix}-{topic}", "title": title or start.text, "locator": locator}
 
 
 def _disclosure_locator(

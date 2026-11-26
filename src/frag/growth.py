@@ -238,7 +238,8 @@ def _citations(
 def disclosure_citations(facts: list[dict[str, Any]], comparison: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {
         note_citation_id(note): {
-            "id": note_citation_id(note), "title": f'Note {note["number"]} · {note["title"]}',
+            "id": note_citation_id(note), "title": note["title"] if note["number"] is None
+            else f'Note {note["number"]} · {note["title"]}',
             "locator": note["locator"],
         }
         for fact in facts for note in fact["applicable_notes"]

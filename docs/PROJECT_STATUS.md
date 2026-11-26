@@ -224,3 +224,8 @@ Phase 2 calculator and its offline results.
   growth, and FY2018 evidence gap reproduced offline with all 11 original
   citation responses.
   [NVIDIA validation](../artifacts/phase06/NVIDIA_REVENUE.md)
+
+- Issue #50 verifies all nine reviewed Ford, McDonald’s, and Disney revenue
+  observations. The FY2024 lookups and the FY2023 to FY2024 reported growth
+  comparisons reproduced offline with their original citation responses.
+  [Ford, McDonald’s, and Disney validation](../artifacts/phase06/FORD_MCDONALDS_DISNEY_REVENUE.md)

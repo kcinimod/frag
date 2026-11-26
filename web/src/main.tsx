@@ -25,7 +25,7 @@ type RevenueFact = {
   currency: string | null;
   scale: number | null;
   status: 'verified' | 'provisional';
-  applicable_notes: (Disclosure & { id?: string; number: number; title: string })[];
+  applicable_notes: (Disclosure & { id?: string; number: number | null; title: string })[];
   comparative: boolean;
   reporting_period: { fiscal_year: number; start: string; end: string };
   parent_table_id: string;
@@ -567,7 +567,10 @@ function RevenueDetail({ fact }: { fact: RevenueFact }) {
         ))}
       </dl>
       {fact.applicable_notes?.map(note => (
-        <DisclosureDetail key={note.id ?? note.number} disclosure={note} title={`Note ${note.number} · ${note.title}`} />
+        <DisclosureDetail
+          key={note.id ?? note.number ?? note.title} disclosure={note}
+          title={note.number === null ? note.title : `Note ${note.number} · ${note.title}`}
+        />
       ))}
     </details>
   );
