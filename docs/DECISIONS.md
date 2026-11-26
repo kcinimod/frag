@@ -418,3 +418,13 @@ Cite the calendar disclosure on both reported growth and an equal-length
 abstention. Retain both verified operands when the requested comparison
 withholds the percentage.
 [Target validation](../artifacts/phase06/TARGET_REVENUE.md)
+
+### Corroborate January fiscal periods from Note 1 (#49)
+
+Match the dated column to the disclosed last-weekday rule and the annual
+week count. Preserve the period derived from the visible statement and
+calendar when inline XBRL is absent. Verification also requires agreement
+with the inline fact, entity context, and currency unit. Cite the original
+comparative presentation, consolidation, fiscal calendar, and revenue
+recognition disclosures for verified NVIDIA results.
+[NVIDIA validation](../artifacts/phase06/NVIDIA_REVENUE.md)

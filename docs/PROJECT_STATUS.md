@@ -217,3 +217,10 @@ Phase 2 calculator and its offline results.
   The FY2023 lookup, -1.57% reported growth, and equal-length abstention
   reproduced offline with all 14 original citation responses.
   [Target validation](../artifacts/phase06/TARGET_REVENUE.md)
+
+- Issue #49 matches all six reviewed NVIDIA revenue observations. FY2023
+  through FY2025 verify against the recent original. FY2016 through FY2018
+  remain provisional in the historical original. The FY2025 lookup, 114.20%
+  growth, and FY2018 evidence gap reproduced offline with all 11 original
+  citation responses.
+  [NVIDIA validation](../artifacts/phase06/NVIDIA_REVENUE.md)

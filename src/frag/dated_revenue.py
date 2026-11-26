@@ -17,7 +17,8 @@ from frag.income_html import (
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
 from frag.revenue_notes import (
     StatementPolicies, accounting_policy_notes, acquisition_revenue_notes, comparison_disclosures,
-    cross_section_policy_notes, dated_policy_notes, fiscal_year_policy_notes, numbered_policy_notes, statement_policy_notes,
+    cross_section_policy_notes, dated_policy_notes, fiscal_year_policy_notes, january_calendar_policy_notes,
+    numbered_policy_notes, statement_policy_notes,
 )
 
 PARSER_VERSION = "dated-annual-revenue-v1"
@@ -29,7 +30,7 @@ FILING_SCOPED_PARSERS = ORIGINAL_EVIDENCE_PARSERS | {PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "statement-periods-v7"
+EXTRACTION_CACHE_REVISION = "statement-periods-v8"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
@@ -46,6 +47,7 @@ SHARED_MONEY_PREAMBLE = re.compile(rf"\({MONEY_DECLARATION}\)", re.I)
 DATED_MONEY_HEADER = re.compile(r"years ended (\(.+\))", re.I)
 FISCAL_YEAR_UNITS = re.compile(r"\((thousands|millions|billions), except per[- ]share (?:data|amounts)\)", re.I)
 DATE_MONTHS = MONTHS | {name[:3]: month for name, month in MONTHS.items()}
+DATED_ANNUAL_HEADERS = {"year ended", "years ended"}
 SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues", "revenue", "net operating revenues"}
 TOTAL_REVENUE_NOTE = re.compile(r"total revenues? \(note \d+\)", re.I)
 
@@ -63,6 +65,7 @@ class DatedStatement:
     original_dated_columns: bool = False
     fiscal_labels: dict[date, int] = field(default_factory=dict)
     disclosed_year_end_weekday: int | None = None
+    calendar_starts: dict[date, date] = field(default_factory=dict)
 
     @property
     def uses_original_evidence(self) -> bool:
@@ -100,7 +103,7 @@ def original_evidence_tables(document: StatementHTML) -> list[Table]:
                               or is_statement_heading(table.heading.text, allow_short_income_heading=False))
         and (table.separate_title or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row)
              or (not reviewed_dated_filing and any(
-                 cell.text.casefold() in {"years ended", "fiscal"} or FISCAL_YEAR_UNITS.fullmatch(cell.text)
+                 cell.text.casefold() in DATED_ANNUAL_HEADERS | {"fiscal"} or FISCAL_YEAR_UNITS.fullmatch(cell.text)
                  for row in table.rows for cell in row
              )))
     ]
@@ -247,7 +250,8 @@ def _visible_fact(
         locators["statement_issuer"] = issuer.locator()
     if end in statement.date_prefixes:
         locators["date_prefix"] = statement.date_prefixes[end].locator(table)
-    start = None
+    calendar_start = statement.calendar_starts.get(end)
+    start = calendar_start.isoformat() if calendar_start else None
     if statement.shared_year:
         try:
             start = (end.replace(year=end.year - 1) + timedelta(days=1)).isoformat()
@@ -268,10 +272,18 @@ def _verify_inline(
     document: StatementHTML, statement: DatedStatement, value: GridCell, end: date,
     prior_end: date | None, cik: str, fact: dict[str, Any], weeks: int | None,
 ) -> None:
+    if (end in statement.calendar_starts
+            and not value.cell.inline_facts and not document.contexts and not document.unit_measures):
+        raise UnsupportedLayout(
+            "The consolidated statement displays revenue for this year, "
+            "but the original lacks the inline XBRL fact, context, and unit needed for verification."
+        )
     tagged = _one(value.cell.inline_facts, "Expected one inline XBRL fact in the revenue cell.")
     inline = tagged.attrs
     concepts = {REVENUE_CONCEPT.casefold()}
-    if statement.shared_year:
+    if statement.shared_year or (
+        end in statement.calendar_starts and statement.label.cell.text.casefold() in {"revenue", "revenues"}
+    ):
         concepts.add("us-gaap:revenues")
     if (inline.get("name") or "").casefold() not in concepts:
         raise UnsupportedLayout("The inline XBRL concept conflicts with the total revenue row.")
@@ -305,7 +317,8 @@ def _annual_facts(
     facts = []
     ordered = sorted(periods)
     for index, end in enumerate(ordered):
-        prior_end = ordered[index - 1] if index else None
+        calendar_start = statement.calendar_starts.get(end)
+        prior_end = calendar_start - timedelta(days=1) if calendar_start else (ordered[index - 1] if index else None)
         fact = None
         year = statement.fiscal_labels.get(end, end.year)
         if statement.fiscal_labels:
@@ -451,7 +464,7 @@ def inspect_original_revenue(
         if table.separate_title:
             parser_version = TITLED_TABLE_PARSER_VERSION
             annual, periods = _titled_table_columns(headers)
-        elif any(cell.cell.text.casefold() == "years ended" for row in headers for cell in row):
+        elif any(cell.cell.text.casefold() in DATED_ANNUAL_HEADERS for row in headers for cell in row):
             parser_version = DATED_COLUMNS_PARSER_VERSION
             annual, periods, date_prefixes = _dated_columns(headers, label)
             _check_revenue_columns(rows[label.row - 1], label, periods)
@@ -482,11 +495,21 @@ def inspect_original_revenue(
                 or not cover_end or _displayed_date(cover_end) != current):
             requirements.append("source_identity_verification")
         scale, unit_locator = _original_statement_scale(table, headers, annual)
+        calendar_starts: dict[date, date] = {}
+        singular_annual_header = parser_version == DATED_COLUMNS_PARSER_VERSION and annual.cell.text.casefold() == "year ended"
+        if singular_annual_header:
+            policy = january_calendar_policy_notes(document, lines, after=table.position)
+            if policy.year_end_weekday is not None:
+                calendar_starts = _january_calendar_starts(periods, policy.weeks, policy.year_end_weekday, diagnostics)
+            policy.weeks = {end.year: policy.weeks[end.year] for end in calendar_starts}
+            company = company or policy.issuer or ""
         statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
                                    shared_year=parser_version == SHARED_YEAR_PARSER_VERSION and not fiscal_labels,
                                    date_prefixes=date_prefixes,
                                    original_dated_columns=parser_version == DATED_COLUMNS_PARSER_VERSION,
-                                   fiscal_labels=fiscal_labels, disclosed_year_end_weekday=policy.year_end_weekday)
+                                   fiscal_labels=fiscal_labels,
+                                   disclosed_year_end_weekday=policy.year_end_weekday if fiscal_labels else None,
+                                   calendar_starts=calendar_starts)
         issuer = statement.issuer_heading
         conflicting_heading = issuer is not None and _company_words(issuer.text, statement=True) != _company_words(company)
         if disclosed_fiscal_years:
@@ -495,6 +518,8 @@ def inspect_original_revenue(
         elif not (table.separate_title or table.embedded_heading) and (
             issuer is None or conflicting_heading
         ):
+            requirements.append("statement_issuer_verification")
+        if singular_annual_header and (not policy.issuer or _issuer_name(policy.issuer) != _issuer_name(company)):
             requirements.append("statement_issuer_verification")
         requirements.extend(_shared_source_requirements(source, company, cik, current))
         if not requirements:
@@ -512,6 +537,8 @@ def inspect_original_revenue(
         current_year = fiscal_labels.get(current, current.year)
         if table.separate_title:
             notes, weeks, qualified_years = dated_policy_notes(document, lines, after=table.position, issuer=company)
+        elif singular_annual_header:
+            notes, weeks, qualified_years = policy.notes, policy.weeks, policy.qualified_years
         elif statement.original_dated_columns:
             notes, weeks, qualified_years = numbered_policy_notes(document, lines, after=table.position)
             acquisition = acquisition_revenue_notes(document, lines, after=table.position, year=current.year)
@@ -597,8 +624,8 @@ def inspect_original_revenue(
 def _dated_columns(
     rows: list[list[GridCell]], label: GridCell,
 ) -> tuple[GridCell, dict[date, GridCell], dict[date, GridCell]]:
-    annual = _one([cell for row in rows for cell in row if cell.cell.text.casefold() == "years ended"],
-                  "Expected one Years Ended header above the revenue row.")
+    annual = _one([cell for row in rows for cell in row if cell.cell.text.casefold() in DATED_ANNUAL_HEADERS],
+                  "Expected one annual period header above the revenue row.")
     dated_rows = []
     for row in rows[annual.row - 1:]:
         cells = [cell for cell in row if cell is not annual and cell.cell.text
@@ -632,6 +659,29 @@ def _dated_columns(
             ))):
         raise UnsupportedLayout(message)
     return annual, periods, prefixes
+
+
+def _january_calendar_starts(
+    periods: dict[date, GridCell], weeks: dict[int, int], weekday: int, diagnostics: list[dict[str, Any]],
+) -> dict[date, date]:
+    def last_weekday(year: int) -> date:
+        january_end = date(year, 1, 31)
+        return january_end - timedelta(days=(january_end.weekday() - weekday) % 7)
+
+    starts = {}
+    for end in periods:
+        week_count = weeks.get(end.year)
+        if week_count is None:
+            continue
+        prior_end = last_weekday(end.year - 1)
+        if end == last_weekday(end.year) and end - prior_end == timedelta(weeks=week_count):
+            starts[end] = prior_end + timedelta(days=1)
+        else:
+            diagnostics.append({
+                "code": "unsupported_calendar", "fiscal_year": end.year,
+                "message": "The displayed fiscal year-end or week count conflicts with the disclosed January calendar.",
+            })
+    return starts
 
 
 def _fiscal_week_columns(

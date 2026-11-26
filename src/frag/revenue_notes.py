@@ -156,6 +156,64 @@ def _week_based_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPo
     )
 
 
+def january_calendar_policy_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> StatementPolicies:
+    blocks = [block for block in document.blocks if block.position > after]
+    section = _policy_section(blocks, r"^note 1\s*-\s*organization and summary of significant accounting policies$")
+    calendar = _unique_heading(section, re.compile(r"Fiscal Year", re.I))
+    scope = _unique_heading(section, CONSOLIDATION)
+    revenue = _unique_heading(section, REVENUE)
+    if calendar is None or scope is None or revenue is None:
+        return StatementPolicies()
+    calendar_text = section[calendar + 1].text
+    rule = re.match(r"We operate on a 52- or 53-week year, ending on the last (Saturday|Sunday) in January\.",
+                    calendar_text, re.I)
+    issuer = re.fullmatch(
+        r"Our consolidated financial statements include the accounts of (.+?) and our wholly-owned subsidiaries\. "
+        r"All intercompany balances and transactions have been eliminated in consolidation\.", section[scope + 1].text, re.I,
+    )
+    qualified_years = _revenue_basis_gaps(blocks)
+    if rule is None or issuer is None or qualified_years is None:
+        return StatementPolicies()
+    weeks: dict[int, int] = {}
+    for years, count in re.findall(
+        r"\bfiscal years? (20\d{2}(?:(?:,\s*|\s+)(?:and\s+)?20\d{2})*) "
+        r"(?:were|are|was|is) (?:both |all |a )?(52|53)-week years?\b", calendar_text[rule.end():], re.I,
+    ):
+        for year in map(int, re.findall(r"20\d{2}", years)):
+            if year in weeks:
+                return StatementPolicies()
+            weeks[year] = int(count)
+
+    policy = section[revenue + 1]
+    if re.search(r"recognition of revenue when, or as, we satisfy a performance obligation", policy.text, re.I):
+        revenue_note = _note(lines, "revenue", section[revenue], policy.end)
+    elif (policy.text.casefold() == "product revenue" and revenue + 2 < len(section)
+          and re.match(r"We recognize revenue from product sales when persuasive evidence of an arrangement exists",
+                       section[revenue + 2].text, re.I)):
+        revenue_note = _note(lines, "revenue", section[revenue], section[revenue + 2].end)
+    else:
+        revenue_note = None
+    notes = _complete_notes(
+        _note(lines, "fiscal-year", section[calendar], section[calendar + 1].end),
+        _note(lines, "consolidation", section[scope], section[scope + 1].end),
+        revenue_note,
+    )
+    if notes:
+        comparative = _policy_excerpt(
+            lines, section, "comparative-presentation",
+            r"^Certain prior fiscal year balances have been reclassified to conform to the current fiscal year presentation\.$",
+        )
+        if comparative:
+            notes.insert(-1, comparative)
+    return StatementPolicies(
+        notes=notes,
+        weeks=weeks, qualified_years=qualified_years, issuer=issuer[1],
+        year_end_weekday=5 if rule[1].casefold() == "saturday" else 6,
+    )
+
+
 def fiscal_year_policy_notes(
     document: StatementHTML, lines: list[str], *, after: tuple[int, int],
 ) -> StatementPolicies:
