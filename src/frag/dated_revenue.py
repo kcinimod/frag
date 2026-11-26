@@ -16,8 +16,8 @@ from frag.income_html import (
 )
 from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cell, revenue_fact_id
 from frag.revenue_notes import (
-    accounting_policy_notes, acquisition_revenue_notes, comparison_disclosures, dated_policy_notes,
-    cross_section_policy_notes, numbered_policy_notes, statement_policy_notes,
+    StatementPolicies, accounting_policy_notes, acquisition_revenue_notes, comparison_disclosures,
+    cross_section_policy_notes, dated_policy_notes, fiscal_year_policy_notes, numbered_policy_notes, statement_policy_notes,
 )
 
 PARSER_VERSION = "dated-annual-revenue-v1"
@@ -29,7 +29,7 @@ FILING_SCOPED_PARSERS = ORIGINAL_EVIDENCE_PARSERS | {PARSER_VERSION}
 SHARED_YEAR_EVIDENCE_VERSION = "original-revenue-evidence-v1"
 REFERENCE = json.loads(files("frag").joinpath("apple-revenue-reference.json").read_text(encoding="utf-8"))
 EVIDENCE_VERSION: str = REFERENCE["evidence_version"]
-EXTRACTION_CACHE_REVISION = "statement-periods-v6"
+EXTRACTION_CACHE_REVISION = "statement-periods-v7"
 OPERATIONS_HEADING = re.compile(r"consolidated statements? of operations", re.I)
 DATE_HEADER = re.compile(r"([A-Za-z]+) ([0-9]{1,2}), ([0-9]{4})")
 MONTH_DAY = re.compile(r"[A-Za-z]+ [0-9]{1,2},?")
@@ -44,6 +44,7 @@ SHARED_YEAR_HEADER = re.compile(
 MONEY_PREAMBLE = re.compile(r"^\(?(?:dollars |amounts )?in (thousands|millions|billions)\b", re.I)
 SHARED_MONEY_PREAMBLE = re.compile(rf"\({MONEY_DECLARATION}\)", re.I)
 DATED_MONEY_HEADER = re.compile(r"years ended (\(.+\))", re.I)
+FISCAL_YEAR_UNITS = re.compile(r"\((thousands|millions|billions), except per[- ]share (?:data|amounts)\)", re.I)
 DATE_MONTHS = MONTHS | {name[:3]: month for name, month in MONTHS.items()}
 SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues", "revenue", "net operating revenues"}
 TOTAL_REVENUE_NOTE = re.compile(r"total revenues? \(note \d+\)", re.I)
@@ -61,10 +62,18 @@ class DatedStatement:
     date_prefixes: dict[date, GridCell] = field(default_factory=dict)
     original_dated_columns: bool = False
     fiscal_labels: dict[date, int] = field(default_factory=dict)
+    disclosed_year_end_weekday: int | None = None
 
     @property
     def uses_original_evidence(self) -> bool:
         return self.shared_year or self.table.separate_title or self.original_dated_columns or bool(self.fiscal_labels)
+
+    @property
+    def issuer_heading(self) -> EvidenceText | None:
+        issuer = self.table.issuer
+        if self.disclosed_year_end_weekday is not None and issuer is not None and DATE_HEADER.fullmatch(issuer.text):
+            return None
+        return issuer
 
 
 def is_dated_statement(table: Table) -> bool:
@@ -90,8 +99,10 @@ def original_evidence_tables(document: StatementHTML) -> list[Table]:
         if table.heading and (table.embedded_heading
                               or is_statement_heading(table.heading.text, allow_short_income_heading=False))
         and (table.separate_title or any(SHARED_YEAR_HEADER.fullmatch(cell.text) for row in table.rows for cell in row)
-             or (not reviewed_dated_filing
-                 and any(cell.text.casefold() in {"years ended", "fiscal"} for row in table.rows for cell in row)))
+             or (not reviewed_dated_filing and any(
+                 cell.text.casefold() in {"years ended", "fiscal"} or FISCAL_YEAR_UNITS.fullmatch(cell.text)
+                 for row in table.rows for cell in row
+             )))
     ]
 
 
@@ -232,8 +243,8 @@ def _visible_fact(
         "year_header": header.locator(table), "value": value.locator(table),
         "unit_header": statement.unit_header, "currency_symbol": markers[0].locator(table),
     }
-    if statement.uses_original_evidence and table.issuer and not table.separate_title:
-        locators["statement_issuer"] = table.issuer.locator()
+    if statement.uses_original_evidence and not table.separate_title and (issuer := statement.issuer_heading):
+        locators["statement_issuer"] = issuer.locator()
     if end in statement.date_prefixes:
         locators["date_prefix"] = statement.date_prefixes[end].locator(table)
     start = None
@@ -298,7 +309,8 @@ def _annual_facts(
         fact = None
         year = statement.fiscal_labels.get(end, end.year)
         if statement.fiscal_labels:
-            prior_end = _fiscal_week_year_end(year - 1)
+            weekday = statement.disclosed_year_end_weekday
+            prior_end = _fiscal_week_year_end(year - 1, weekday if weekday is not None else 6)
         week_count = weeks.get(year)
         try:
             fact, value = _visible_fact(statement, periods[end], end, base)
@@ -429,6 +441,9 @@ def inspect_original_revenue(
         date_prefixes: dict[date, GridCell] = {}
         fiscal_labels: dict[date, int] = {}
         fiscal_header = any(cell.cell.text.casefold() == "fiscal" for row in headers for cell in row)
+        fiscal_unit_headers = [cell for row in headers for cell in row if FISCAL_YEAR_UNITS.fullmatch(cell.cell.text)]
+        disclosed_fiscal_years = False
+        policy = StatementPolicies()
         company = _cover(document, "entityregistrantname")
         cik = _cover(document, "entitycentralindexkey")
         cover_end = _cover(document, "documentperiodenddate")
@@ -448,6 +463,12 @@ def inspect_original_revenue(
                 headers, label, _displayed_date(cover_end),
             )
             _check_revenue_columns(rows[label.row - 1], label, periods)
+        elif fiscal_unit_headers:
+            disclosed_fiscal_years = True
+            annual = _one(fiscal_unit_headers, "Expected one fiscal year and units header.")
+            policy = fiscal_year_policy_notes(document, lines, after=table.position)
+            periods, fiscal_labels = _disclosed_fiscal_year_columns(headers, label, annual, policy)
+            _check_revenue_columns(rows[label.row - 1], label, periods)
         else:
             annual = _one([cell for row in headers for cell in row if SHARED_YEAR_HEADER.fullmatch(cell.cell.text)],
                           "Expected one shared fiscal year-end above the revenue row.")
@@ -460,8 +481,19 @@ def inspect_original_revenue(
                 or _cover(document, "documenttype") != "10-K"
                 or not cover_end or _displayed_date(cover_end) != current):
             requirements.append("source_identity_verification")
-        if not (table.separate_title or table.embedded_heading) and (
-            table.issuer is None or _company_words(table.issuer.text, statement=True) != _company_words(company)
+        scale, unit_locator = _original_statement_scale(table, headers, annual)
+        statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
+                                   shared_year=parser_version == SHARED_YEAR_PARSER_VERSION and not fiscal_labels,
+                                   date_prefixes=date_prefixes,
+                                   original_dated_columns=parser_version == DATED_COLUMNS_PARSER_VERSION,
+                                   fiscal_labels=fiscal_labels, disclosed_year_end_weekday=policy.year_end_weekday)
+        issuer = statement.issuer_heading
+        conflicting_heading = issuer is not None and _company_words(issuer.text, statement=True) != _company_words(company)
+        if disclosed_fiscal_years:
+            if conflicting_heading or not policy.issuer or _issuer_name(policy.issuer) != _issuer_name(company):
+                requirements.append("statement_issuer_verification")
+        elif not (table.separate_title or table.embedded_heading) and (
+            issuer is None or conflicting_heading
         ):
             requirements.append("statement_issuer_verification")
         requirements.extend(_shared_source_requirements(source, company, cik, current))
@@ -470,14 +502,8 @@ def inspect_original_revenue(
                 table, annual, {fiscal_labels.get(end, end.year): header for end, header in periods.items()},
                 label, rows, date_prefixes={fiscal_labels.get(end, end.year): cell for end, cell in date_prefixes.items()},
             )
-            if (shared_row or fiscal_header or parser_version == DATED_COLUMNS_PARSER_VERSION) and not coverage:
+            if (shared_row or fiscal_labels or parser_version == DATED_COLUMNS_PARSER_VERSION) and not coverage:
                 raise UnsupportedLayout("The visible fiscal year headers do not establish an unambiguous period inventory.")
-        scale, unit_locator = _original_statement_scale(table, headers, annual)
-        statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
-                                   shared_year=parser_version == SHARED_YEAR_PARSER_VERSION and not fiscal_header,
-                                   date_prefixes=date_prefixes,
-                                   original_dated_columns=parser_version == DATED_COLUMNS_PARSER_VERSION,
-                                   fiscal_labels=fiscal_labels)
         weeks: dict[int, int] = {}
         qualified_years: set[int] = set()
         acquisition_notes: list[dict[str, Any]] = []
@@ -497,6 +523,8 @@ def inspect_original_revenue(
                 })
             else:
                 acquisition_notes, caveats = acquisition
+        elif disclosed_fiscal_years:
+            notes, weeks, qualified_years = policy.notes, policy.weeks, policy.qualified_years
         elif fiscal_header or table.embedded_heading or (
             table.heading and re.fullmatch(r"statements? of consolidated income", table.heading.text, re.I)
         ):
@@ -627,10 +655,30 @@ def _fiscal_week_columns(
     return prefixes[0], periods, labels, date_prefixes
 
 
-def _fiscal_week_year_end(fiscal_year: int) -> date:
+def _fiscal_week_year_end(fiscal_year: int, weekday: int = 6) -> date:
     january_end = date(fiscal_year + 1, 1, 31)
-    days_to_sunday = 6 - january_end.weekday()
-    return january_end + timedelta(days=(days_to_sunday + 3) % 7 - 3)
+    days_to_week_end = weekday - january_end.weekday()
+    return january_end + timedelta(days=(days_to_week_end + 3) % 7 - 3)
+
+
+def _disclosed_fiscal_year_columns(
+    rows: list[list[GridCell]], label: GridCell, annual: GridCell, policy: StatementPolicies,
+) -> tuple[dict[date, GridCell], dict[date, int]]:
+    headers = [cell for cell in rows[annual.row - 1] if cell.cell.text and cell is not annual]
+    message = "The displayed fiscal years do not match the disclosed fiscal calendar."
+    if (annual.columns.stop > label.columns.stop or len(headers) < 2 or any(
+        not FISCAL_YEAR.fullmatch(cell.cell.text) or cell.columns.start < label.columns.stop for cell in headers
+    )):
+        raise UnsupportedLayout(message)
+    years = [int(cell.cell.text) for cell in headers]
+    weekday = policy.year_end_weekday
+    if (weekday is None or years != list(range(years[0], years[0] - len(years), -1))
+            or any(year not in policy.period_ends for year in years)):
+        raise UnsupportedLayout(message)
+    ends = [_displayed_date(policy.period_ends[year]) for year in years]
+    if any(end != _fiscal_week_year_end(year, weekday) for end, year in zip(ends, years, strict=True)):
+        raise UnsupportedLayout("The disclosed fiscal year-end dates conflict with the filing's calendar rule.")
+    return dict(zip(ends, headers, strict=True)), dict(zip(ends, years, strict=True))
 
 
 def _transaction_in_period(disclosed: str | None, prior_end: date, current_end: date) -> bool:
@@ -698,6 +746,8 @@ def _original_comparison(
 def _original_statement_scale(
     table: Table, headers: list[list[GridCell]], annual: GridCell,
 ) -> tuple[int, dict[str, int]]:
+    if fiscal_units := FISCAL_YEAR_UNITS.fullmatch(annual.cell.text):
+        return SCALES[fiscal_units[1].casefold()], annual.locator(table)
     if table.separate_title:
         declaration = DATED_MONEY_HEADER.fullmatch(annual.cell.text)
         units = SHARED_MONEY_PREAMBLE.fullmatch(declaration[1]) if declaration else None
@@ -767,7 +817,12 @@ def _company_words(name: str, *, statement: bool = False) -> str:
     name = _normalized_company(name.replace("-", " "))
     if statement:
         name = re.sub(r"^[0-9]+ ", "", name).removesuffix(" and subsidiaries")
-    return re.sub(r"\bco$", "company", name.removeprefix("the "))
+    name = re.sub(r"\bco$", "company", name.removeprefix("the "))
+    return re.sub(r"\bcorp$", "corporation", name)
+
+
+def _issuer_name(name: str) -> str:
+    return re.sub(r" (?:corp(?:oration)?|inc(?:orporated)?)$", "", _company_words(name))
 
 
 def _shared_source_requirements(source: dict[str, Any], company: str, cik: str, end: date) -> list[str]:

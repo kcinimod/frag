@@ -1,0 +1,256 @@
+{
+  "cases": [
+    {
+      "case_id": "P6-01",
+      "kind": "lookup",
+      "outcome": "answerable",
+      "question": "What was reported consolidated revenue in FY2023?",
+      "source_id": "0000027419-24-000032",
+      "years": [
+        2023
+      ]
+    },
+    {
+      "absolute_change": "-1708000000",
+      "case_id": "P6-02",
+      "comparison_caveat": "Compare the 52- and 53-week totals as reported without annualizing them.",
+      "kind": "growth",
+      "outcome": "answerable",
+      "percent": "-1.57",
+      "period_weeks": [
+        52,
+        53
+      ],
+      "question": "What was reported consolidated revenue growth from FY2022 to FY2023 as reported?",
+      "source_id": "0000027419-24-000032",
+      "years": [
+        2022,
+        2023
+      ]
+    },
+    {
+      "case_id": "P6-15",
+      "kind": "growth",
+      "outcome": "incompatible_periods",
+      "partial_years": [
+        2022,
+        2023
+      ],
+      "period_weeks": [
+        52,
+        53
+      ],
+      "question": "What was reported consolidated revenue growth from FY2022 to FY2023? Compare equal-length fiscal periods only.",
+      "reason": "FY2022 contains 52 weeks and FY2023 contains 53 weeks. Both observations are reported; equal-length operands are unavailable for those years.",
+      "source_id": "0000027419-24-000032",
+      "years": [
+        2022,
+        2023
+      ]
+    }
+  ],
+  "evidence": {
+    "applicable_notes": [
+      {
+        "label": "Consolidation",
+        "locator": {
+          "end_byte": 1070884,
+          "sha256": "5d9da78bd3f1dcda7fe9eeaef70b26c76364b6b6f0a11ff5b74f034396d215d0",
+          "start_byte": 1070699
+        },
+        "meaning": "Consolidates wholly owned subsidiaries and eliminates intercompany balances and transactions."
+      },
+      {
+        "label": "Fiscal year",
+        "locator": {
+          "end_byte": 1072540,
+          "sha256": "7394f647cc5702af494555786f3389d989a3bc6fc164197b97fe2e91cc35bb49",
+          "start_byte": 1072104
+        },
+        "meaning": "FY2023 has 53 weeks versus 52 weeks in FY2022 and FY2021."
+      },
+      {
+        "label": "Revenues",
+        "locator": {
+          "end_byte": 1078748,
+          "sha256": "1320cf3f690467bc59a44327fc081000472de1996b9ab4b4d67efdc7636b3d0a",
+          "start_byte": 1078538
+        },
+        "meaning": "Reported total includes merchandise and other revenue including credit card profit sharing."
+      }
+    ],
+    "facts": {
+      "2021": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-11",
+        "currency": "USD",
+        "element_id": "f-46",
+        "fiscal_year": 2021,
+        "locators": {
+          "context": {
+            "end_byte": 10923,
+            "sha256": "74262af85f75d1918d22b63c836b42226b65c81b00c542c69d835a6802bb909f",
+            "start_byte": 10659
+          },
+          "inline_fact": {
+            "end_byte": 826290,
+            "sha256": "28e8a953b75b18d6d26b7aee8407c263c44364f522b0ffe6be1344487a7e6dad",
+            "start_byte": 826088
+          },
+          "period_cell": {
+            "end_byte": 819817,
+            "sha256": "3e77068d69fca49358a116efd77117163e4e837ca42bb42395dfa31381b55dc5",
+            "start_byte": 819585
+          },
+          "statement_cell": {
+            "end_byte": 826308,
+            "sha256": "f184d534a835dd83894a494175def7e2c71154121249634edc2b9982841a129c",
+            "start_byte": 825714
+          },
+          "unit": {
+            "end_byte": 7664,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 7588
+          }
+        },
+        "normalized_amount": "106005000000",
+        "period_days": 364,
+        "period_end": "2022-01-29",
+        "period_start": "2021-01-31",
+        "precision_decimals": -6,
+        "raw_amount": "106,005",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "2022": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-10",
+        "currency": "USD",
+        "element_id": "f-45",
+        "fiscal_year": 2022,
+        "locators": {
+          "context": {
+            "end_byte": 10659,
+            "sha256": "c115aec754aa59226cfad9d46e625d4014ca89f2f7bfb85ede763c026d0c53ed",
+            "start_byte": 10395
+          },
+          "inline_fact": {
+            "end_byte": 825696,
+            "sha256": "84ac6e253d174037ebe898d48b5d0b49bfbe7b34ee8fc352a91f933aad8083c7",
+            "start_byte": 825494
+          },
+          "period_cell": {
+            "end_byte": 819585,
+            "sha256": "7fb4069b3347c93c1340fcd104bf6f61c3ea7cc2d57dd4876ae3fa58fb3faab8",
+            "start_byte": 819353
+          },
+          "statement_cell": {
+            "end_byte": 825714,
+            "sha256": "c3c6776c58d2dd21b563df32334f0126fa00d75dbb88b43673290f4c55eaea46",
+            "start_byte": 825120
+          },
+          "unit": {
+            "end_byte": 7664,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 7588
+          }
+        },
+        "normalized_amount": "109120000000",
+        "period_days": 364,
+        "period_end": "2023-01-28",
+        "period_start": "2022-01-30",
+        "precision_decimals": -6,
+        "raw_amount": "109,120",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "2023": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-44",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 7370,
+            "sha256": "ecaf1bdab7d048e612bd5d061f5d0904ae41a715c95dc247a6a8b97918d569da",
+            "start_byte": 7107
+          },
+          "inline_fact": {
+            "end_byte": 825102,
+            "sha256": "e6db4126c4fc179049573afa9915717b507b4eaa39d8b29bee386ab6671e0828",
+            "start_byte": 824901
+          },
+          "period_cell": {
+            "end_byte": 819353,
+            "sha256": "8cf72432e7e2fbacfafdb4d754ff3a7132ae051950c301445ba3ba18fa1dc302",
+            "start_byte": 819121
+          },
+          "statement_cell": {
+            "end_byte": 825120,
+            "sha256": "b1e9c4d1326a85a5db13d08323ead0f638f86af4edfe4d08338495bcd9c37f5b",
+            "start_byte": 824655
+          },
+          "unit": {
+            "end_byte": 7664,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 7588
+          }
+        },
+        "normalized_amount": "107412000000",
+        "period_days": 371,
+        "period_end": "2024-02-03",
+        "period_start": "2023-01-29",
+        "precision_decimals": -6,
+        "raw_amount": "107,412",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      }
+    },
+    "layout": {
+      "period_header": "Descending years alone in one row",
+      "title": "Above table",
+      "unit_placement": "In year row"
+    },
+    "locators": {
+      "period_header": {
+        "end_byte": 819822,
+        "sha256": "51d6407667d01cc1171de073d4bb5344e4d2c323687765d943c98b1694da5c70",
+        "start_byte": 818858
+      },
+      "revenue_row": {
+        "end_byte": 826441,
+        "sha256": "2cf570e16e1899447b44a63b08c242890fadbe6b06bfe45fd3e9bca113ea9c32",
+        "start_byte": 824387
+      },
+      "statement": {
+        "end_byte": 855383,
+        "sha256": "45df2e15ebeabd598770da0b9c168a5244c07841c43d002cc1a4c02fb2dbf04c",
+        "start_byte": 818428
+      },
+      "statement_title_and_units": {
+        "end_byte": 819822,
+        "sha256": "7fe283f805cf9ec47f4ffcb3a923f5a73242109bf07a0e3169ae5f1d52f2bcae",
+        "start_byte": 818290
+      }
+    },
+    "statement_row": "Total revenue"
+  },
+  "source": {
+    "accession": "0000027419-24-000032",
+    "byte_length": 1930390,
+    "cik": "0000027419",
+    "filing_date": "2024-03-13",
+    "form": "10-K",
+    "issuer": "TARGET CORP",
+    "original_filename": "tgt-20240203.htm",
+    "path": "originals/0000027419-24-000032/tgt-20240203.htm",
+    "report_end": "2024-02-03",
+    "sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+    "source_id": "0000027419-24-000032",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/27419/000002741924000032/tgt-20240203.htm"
+  }
+}

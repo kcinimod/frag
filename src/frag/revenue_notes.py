@@ -57,6 +57,15 @@ FISCAL_WEEK_COUNTS = re.compile(
     r"\b(fiscal 20\d{2}(?:(?:,\s*|\s+and\s+)(?:and\s+)?fiscal 20\d{2})*) "
     r"(?:was|were) (?:each |a )?(52|53)-week fiscal years?\b", re.I,
 )
+FISCAL_DATE = r"[A-Za-z]+ \d{1,2}, \d{4}"
+DATED_FISCAL_YEAR = re.compile(
+    rf"\bFiscal (\d{{4}}) ended ({FISCAL_DATE}), and consisted of (52|53) weeks\.", re.I,
+)
+DATED_FISCAL_PAIR = re.compile(
+    rf"\bFiscal (\d{{4}}) and (\d{{4}}) ended ({FISCAL_DATE}), and ({FISCAL_DATE}), "
+    r"respectively, and consisted of (52|53) weeks\.", re.I,
+)
+FISCAL_YEAR_END_RULE = re.compile(r"\bOur fiscal year ends on the (Saturday|Sunday) nearest January 31\.", re.I)
 
 
 @dataclass
@@ -69,6 +78,8 @@ class StatementPolicies:
     issuer: str | None = None
     week_based_calendar: bool = False
     transaction_date: str | None = None
+    period_ends: dict[int, str] = field(default_factory=dict)
+    year_end_weekday: int | None = None
 
 
 def statement_policy_notes(
@@ -143,6 +154,53 @@ def _week_based_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPo
                  r"have been consolidated .*? effective (?P<date>[A-Za-z]+ \d+, (?P<year>20\d{2}))\."),
         caveat="{business} results are included from the acquisition date in {year}.",
     )
+
+
+def fiscal_year_policy_notes(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> StatementPolicies:
+    blocks = [block for block in document.blocks if block.position > after]
+    policy = _policy_section(blocks, r"^1\.\s*summary of accounting policies$")
+    calendar = [block for block in policy if re.match(r"Fiscal year\s*[-–—]", block.text, re.I)]
+    scope = [match for block in policy if (match := re.match(
+        r"Consolidation\s*[-–—] The consolidated financial statements include the balances of (.+?) "
+        r"and its subsidiaries after elimination of intercompany balances and transactions\.", block.text, re.I,
+    ))]
+    if len(calendar) != 1:
+        return StatementPolicies()
+    rule = FISCAL_YEAR_END_RULE.findall(calendar[0].text)
+    if len(rule) != 1:
+        return StatementPolicies()
+    weekday = 5 if rule[0].casefold() == "saturday" else 6
+    periods = [(year, end, weeks) for year, end, weeks in DATED_FISCAL_YEAR.findall(calendar[0].text)]
+    for year, prior_year, end, prior_end, weeks in DATED_FISCAL_PAIR.findall(calendar[0].text):
+        periods.extend([(year, end, weeks), (prior_year, prior_end, weeks)])
+    week_counts = {int(year): int(weeks) for year, _, weeks in periods}
+    if len(week_counts) != len(periods):
+        return StatementPolicies()
+    ends = {int(year): end for year, end, _ in periods}
+    qualified = _revenue_basis_gaps(blocks)
+    notes: list[dict[str, Any]] = []
+    revenue = _unique_heading(blocks, re.compile(r"(\d+)\.\s*Revenues", re.I))
+    if qualified is not None and len(scope) == 1 and revenue is not None:
+        heading = blocks[revenue]
+        revenue_section = _numbered_note_body(blocks, revenue)
+        overview = [block for block in revenue_section if re.match(
+            r"Merchandise sales represent the vast majority of our revenues\..*\bother sources\b", block.text, re.I,
+        )]
+        recognition = [block for block in revenue_section if re.match(
+            r"Merchandise sales\s*[-–—] .*\btotal revenues do not include sales tax\b.*\brecognized net of expected returns\b",
+            block.text, re.I,
+        )]
+        if len(overview) == len(recognition) == 1 and overview[0].position < recognition[0].position:
+            notes = _complete_notes(
+                _policy_excerpt(lines, policy, "consolidation", r"^Consolidation\s*[-–—]"),
+                _policy_excerpt(lines, policy, "fiscal-year", r"^Fiscal year\s*[-–—]"),
+                _note(lines, "revenue", heading, recognition[0].end, number=int(heading.text.split(".")[0])),
+            )
+    return StatementPolicies(notes=notes, weeks=week_counts, qualified_years=qualified or set(),
+                             issuer=scope[0][1] if len(scope) == 1 else None, period_ends=ends,
+                             year_end_weekday=weekday)
 
 
 def _continuing_operations_policy(lines: list[str], blocks: list[TextBlock]) -> StatementPolicies:

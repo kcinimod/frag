@@ -212,3 +212,8 @@ Phase 2 calculator and its offline results.
   The FY2024 lookup, 15.65% reported growth, and cited FY2021 absence with
   the verified FY2024 companion all reproduced offline.
   [Netflix validation](../artifacts/phase06/NETFLIX_REVENUE.md)
+
+- Issue #48 verifies Target's three FY2021 to FY2023 revenue observations.
+  The FY2023 lookup, -1.57% reported growth, and equal-length abstention
+  reproduced offline with all 14 original citation responses.
+  [Target validation](../artifacts/phase06/TARGET_REVENUE.md)

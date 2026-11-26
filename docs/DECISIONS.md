@@ -408,3 +408,13 @@ warm, and socket-blocked runs. Keep the independent references in scorer
 custody and publish the digest of the full score for exact reproduction.
 Preserve the failed decision and the evidence for each stop.
 [Fresh acceptance checkpoint](../artifacts/phase06/SEC_ACCEPTANCE.md)
+
+### Verify year-only fiscal headers against the disclosed calendar (#48)
+
+Associate the revenue cells with the visible year columns and units. Use the
+fiscal-calendar disclosure to map each fiscal label to its stated end date
+and week count, then corroborate the mapping with the cell's inline context.
+Cite the calendar disclosure on both reported growth and an equal-length
+abstention. Retain both verified operands when the requested comparison
+withholds the percentage.
+[Target validation](../artifacts/phase06/TARGET_REVENUE.md)
