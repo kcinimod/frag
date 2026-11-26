@@ -381,3 +381,12 @@ with reviewed original evidence and its opened citations support it. Keep
 both results outside the supported-answer and grounded-abstention counts.
 Use the frozen Phase 5 checks for numeric answers, citations, and replay.
 [Phase 6 scoring controls](../artifacts/phase06/README.md#phase-6-scoring-controls)
+
+### Compare the Phase 6 development candidate against the frozen baseline (#42)
+
+Measure the committed candidate with the original opened and earlier inputs
+and the frozen planner and retrieval settings. Score original statement
+extraction separately from verification. Count historical GE FY2018 as a
+matched provisional observation and keep Apple FY2024 as an incomplete
+regression while the original's identity and disclosures need verification.
+[Development gate results and replay](../artifacts/phase06/DEVELOPMENT_GATE.md)

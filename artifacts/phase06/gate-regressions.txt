@@ -1,0 +1,22 @@
+Socket-blocked replay matched 5 results and 19 citation responses.
+coca-cola-absent: Chrome 158.0.8127.37, 5 citation responses matched
+pg-equal-length: Chrome 158.0.8127.37, 5 citation responses matched
+ge-historical: Chrome 158.0.8127.37, 0 citation responses matched
+apple-fy2024: Chrome 158.0.8127.37, 0 citation responses matched
+microsoft-growth: Chrome 158.0.8127.37, 9 citation responses matched
+
+Validated sha256:7d8bdb38467da5665de85d851f17f5786058c3ed7fc5b207171051e8a7b27cde with three sources, six facts, and stable reindexing.
+FY2022 USD 198,270 million, HTML line 4403. CLI replay matched.
+FY2023 USD 211,915 million, HTML line 4399. CLI replay matched.
+Clarification and unsupported cases passed. Ordinary questions left the store unchanged.
+complete-with-distractors: calculated (sufficient_evidence). Offline record matched. Ask 64.5 ms, replay 14.1 ms.
+missing-year: evidence_unavailable (missing_fiscal_year). Offline record matched. Ask 62.7 ms, replay 12.2 ms.
+missing-context: evidence_unavailable (missing_context). Offline record matched. Ask 14.5 ms, replay 12.0 ms.
+synthetic-incompatible: evidence_unavailable (incompatible). Offline record matched. Ask 5.9 ms, replay 2.8 ms.
+synthetic-zero: undefined_zero_baseline (sufficient_evidence). Offline record matched. Ask 6.7 ms, replay 3.1 ms.
+one-pass: evidence_unavailable (missing_fiscal_year). Offline replay matched.
+recovered: calculated (sufficient_evidence). Offline replay matched.
+missing: evidence_unavailable (no_progress). Offline replay matched.
+calls: evidence_unavailable (budget_exhausted). Offline replay matched.
+time: evidence_unavailable (budget_exhausted). Offline replay matched.
+Offline browser smoke passed for original revenue cells and disclosures in complete and partial results.
