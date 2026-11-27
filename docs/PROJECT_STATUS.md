@@ -254,8 +254,8 @@ Phase 2 calculator and its offline results.
 
 - Issue #54 independently audits and seals the fresh 15-case cohort across
   six issuer families and seven preserved domestic 10-Ks. Its runner inputs
-  remain in custody pending the acceptance freeze. The scoring references
-  are held separately. [Continuation holdout custody](../artifacts/phase06/CONTINUATION_HOLDOUT.md)
+  stayed in custody until the #45 freeze. The scoring references are held
+  separately. [Continuation holdout custody](../artifacts/phase06/CONTINUATION_HOLDOUT.md)
 
 - Issue #45 evaluates the fresh #54 cohort after rechecking both seals
   against the final development inventory and freezing the runner and

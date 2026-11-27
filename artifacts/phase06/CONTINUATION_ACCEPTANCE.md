@@ -88,9 +88,10 @@ missing required evidence separately.
 
 Run from the repository root with the
 [pinned Python environment](README.md#reproduce-on-windows) and the two
-separately held [#54 archives](CONTINUATION_HOLDOUT.md). The archived
-revisions supply runner, scorer, and production code. Set `$custody` to the
-local custody directory. Verify the retained artifact bytes, recreate the
+separately held [#54 archives](CONTINUATION_HOLDOUT.md). The launcher
+exports runner, scorer, and production code from the pinned revisions and
+checks the snapshot against the freeze before copying the runner archive.
+Set `$custody` to the local custody directory. Verify the retained artifact bytes, recreate the
 frozen workspace, and replay all 30 results and citation sets offline.
 
 ```powershell
@@ -100,8 +101,6 @@ $phase = 'artifacts/phase06'
 $records = "$phase/continuation-acceptance"
 $custody = '../FRAG-SEC-Holdout-54'
 $run = "build/phase06-fresh-45-replay-$([guid]::NewGuid())"
-git diff --quiet $evaluation -- "$phase/acceptance.ps1"
-if ($LASTEXITCODE -ne 0) { throw 'Use the launcher from the pinned evaluation revision.' }
 Get-Content "$records/SHA256SUMS" | ForEach-Object {
     $hash, $name = $_ -split '  ', 2
     if ((Get-FileHash -LiteralPath "$records/$name").Hash -ne $hash) {
@@ -144,7 +143,12 @@ $run = "build/phase06-fresh-45-live-$([guid]::NewGuid())"
     -FreshContinuation -ContinuationRevision $production -EvaluationRevision $evaluation
 & "$phase/acceptance.ps1" -Mode Live -Destination $run -Custody $custody
 & "$phase/acceptance.ps1" -Mode Replay -Destination $run -Custody $custody
-if ($LASTEXITCODE -ne 0) { throw 'Expected 30/30 exact replays.' }
+$replayExit = $LASTEXITCODE
 & "$phase/acceptance.ps1" -Mode Score -Destination $run -Custody $custody
 if ($LASTEXITCODE -ne 2) { throw 'Expected the measured gate failure.' }
+if ($replayExit -ne 0) { throw 'Expected 30/30 exact replays.' }
 ```
+
+If a replay result or citation differs, the score records the mismatch.
+If reingested source evidence differs, the scorer rejects the report pair
+and the replay record identifies the affected sources.

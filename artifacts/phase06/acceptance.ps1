@@ -29,6 +29,38 @@ function Invoke-CheckedPython {
     if ($LASTEXITCODE -ne 0) { throw "Python command failed ($LASTEXITCODE): $args" }
 }
 
+function Confirm-ContinuationFreeze([string]$Runner, [string]$Freeze, [string]$Scoring, [switch]$RequireModel) {
+    if (-not (Test-Path -LiteralPath "$Runner/continuation-audit.json" -PathType Leaf)) {
+        throw 'The continuation audit is required before releasing runner inputs.'
+    }
+    $validate = @'
+from pathlib import Path
+import sys
+
+runner, freeze, scoring = map(Path, sys.argv[1:4])
+sys.path.insert(0, str(runner / "artifacts/phase06"))
+from fresh_run import SCORING_FILES, configuration, digest, read_json, runtime_hashes
+
+frozen = read_json(freeze)
+config = configuration()
+scorer_paths = (*SCORING_FILES, "artifacts/phase06/verify_continuation_custody.py")
+scoring_files = {name: digest(scoring / name) for name in scorer_paths}
+if ("continuation_audit_sha256" not in config
+        or any(frozen.get(key) != value for key, value in config.items())
+        or scoring_files != frozen.get("scoring_files")):
+    raise SystemExit("The freeze differs from the verified continuation snapshot.")
+if "--require-model" in sys.argv and (
+    digest(runner / "model/model.gguf") != frozen["weights_sha256"]
+    or runtime_hashes(runner / "model") != frozen["runtime_files"]
+):
+    raise SystemExit("The model or runtime differs from the continuation freeze.")
+'@
+    $arguments = @('-', $Runner, $Freeze, $Scoring)
+    if ($RequireModel) { $arguments += '--require-model' }
+    $validate | & $python @arguments
+    if ($LASTEXITCODE -ne 0) { throw 'Continuation freeze validation failed.' }
+}
+
 function Export-Snapshot($Commit, $Archive, $Directory, $Paths) {
     git -C $repo -c core.autocrlf=false archive --format=zip --output=$Archive $Commit -- @Paths
     if ($LASTEXITCODE -ne 0) { throw "Could not export the Phase 6 snapshot at $Commit." }
@@ -83,10 +115,7 @@ if ($Mode -eq 'Freeze') {
     }
     if ($SavedFreeze) {
         if ($FreshContinuation) {
-            $frozen = Get-Content -Raw -LiteralPath $SavedFreeze | ConvertFrom-Json
-            if ($frozen.continuation_audit_sha256 -ne (Get-FileHash "$runner/continuation-audit.json").Hash) {
-                throw 'The retained freeze differs from the verified continuation snapshot.'
-            }
+            Confirm-ContinuationFreeze $runner $SavedFreeze "$session/scoring"
         }
         Copy-Item -LiteralPath $SavedFreeze -Destination "$runner/freeze.json"
     } else {
@@ -102,16 +131,17 @@ $session = (Resolve-Path -LiteralPath $Destination).Path
 $runner = "$session/runner"
 $freeze = "$runner/freeze.json"
 $inputs = "$runner/inputs.zip"
-$fresh = Test-Path -LiteralPath "$runner/continuation-audit.json" -PathType Leaf
+if (-not (Test-Path -LiteralPath $freeze -PathType Leaf)) { throw 'Freeze the workspace before releasing inputs.' }
+$frozen = Get-Content -Raw -LiteralPath $freeze | ConvertFrom-Json
+$fresh = $frozen.PSObject.Properties.Name -contains 'continuation_audit_sha256' -or
+    (Test-Path -LiteralPath "$runner/$phase/CONTINUATION_PROTOCOL.md" -PathType Leaf)
 if ($Mode -eq 'Live' -or $Mode -eq 'Replay') {
-    if (-not (Test-Path -LiteralPath $freeze -PathType Leaf)) { throw 'Freeze the workspace before releasing inputs.' }
+    if ($fresh) {
+        Confirm-ContinuationFreeze $runner $freeze "$session/scoring" -RequireModel:($Mode -eq 'Live')
+    }
     if (-not (Test-Path -LiteralPath $inputs -PathType Leaf)) {
         $custodyRoot = Resolve-Custody $fresh
         if ($fresh) {
-            $frozen = Get-Content -Raw -LiteralPath $freeze | ConvertFrom-Json
-            if ($frozen.continuation_audit_sha256 -ne (Get-FileHash "$runner/continuation-audit.json").Hash) {
-                throw 'The freeze differs from the verified continuation snapshot.'
-            }
             $runnerBundle = $frozen.receipt.runner_bundle.path
             if ((Get-FileHash -LiteralPath (Join-Path $custodyRoot $runnerBundle)).Hash -ne $frozen.receipt.runner_bundle.sha256) {
                 throw 'The runner archive differs from the frozen seal.'

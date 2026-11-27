@@ -71,6 +71,25 @@ def test_fresh_continuation_freeze_requires_an_explicit_evaluation_revision(tmp_
     assert not destination.exists()
 
 
+def test_fresh_continuation_does_not_release_inputs_when_audit_is_missing(tmp_path: Path) -> None:
+    destination = tmp_path / "session"
+    runner = destination / "runner"
+    (runner / PHASE).mkdir(parents=True)
+    (runner / PHASE / "CONTINUATION_PROTOCOL.md").write_text("Synthetic continuation snapshot", encoding="utf-8")
+    (runner / "freeze.json").write_text('{"continuation_audit_sha256": "synthetic"}', encoding="utf-8")
+    custody = tmp_path / "custody"
+    (custody / "runner").mkdir(parents=True)
+    (custody / "runner/inputs.zip").write_bytes(b"synthetic custody input")
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-File", str(ROOT / PHASE / "acceptance.ps1"),
+         "-Mode", "Replay", "-Destination", str(destination), "-Custody", str(custody)],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert "The continuation audit is required before releasing runner inputs" in result.stderr
+    assert not (runner / "inputs.zip").exists()
+
+
 @pytest.fixture
 def cohort(tmp_path: Path) -> tuple[Path, Path, dict[str, Any]]:
     snapshot = tmp_path / "runner"
