@@ -476,3 +476,12 @@ the separate scoring archive. Both passes failed the gate and exactly
 reproduced their results and citation sets offline. Keep #44's original
 result and scoring policy as the historical checkpoint.
 [Second fresh acceptance decision](../artifacts/phase06/CONTINUATION_ACCEPTANCE.md)
+
+### Bound model-only selection by visible table and row order (#57)
+
+Present every visible table and row in source order, splitting long row
+text across batches. Constrain each decision to the current batch's stable
+row IDs and explicit abstention. Compare nominations in further bounded
+batches. Apply the same original-cell checks as rules alone to the final
+selection and retain each model response for offline replay.
+[Model-only selection and evidence](../artifacts/phase06/REVENUE_SELECTION_MODEL.md)

@@ -1,0 +1,164 @@
+{
+  "controls": {
+    "absent": {
+      "expected_row_id": null,
+      "observation_count": 0,
+      "selected": {
+        "row_id": "table-1/row-2",
+        "table_id": "table-1"
+      },
+      "stop": "unsupported_scope"
+    },
+    "distractor": {
+      "expected_row_id": "table-2/row-4",
+      "observation_count": 2,
+      "selected": {
+        "row_id": "table-2/row-4",
+        "table_id": "table-2"
+      },
+      "stop": "verification_gap"
+    }
+  },
+  "exact_observations": 0,
+  "filings": {
+    "0000077476-25-000007": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "PEPSICO INC",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-28/row-3",
+        "table_id": "table-28"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": true,
+      "reviewed_target_selected": true,
+      "selected": {
+        "row_id": "table-28/row-3",
+        "table_id": "table-28"
+      },
+      "stop": "extraction_gap",
+      "verified_exact_fiscal_years": []
+    },
+    "0000796343-18-000015": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "ADOBE INC.",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-121/row-9",
+        "table_id": "table-121"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": false,
+      "reviewed_target_selected": false,
+      "selected": {
+        "row_id": "table-128/row-7",
+        "table_id": "table-128"
+      },
+      "stop": "unsupported_scope",
+      "verified_exact_fiscal_years": []
+    },
+    "0000796343-25-000004": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "ADOBE INC.",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-32/row-8",
+        "table_id": "table-32"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": true,
+      "reviewed_target_selected": true,
+      "selected": {
+        "row_id": "table-32/row-8",
+        "table_id": "table-32"
+      },
+      "stop": "extraction_gap",
+      "verified_exact_fiscal_years": []
+    },
+    "0000950170-24-075605": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "ORACLE CORP",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-36/row-9",
+        "table_id": "table-36"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": true,
+      "reviewed_target_selected": false,
+      "selected": {
+        "row_id": "table-76/row-15",
+        "table_id": "table-76"
+      },
+      "stop": "unsupported_scope",
+      "verified_exact_fiscal_years": []
+    },
+    "0001065088-25-000037": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "EBAY INC",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-31/row-5",
+        "table_id": "table-31"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": false,
+      "reviewed_target_selected": false,
+      "selected": {
+        "row_id": "table-42/row-6",
+        "table_id": "table-42"
+      },
+      "stop": "unsupported_scope",
+      "verified_exact_fiscal_years": []
+    },
+    "0001108524-24-000005": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "Salesforce, Inc.",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-31/row-7",
+        "table_id": "table-31"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": false,
+      "reviewed_target_selected": false,
+      "selected": {
+        "row_id": "table-81/row-48",
+        "table_id": "table-81"
+      },
+      "stop": "unsupported_scope",
+      "verified_exact_fiscal_years": []
+    },
+    "0001141391-25-000011": {
+      "exact_fiscal_years": [],
+      "incorrect_verified_fiscal_years": [],
+      "issuer": "Mastercard Inc",
+      "observations_reviewed": 3,
+      "reviewed_target": {
+        "row_id": "table-56/row-6",
+        "table_id": "table-56"
+      },
+      "reviewed_target_covered": true,
+      "reviewed_target_nominated": false,
+      "reviewed_target_selected": false,
+      "selected": {
+        "row_id": "table-64/row-16",
+        "table_id": "table-64"
+      },
+      "stop": "unsupported_scope",
+      "verified_exact_fiscal_years": []
+    }
+  },
+  "incorrect_verified_observations": 0,
+  "independent_review_sha256": "c548cc4b73a619267145901c722eda1ed0a61d5aaadc90611efd8025ac17789f",
+  "observations_reviewed": 21,
+  "replayed_cases": 9,
+  "run_sha256": "f0888c1b9f2210aaa748c6eb226f94208fdab5988afe609e17a68c8438dd6b7d",
+  "verified_exact_observations": 0
+}

@@ -79,7 +79,7 @@ def run_rules(inventory: FilingInventory, source: dict[str, Any]) -> dict[str, A
         result = extract_selection(inventory, source, strongest[0])
     else:
         stop = "ambiguous_candidates" if strongest else "no_candidate"
-        result = _stopped(stop, "Rules did not find a unique consolidated revenue row.")
+        result = selection_stop(stop, "Rules did not find a unique consolidated revenue row.")
     return {**result, "candidates": [asdict(candidate) for candidate in candidates]}
 
 
@@ -90,24 +90,24 @@ def extract_selection(
     table = next((table for table in inventory.document.visible_tables
                   if f"table-{table.number}" == selection.table_id), None)
     if table is None:
-        return _stopped("invalid_selection", "The selected table ID is absent.", selection)
+        return selection_stop("invalid_selection", "The selected table ID is absent.", selection)
     row = next((row for row in range(1, len(table.rows) + 1)
                 if _selection(table, row) == selection), None)
     if row is None:
-        return _stopped("invalid_selection", "The selected row ID is absent from the table.", selection)
+        return selection_stop("invalid_selection", "The selected row ID is absent from the table.", selection)
     heading = _statement_heading(table)
     if heading is None or not _supports_consolidated_total(table, row):
-        return _stopped("unsupported_scope", "The selection does not establish a consolidated revenue total.",
+        return selection_stop("unsupported_scope", "The selection does not establish a consolidated revenue total.",
                         selection)
     try:
         rows = table_grid(table)
     except UnsupportedLayout as exc:
-        return _stopped("unsupported_layout", str(exc), selection)
+        return selection_stop("unsupported_layout", str(exc), selection)
     label = next(cell for cell in rows[row - 1].cells if cell.cell.text)
     # A dimensioned tag identifies a component even if its visible label looks like a total.
     if any(context.dimensioned for cell in rows[row - 1].cells for fact in cell.cell.inline_facts
            for context in inventory.document.contexts.get(fact.attrs.get("contextref") or "", [])):
-        return _stopped("unsupported_scope", "The selected row has dimensioned Inline XBRL contexts.", selection)
+        return selection_stop("unsupported_scope", "The selected row has dimensioned Inline XBRL contexts.", selection)
     statement = replace(table, heading=heading)
     result = inspect_original_revenue(
         inventory.document, [statement], inventory.lines,
@@ -135,7 +135,7 @@ def extract_selection(
     }
 
 
-def _stopped(stop: str, message: str, selection: Selection | None = None) -> dict[str, Any]:
+def selection_stop(stop: str, message: str, selection: Selection | None = None) -> dict[str, Any]:
     return {
         "selected": asdict(selection) if selection else None, "stop": stop, "observations": [],
         "diagnostics": [{"code": stop, "message": message}], "unresolved_requirements": [stop],

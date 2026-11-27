@@ -16,6 +16,8 @@
 
 [Issue #56 rules-alone extraction baseline and retained records](REVENUE_SELECTION_BASELINE.md)
 
+[Issue #57 model-only development run and offline replay](REVENUE_SELECTION_MODEL.md)
+
 ## Reproduce the rules-alone extraction baseline on Windows
 
 Run from the repository root with the project Python environment and the

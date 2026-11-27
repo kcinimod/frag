@@ -21,3 +21,4 @@ artifacts/phase06/*.json -text diff
 artifacts/phase06/continuation-acceptance/*.json -text diff
 artifacts/phase06/continuation-acceptance/SHA256SUMS -text diff
 artifacts/phase06/revenue-selection-baseline/*.json -text diff
+artifacts/phase06/revenue-selection-model/*.json -text diff

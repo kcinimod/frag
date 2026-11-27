@@ -271,3 +271,10 @@ Phase 2 calculator and its offline results.
   Thirteen cases stop at extraction and two at verification. The original
   #44 decision remains the historical baseline.
   [Second fresh decision and reproduction](../artifacts/phase06/CONTINUATION_ACCEPTANCE.md)
+
+- Issue #57 runs the pinned Qwen2.5 1.5B selector over the full visible
+  table inventory of the seven opened #54 filings and two synthetic
+  controls. It selects two reviewed rows and matches 0/21 exact
+  observations. The shared extractor rejects the absent-target choice.
+  The independent review replays all nine cases offline.
+  [Model-only run](../artifacts/phase06/REVENUE_SELECTION_MODEL.md)
