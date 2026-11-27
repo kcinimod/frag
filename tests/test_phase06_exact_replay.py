@@ -69,7 +69,7 @@ def cohort(tmp_path: Path) -> tuple[Path, Path, dict[str, Any]]:
         "artifacts/phase04/sec_holdout_runner.py", "artifacts/phase04/sec_holdout_score.py",
         "artifacts/phase05/baseline.py", "artifacts/phase05/holdout.py", "artifacts/phase05/score.py",
         "artifacts/phase05/custody.json", "artifacts/phase05/holdout-freeze.json",
-        *(str(PHASE / name) for name in ("fresh_run.py", "exact_replay.py", "EXACT_REPLAY.md",
+        *(str(PHASE / name) for name in ("fresh_run.py", "exact_replay.py", "EXACT_REPLAY.md", "acceptance.ps1",
                                          "DEVELOPMENT_LAYOUTS.md", "gate-score.json")),
     ]
     for name in files:

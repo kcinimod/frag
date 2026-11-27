@@ -44,7 +44,7 @@ if ($Mode -eq 'Freeze') {
     }
     foreach ($role in @('runner', 'scoring')) {
         Export-Snapshot $revision "$session/$role-production.zip" "$session/$role" $paths
-        $files = if ($role -eq 'runner') { @('fresh_run.py', 'FRESH_PROTOCOL.md', 'acceptance.ps1') } else { @('fresh_score.py') }
+        $files = @(if ($role -eq 'runner') { 'fresh_run.py', 'FRESH_PROTOCOL.md', 'acceptance.ps1' } else { 'fresh_score.py' })
         if ($Continuation) {
             $files += 'exact_replay.py'
             $files += if ($role -eq 'runner') { 'EXACT_REPLAY.md' } else { 'fresh_score_v2.py' }

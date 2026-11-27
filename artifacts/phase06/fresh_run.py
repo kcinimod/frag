@@ -44,8 +44,8 @@ def configuration() -> dict:
     for field in ("python", "dependencies", "model", "weights_sha256", "retrieval"):
         if config[field] != baseline[field]:
             raise ValueError(f"{field} differs from the development gate baseline.")
-    for name in (Path(__file__), PHASE / "exact_replay.py", PHASE / "EXACT_REPLAY.md", receipt_path, gate,
-                 layout, historical, ROOT / "artifacts/phase05/custody.json",
+    for name in (Path(__file__), PHASE / "exact_replay.py", PHASE / "EXACT_REPLAY.md",
+                 PHASE / "acceptance.ps1", receipt_path, gate, layout, historical, ROOT / "artifacts/phase05/custody.json",
                  ROOT / "artifacts/phase05/holdout.py"):
         config["files"][name.relative_to(ROOT).as_posix()] = digest(name)
     return {
