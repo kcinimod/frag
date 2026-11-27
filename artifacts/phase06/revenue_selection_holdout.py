@@ -13,7 +13,8 @@ from zipfile import ZipFile
 
 PHASE = Path(__file__).resolve().parent
 RECEIPT = PHASE / "revenue-selection-holdout-receipt.json"
-CELL = re.compile(rb"<t[dh]\b[^>]*(?:/>|>.*?</t[dh]>)", re.I | re.S)
+CELL_TAG = re.compile(rb"<t[dh]\b[^>]*>", re.I)
+COLSPAN = re.compile(rb"""\bcolspan\s*=\s*["']?(\d+)""", re.I)
 
 
 def sealed(path: Path, digest: str) -> bytes:
@@ -61,13 +62,18 @@ def inside(child: dict[str, Any], parent: dict[str, Any]) -> bool:
     return bool(parent["start_byte"] <= child["start_byte"] < child["end_byte"] <= parent["end_byte"])
 
 
-def matching_cells(original: bytes, locator: dict[str, Any], pattern: str) -> list[int]:
+def cell_columns(original: bytes, locator: dict[str, Any]) -> dict[int, range]:
+    """Map cell starts to physical columns in the reviewed, un-nested row."""
     row = checked_span(original, locator)
-    return [
-        locator["start_byte"] + cell.start()
-        for cell in CELL.finditer(row)
-        if re.fullmatch(pattern, visible(cell[0]))
-    ]
+    columns = {}
+    column = 0
+    start = locator["start_byte"]
+    for cell in CELL_TAG.finditer(row):
+        colspan = COLSPAN.search(cell[0])
+        width = int(colspan[1]) if colspan else 1
+        columns[start + cell.start()] = range(column, column + width)
+        column += width
+    return columns
 
 
 def audit_observations(
@@ -82,13 +88,8 @@ def audit_observations(
         raise ValueError(f"Statement evidence differs for {source['source_id']}.")
     if str(int(company_facts["cik"])) != str(int(source["cik"])):
         raise ValueError("SEC Company Facts must belong to the filing registrant.")
-    # Compare the order of visible financial cells. Some headers span spacers
-    # or currency columns separately from the numeric cells beneath them.
-    years = matching_cells(original, locators["period_header"], r"(?:19|20)\d{2}")
-    amounts = matching_cells(original, locators["revenue_row"], r"\d[\d,]*")
-    if len(years) != len(amounts):
-        raise ValueError(f"Revenue and period columns differ for {source['source_id']}.")
-    value_by_period = dict(zip(years, amounts, strict=True))
+    header_columns = cell_columns(original, locators["period_header"])
+    amount_columns = cell_columns(original, locators["revenue_row"])
     for year, fact in review["facts"].items():
         spans = fact["locators"]
         snippets = {key: checked_span(original, locator) for key, locator in spans.items()}
@@ -98,13 +99,15 @@ def audit_observations(
         inline_tag = snippets["inline_fact"].partition(b">")[0]
         attrs = dict(re.findall(rb'([\w:-]+)="([^"]+)"', inline_tag))
         unit_id = attrs.get(b"unitRef", b"")
+        year_cell = header_columns.get(spans["period_cell"]["start_byte"], range(0))
+        value_cell = amount_columns.get(spans["statement_cell"]["start_byte"], range(0))
         sec_rows = company_facts["facts"]["us-gaap"][fact["concept"].split(":")[1]]["units"]["USD"]
         if (
             year != str(fact["fiscal_year"])
             or visible(snippets["period_cell"]) != year
             or not inside(spans["period_cell"], locators["period_header"])
             or not inside(spans["statement_cell"], locators["revenue_row"])
-            or value_by_period.get(spans["period_cell"]["start_byte"]) != spans["statement_cell"]["start_byte"]
+            or not any(column in year_cell for column in value_cell)
             or not inside(spans["inline_fact"], spans["statement_cell"])
             or visible(snippets["statement_cell"]) != fact["raw_amount"]
             or visible(snippets["inline_fact"]) != fact["raw_amount"]

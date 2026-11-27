@@ -13,13 +13,14 @@ def span(original: bytes, fragment: bytes) -> dict[str, Any]:
     return {"start_byte": start, "end_byte": start + len(fragment), "sha256": sha256(fragment).hexdigest()}
 
 
-@pytest.mark.parametrize(("value_first", "visible_scale", "error"), [
-    (True, b"millions", None),
-    (False, b"millions", "Observation evidence differs"),
-    (True, b"thousands", "Statement evidence differs"),
+@pytest.mark.parametrize(("layout", "visible_scale", "error"), [
+    ("aligned", b"millions", None),
+    ("swapped", b"millions", "Observation evidence differs"),
+    ("shifted", b"millions", "Observation evidence differs"),
+    ("aligned", b"thousands", "Statement evidence differs"),
 ])
 def test_review_binds_amount_to_physical_year_column_and_statement_scale(
-    value_first: bool, visible_scale: bytes, error: str | None,
+    layout: str, visible_scale: bytes, error: str | None,
 ) -> None:
     heading = b"<h2>Consolidated statements of operations</h2>"
     units = b"<p>(In " + visible_scale + b")</p>"
@@ -30,7 +31,12 @@ def test_review_binds_amount_to_physical_year_column_and_statement_scale(
     value_cell = b"<td>" + inline + b"</td>"
     amount = b"<td>$</td>" + value_cell
     other = b"<td>$</td><td>12</td>"
-    row = b"<tr><td>Revenue</td>" + (amount + other if value_first else other + amount) + b"</tr>"
+    cells = {
+        "aligned": amount + other,
+        "swapped": other + amount,
+        "shifted": b"<td></td><td></td>" + value_cell + b"<td>12</td>",
+    }
+    row = b"<tr><td>Revenue</td>" + cells[layout] + b"</tr>"
     statement = b"<table>" + header + row + b"</table>"
     context = b'<xbrli:context id="c">1 2024-01-01 2024-12-31</xbrli:context>'
     unit = b'<xbrli:unit id="usd">iso4217:USD</xbrli:unit>'

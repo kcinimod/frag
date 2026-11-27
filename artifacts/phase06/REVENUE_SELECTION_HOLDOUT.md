@@ -35,7 +35,9 @@ only the original inputs and their manifest. The scoring archive holds the
 references and evidence, including the incorporated exhibit. Run this check
 from the repository root in scorer custody. It verifies the seals, opens the
 reviewed byte ranges, corroborates the observations, and checks the
-preparation inventory without loading model weights.
+preparation inventory without loading model weights. Each reviewed period
+and value cell must share a physical column. The verifier accounts for
+merged headers and spacer cells.
 
 ```powershell
 .venv/Scripts/python.exe artifacts/phase06/revenue_selection_holdout.py '../FRAG-SEC-Holdout-59'
