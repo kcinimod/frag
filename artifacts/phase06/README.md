@@ -18,6 +18,8 @@
 
 [Issue #57 model-only development run and offline replay](REVENUE_SELECTION_MODEL.md)
 
+[Issue #58 paired revenue selection results and offline replay](REVENUE_SELECTION_COMPARISON.md)
+
 ## Reproduce the rules-alone extraction baseline on Windows
 
 Run from the repository root with the project Python environment and the

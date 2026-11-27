@@ -1,0 +1,956 @@
+{
+  "controls": {
+    "absent": {
+      "reviewed_target": null,
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "miss_cause": "model_choice",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-1/row-2",
+            "table_id": "table-1"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "abstained",
+          "shortlist": []
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "abstained",
+          "shortlist": []
+        }
+      }
+    },
+    "distractor": {
+      "reviewed_target": {
+        "row_id": "table-2/row-4",
+        "table_id": "table-2"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 2,
+            "outcome": "verification_gap"
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-2/row-4",
+            "table_id": "table-2"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 2,
+            "outcome": "verification_gap"
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-2/row-4",
+            "table_id": "table-2"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-2/row-3",
+              "table_id": "table-2"
+            },
+            {
+              "row_id": "table-2/row-4",
+              "table_id": "table-2"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 2,
+            "outcome": "verification_gap"
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": 3,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-2/row-4",
+            "table_id": "table-2"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-2/row-3",
+              "table_id": "table-2"
+            },
+            {
+              "row_id": "table-2/row-4",
+              "table_id": "table-2"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "filings": {
+    "0000077476-25-000007": {
+      "issuer": "PEPSICO INC",
+      "reviewed_target": {
+        "row_id": "table-28/row-3",
+        "table_id": "table-28"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-28/row-3",
+            "table_id": "table-28"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-28/row-3",
+            "table_id": "table-28"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-28/row-3",
+              "table_id": "table-28"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": 22,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-28/row-3",
+            "table_id": "table-28"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-28/row-3",
+              "table_id": "table-28"
+            }
+          ]
+        }
+      }
+    },
+    "0000796343-18-000015": {
+      "issuer": "ADOBE INC.",
+      "reviewed_target": {
+        "row_id": "table-121/row-9",
+        "table_id": "table-121"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2015,
+              2016,
+              2017
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2015,
+              2016,
+              2017
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "model_choice",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-128/row-7",
+            "table_id": "table-128"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2015,
+              2016,
+              2017
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2015,
+              2016,
+              2017
+            ],
+            "observation_count": 3,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-121/row-9",
+            "table_id": "table-121"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-121/row-9",
+              "table_id": "table-121"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2015,
+              2016,
+              2017
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2015,
+              2016,
+              2017
+            ],
+            "observation_count": 3,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": 33,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-121/row-9",
+            "table_id": "table-121"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-121/row-9",
+              "table_id": "table-121"
+            }
+          ]
+        }
+      }
+    },
+    "0000796343-25-000004": {
+      "issuer": "ADOBE INC.",
+      "reviewed_target": {
+        "row_id": "table-32/row-8",
+        "table_id": "table-32"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 3,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-32/row-8",
+            "table_id": "table-32"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 3,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-32/row-8",
+            "table_id": "table-32"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-32/row-8",
+              "table_id": "table-32"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 3,
+            "outcome": "extraction_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "deterministic_validation",
+          "reviewed_table_rows_omitted": 34,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-32/row-8",
+            "table_id": "table-32"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-32/row-8",
+              "table_id": "table-32"
+            }
+          ]
+        }
+      }
+    },
+    "0000950170-24-075605": {
+      "issuer": "ORACLE CORP",
+      "reviewed_target": {
+        "row_id": "table-36/row-9",
+        "table_id": "table-36"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "model_choice",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-76/row-15",
+            "table_id": "table-76"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-36/row-9",
+            "table_id": "table-36"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-36/row-9",
+              "table_id": "table-36"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": 31,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-36/row-9",
+            "table_id": "table-36"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-36/row-9",
+              "table_id": "table-36"
+            }
+          ]
+        }
+      }
+    },
+    "0001065088-25-000037": {
+      "issuer": "EBAY INC",
+      "reviewed_target": {
+        "row_id": "table-31/row-5",
+        "table_id": "table-31"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "model_choice",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-42/row-6",
+            "table_id": "table-42"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-31/row-5",
+            "table_id": "table-31"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-31/row-5",
+              "table_id": "table-31"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": 37,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-31/row-5",
+            "table_id": "table-31"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-31/row-5",
+              "table_id": "table-31"
+            }
+          ]
+        }
+      }
+    },
+    "0001108524-24-000005": {
+      "issuer": "Salesforce, Inc.",
+      "reviewed_target": {
+        "row_id": "table-31/row-7",
+        "table_id": "table-31"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "model_choice",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-81/row-48",
+            "table_id": "table-81"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-31/row-7",
+            "table_id": "table-31"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-31/row-7",
+              "table_id": "table-31"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": 31,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-31/row-7",
+            "table_id": "table-31"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-31/row-7",
+              "table_id": "table-31"
+            }
+          ]
+        }
+      }
+    },
+    "0001141391-25-000011": {
+      "issuer": "Mastercard Inc",
+      "reviewed_target": {
+        "row_id": "table-56/row-6",
+        "table_id": "table-56"
+      },
+      "strategies": {
+        "model_alone": {
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": "model_choice",
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-64/row-16",
+            "table_id": "table-64"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-56/row-6",
+            "table_id": "table-56"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-56/row-6",
+              "table_id": "table-56"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "incorrect_verified_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap",
+            "verified_exact_fiscal_years": []
+          },
+          "miss_cause": null,
+          "reviewed_table_rows_omitted": 28,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-56/row-6",
+            "table_id": "table-56"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-56/row-6",
+              "table_id": "table-56"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "independent_review_sha256": "c548cc4b73a619267145901c722eda1ed0a61d5aaadc90611efd8025ac17789f",
+  "observations_reviewed": 21,
+  "replayed_cases": 9,
+  "run_sha256": "5e5316bf3d6cf05d87dde1ba4457fdff00b811801bf9ea1a2d0b2d2ee6d584cc",
+  "strategies": {
+    "model_alone": {
+      "exact_observations": 0,
+      "incorrect_verified_observations": 0,
+      "reviewed_rows_selected": 2,
+      "verified_exact_observations": 0
+    },
+    "rules_alone": {
+      "exact_observations": 12,
+      "incorrect_verified_observations": 0,
+      "reviewed_rows_selected": 7,
+      "verified_exact_observations": 0
+    },
+    "rules_shortlisted_model": {
+      "exact_observations": 12,
+      "incorrect_verified_observations": 0,
+      "reviewed_rows_selected": 7,
+      "verified_exact_observations": 0
+    }
+  }
+}

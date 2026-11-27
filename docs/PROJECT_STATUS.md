@@ -1,5 +1,12 @@
 # Project status
 
+Issue #58 compared all three revenue selectors on the seven opened #54
+filings and two synthetic controls. Rules alone and the shortlisted model
+each selected all seven reviewed rows and matched 12 of 21 observations.
+The model-only strategy selected two reviewed rows and matched zero
+observations. Offline replay reproduced all nine cases.
+[Paired results and replay commands](../artifacts/phase06/REVENUE_SELECTION_COMPARISON.md)
+
 Issue #56 established the rules-alone baseline for the #55 selection
 experiment. It selected the reviewed consolidated revenue row on all seven
 opened #54 filings and matched 12 of 21 reviewed annual observations exactly.

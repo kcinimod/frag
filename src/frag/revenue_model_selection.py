@@ -1,4 +1,4 @@
-"""Bounded model-only selection over the visible filing inventory."""
+"""Bounded local-model selection over visible filing rows."""
 
 from collections.abc import Callable, Iterable, Iterator
 from dataclasses import asdict, dataclass
@@ -7,7 +7,7 @@ import json
 from time import perf_counter
 from typing import Any
 
-from frag.revenue_selection import FilingInventory, Selection, extract_selection, selection_stop
+from frag.revenue_selection import FilingInventory, Selection, extract_selection, selection_stop, shortlist_revenue
 
 PROMPT_BYTE_LIMIT = 7600
 ROW_FRAGMENT_BYTES = 850
@@ -68,15 +68,20 @@ def _fragments(text: str, limit: int) -> Iterator[str]:
     yield text[start:]
 
 
-def _candidates(tables: list[dict[str, Any]]) -> Iterator[Candidate]:
+def _candidates(tables: list[dict[str, Any]], row_ids: set[str] | None) -> Iterator[Candidate]:
     for table in tables:
+        rows = table["rows"]
+        if row_ids is not None:
+            rows = [row for row in rows if row["row_id"] in row_ids]
+            if not rows:
+                continue
         pieces = [table["caption"], table["heading"], table["preamble"], *reversed(table["nearby"])]
         context = " | ".join(dict.fromkeys(piece["text"] for piece in pieces if piece and piece["text"]))
         context = next(_fragments(context, TABLE_CONTEXT_BYTES))
         table_id = table["table_id"]
-        if not table["rows"]:
+        if not rows:
             yield Candidate(table_id, None, context, "")
-        for row in table["rows"]:
+        for row in rows:
             text = " | ".join(cell["text"] for cell in row["cells"] if cell["text"])
             for fragment in _fragments(text, ROW_FRAGMENT_BYTES):
                 yield Candidate(table_id, row["row_id"], context, fragment)
@@ -149,13 +154,15 @@ def _unique_fields(pairs: list[tuple[str, object]]) -> dict[str, object]:
 
 
 def run_model_selection(
-    inventory: FilingInventory, source: dict[str, Any], propose: Propose,
+    inventory: FilingInventory, source: dict[str, Any], propose: Propose, *, shortlist: bool = False,
 ) -> dict[str, Any]:
-    """Consider all visible tables and rows, then validate one winning pair against the original."""
+    """Apply the same model and original-evidence checks to the chosen candidate set."""
     tables = inventory.record()
+    survivors = shortlist_revenue(inventory) if shortlist else None
+    row_ids = None if survivors is None else {candidate.row_id for candidate in survivors}
     records = []
     nominations: dict[str, Candidate] = {}
-    for prompt, batch in _batches(_candidates(tables)):
+    for prompt, batch in _batches(_candidates(tables, row_ids)):
         winner, record = _choose(prompt, batch, propose, "inventory")
         records.append(record)
         if winner is not None and winner.row_id is not None:
@@ -166,6 +173,9 @@ def run_model_selection(
         "submitted_tables": len({key for record in records for key in record["table_ids"]}),
         "submitted_rows": len({key for record in records for key in record["row_ids"]}),
     }
+    trace = {"coverage": coverage, "batches": records}
+    if survivors is not None:
+        trace["shortlist"] = [asdict(candidate) for candidate in survivors]
     # The same row can be nominated from different fragments. Retain its first nomination.
     winners = list(nominations.values())
     stage = 0
@@ -183,7 +193,7 @@ def run_model_selection(
                 remaining.append(winner)
         if len(remaining) == len(winners):
             result = selection_stop("input_limit", "The prompt budget could not compare any nominations.")
-            return {**result, "coverage": coverage, "batches": records}
+            return {**result, **trace}
         winners = remaining
     stop = next((record["outcome"] for record in records if record["outcome"] in failures), None)
     if stop:
@@ -195,4 +205,4 @@ def run_model_selection(
         winner = winners[0]
         assert winner.row_id is not None
         result = extract_selection(inventory, source, Selection(winner.table_id, winner.row_id))
-    return {**result, "coverage": coverage, "batches": records}
+    return {**result, **trace}

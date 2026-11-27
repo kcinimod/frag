@@ -154,6 +154,36 @@ def test_model_selection_uses_the_same_original_evidence_as_rules() -> None:
     assert [fact["normalized_amount"] for fact in result["observations"]] == ["15000000", "19000000"]
 
 
+def test_shortlisted_model_receives_totals_and_subtotals_but_uses_original_cells() -> None:
+    fixture = Path(__file__).with_name("fixtures") / "revenue-selection-distractor.html"
+    inventory = filing_inventory(fixture.read_bytes())
+
+    def model(prompt: str, row_ids: tuple[str, ...]) -> str:
+        assert row_ids == ("table-2/row-3", "table-2/row-4")
+        assert "Total revenues | $ | 19 | $ | 15" in prompt
+        return '{"row_id":"table-2/row-4"}'
+
+    result = run_model_selection(inventory, SYNTHETIC_SOURCE, model, shortlist=True)
+    assert result["shortlist"] == [
+        {"table_id": "table-2", "row_id": "table-2/row-3"},
+        {"table_id": "table-2", "row_id": "table-2/row-4"},
+    ]
+    assert [fact["normalized_amount"] for fact in result["observations"]] == ["15000000", "19000000"]
+    assert result["observations"] == run_rules(inventory, SYNTHETIC_SOURCE)["observations"]
+
+
+def test_empty_shortlist_abstains_without_calling_the_model() -> None:
+    fixture = Path(__file__).with_name("fixtures") / "revenue-selection-absent.html"
+
+    def model(prompt: str, row_ids: tuple[str, ...]) -> str:
+        pytest.fail("An empty shortlist should not produce a model request.")
+
+    result = run_model_selection(filing_inventory(fixture.read_bytes()), SYNTHETIC_SOURCE, model, shortlist=True)
+    assert (result["shortlist"], result["selected"], result["stop"], result["observations"]) == (
+        [], None, "no_candidate", [],
+    )
+
+
 @pytest.mark.parametrize(("response", "stop"), [
     ('{"row_id":null}', "model_abstained"),
     ('{"row_id":"table-2/row-1"}', "unsupported_scope"),

@@ -1,5 +1,14 @@
 # Decision log
 
+## Issue #58 paired revenue selection
+
+Give the two model strategies the same prompt, row representation, batching
+policy, runtime, and deterministic extractor. Use every plausible rules
+candidate before ranking for the shortlisted input. Replay all strategies
+on the same originals and assess shortlist coverage, model choice, and
+downstream extraction against the independent review.
+[Paired evaluation record](../artifacts/phase06/REVENUE_SELECTION_COMPARISON.md)
+
 ## Issue #56 rules-alone extraction baseline
 
 Capture the common visible HTML inventory before shortlisting. Select table

@@ -1,4 +1,4 @@
-"""Run the Phase 6 model-only revenue selection experiment."""
+"""Run model-only selection or compare all three Phase 6 revenue selectors."""
 
 import argparse
 from dataclasses import asdict
@@ -20,9 +20,9 @@ from revenue_selection_baseline import PHASE, ROOT, elapsed, json_bytes, peak_wo
 
 from frag.revenue_model_selection import (
     PROMPT_BYTE_LIMIT, ROW_FRAGMENT_BYTES, SYSTEM_PROMPT, TABLE_CONTEXT_BYTES,
-    InvalidModelResponse, ModelUnavailable, run_model_selection,
+    InvalidModelResponse, ModelUnavailable, Propose, run_model_selection,
 )
-from frag.revenue_selection import filing_inventory
+from frag.revenue_selection import FilingInventory, filing_inventory, run_rules
 from frag.store import SourceMetadata
 
 WEIGHTS = {
@@ -42,6 +42,7 @@ root ::= "{" ws "\"row_id\"" ws ":" ws choice ws "}"
 ws ::= [ ]?
 '''.strip()
 CONTROLS = {"absent": None, "distractor": "table-2/row-4"}
+STRATEGIES = ("rules_alone", "model_alone", "rules_shortlisted_model")
 
 
 class LocalSelector:
@@ -144,22 +145,41 @@ def filing_source(filing: dict[str, Any]) -> dict[str, Any]:
     return {**asdict(metadata), "provenance": {"kind": "local_original"}}
 
 
+def select_revenue(
+    strategy: str, inventory: FilingInventory, source: dict[str, Any], propose: Propose,
+) -> dict[str, Any]:
+    if strategy == "rules_alone":
+        return run_rules(inventory, source)
+    return run_model_selection(inventory, source, propose, shortlist=strategy == "rules_shortlisted_model")
+
+
 def write_cases(
-    runner_payload: bytes, staging: Path, selector: LocalSelector, pid: int, accelerated: bool,
+    runner_payload: bytes, staging: Path, selector: LocalSelector, pid: int, accelerated: bool, compare: bool,
 ) -> tuple[str, dict[str, Any], dict[str, Any]]:
     def run_case(original: bytes, source: dict[str, Any]) -> dict[str, Any]:
         start = perf_counter()
         inventory = filing_inventory(original)
         inventory_ms = elapsed(start)
-        start = perf_counter()
-        result = run_model_selection(inventory, source, selector.propose)
-        return {
-            **result, "original_sha256": inventory.original_sha256, "inventory_ms": inventory_ms,
-            "selection_and_validation_ms": elapsed(start),
-            "process_peak_working_set_bytes": peak_working_set_bytes(),
-            "model_peak_working_set_bytes": model_peak_working_set(pid),
-            "nvidia_device_memory_used_mib": nvidia_memory_sample() if accelerated else None,
-        }
+        def select(strategy: str) -> dict[str, Any]:
+            start = perf_counter()
+            result = select_revenue(strategy, inventory, source, selector.propose)
+            uses_model = strategy != "rules_alone"
+            return {
+                **result, "original_sha256": inventory.original_sha256, "inventory_ms": inventory_ms,
+                "selection_and_validation_ms": elapsed(start),
+                "process_peak_working_set_bytes": peak_working_set_bytes(),
+                "model_peak_working_set_bytes": model_peak_working_set(pid) if uses_model else None,
+                "nvidia_device_memory_used_mib": nvidia_memory_sample() if uses_model and accelerated else None,
+            }
+
+        if not compare:
+            return select("model_alone")
+        return {"strategies": {strategy: select(strategy) for strategy in STRATEGIES}}
+
+    def show(result: dict[str, Any]) -> None:
+        for strategy, record in result.get("strategies", {"model_alone": result}).items():
+            print(f"  {strategy}: {len(record.get('batches', []))} batches, "
+                  f"stop={record['stop']}, selected={record['selected']}", flush=True)
 
     controls = {}
     for label, expected_row in CONTROLS.items():
@@ -168,7 +188,8 @@ def write_cases(
         result = run_case(path.read_bytes(), {**source, "provenance": {"kind": "synthetic"}})
         controls[label] = {**result, "fixture": path.relative_to(ROOT).as_posix(), "expected_row_id": expected_row}
         (staging / f"control-{label}.json").write_bytes(json_bytes(controls[label]))
-        print(f"Control {label}: {result['stop']}", flush=True)
+        print(f"Control {label}", flush=True)
+        show(result)
     results = {}
     with ZipFile(BytesIO(runner_payload)) as runner:
         manifest = json.loads(runner.read("manifest.json"))
@@ -181,13 +202,13 @@ def write_cases(
             result = run_case(original, filing_source(filing))
             results[source_id] = {**result, "issuer": filing["issuer"]}
             (staging / f"{source_id}.json").write_bytes(json_bytes(results[source_id]))
-            print(f"  {len(result['batches'])} batches, stop={result['stop']}, selected={result['selected']}", flush=True)
+            show(result)
     return manifest["cohort"], results, controls
 
 
 def run(
     runner_path: Path, output: Path, model_dir: Path, runtime: Path,
-    port: int, gpu_layers: int, device: str | None,
+    port: int, gpu_layers: int, device: str | None, *, compare: bool = False,
 ) -> None:
     runner_payload = read_sealed(runner_path, "runner")
     if output.exists():
@@ -229,12 +250,15 @@ def run(
             selector = LocalSelector(port, alias)
             selector.wait_ready(process)
             startup_ms = elapsed(start)
-            cohort, filings, controls = write_cases(runner_payload, staging, selector, process.pid, gpu_layers > 0)
+            cohort, filings, controls = write_cases(
+                runner_payload, staging, selector, process.pid, gpu_layers > 0, compare,
+            )
         finally:
             process.terminate()
             process.wait(timeout=15)
     report = {
-        "strategy": "model_alone", "cohort": cohort, "runner_sha256": sha256(runner_payload).hexdigest(),
+        "strategy": "paired" if compare else "model_alone",
+        "cohort": cohort, "runner_sha256": sha256(runner_payload).hexdigest(),
         "python": platform.python_version(), "platform": platform.platform(),
         "device_vram_peak_measured": False, "startup_ms": startup_ms, "weights": WEIGHTS, "served_alias": alias,
         "runtime_fingerprint": RUNTIME_FINGERPRINT, "runtime_file_sha256": runtime_files,
@@ -265,9 +289,10 @@ def main() -> None:
     parser.add_argument("--gpu-layers", type=int, default=0)
     parser.add_argument("--device")
     parser.add_argument("--port", type=int, default=18097)
+    parser.add_argument("--compare", action="store_true", help="Run all three selectors on every original and control.")
     args = parser.parse_args()
     runtime = args.runtime or args.model_dir / "runtime" / "llama-server.exe"
-    run(args.runner, args.output, args.model_dir, runtime, args.port, args.gpu_layers, args.device)
+    run(args.runner, args.output, args.model_dir, runtime, args.port, args.gpu_layers, args.device, compare=args.compare)
 
 
 if __name__ == "__main__":

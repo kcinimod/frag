@@ -1,6 +1,7 @@
 """Offline table and row selection for reported consolidated revenue."""
 
 from dataclasses import asdict, dataclass, replace
+from collections.abc import Iterator
 from hashlib import sha256
 import re
 from typing import Any
@@ -66,15 +67,24 @@ class Selection:
     row_id: str
 
 
+def _candidate_rows(inventory: FilingInventory) -> Iterator[tuple[Table, dict[int, bool]]]:
+    for table in inventory.document.visible_tables:
+        if _statement_heading(table):
+            yield table, _revenue_rows(table)
+
+
+def shortlist_revenue(inventory: FilingInventory) -> list[Selection]:
+    """Return every plausible pair before the rules rank them."""
+    return [_selection(table, row) for table, rows in _candidate_rows(inventory) for row in rows]
+
+
 def run_rules(inventory: FilingInventory, source: dict[str, Any]) -> dict[str, Any]:
     """Shortlist plausible statement rows and select a unique strongest total."""
     candidates: list[Selection] = []
     strongest: list[Selection] = []
-    for table in inventory.document.visible_tables:
-        if _statement_heading(table):
-            rows = _revenue_rows(table)
-            candidates.extend(_selection(table, row) for row in rows)
-            strongest.extend(_selection(table, row) for row in _strongest_rows(rows))
+    for table, rows in _candidate_rows(inventory):
+        candidates.extend(_selection(table, row) for row in rows)
+        strongest.extend(_selection(table, row) for row in _strongest_rows(rows))
     if len(strongest) == 1:
         result = extract_selection(inventory, source, strongest[0])
     else:
