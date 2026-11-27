@@ -494,3 +494,13 @@ row IDs and explicit abstention. Compare nominations in further bounded
 batches. Apply the same original-cell checks as rules alone to the final
 selection and retain each model response for offline replay.
 [Model-only selection and evidence](../artifacts/phase06/REVENUE_SELECTION_MODEL.md)
+
+### Reserve an issuer-disjoint extraction holdout (#59)
+
+Use original domestic 10-K primary documents for the generalization check
+and retain the corresponding scoring evidence separately. Include a primary
+document whose consolidated statement is incorporated from an exhibit and
+a synthetic statement with a plausible division revenue distractor. Recheck
+the frozen development inventory against the sealed lineage and original
+identities before releasing the runner archive.
+[Extraction holdout custody](../artifacts/phase06/REVENUE_SELECTION_HOLDOUT.md)

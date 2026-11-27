@@ -1,0 +1,21 @@
+{
+  "absent_targets": 2,
+  "cohort": "sec-phase06-extraction-holdout-59-v1",
+  "distractor_cases": 5,
+  "filings": 5,
+  "issuer_families": 5,
+  "known_development_originals": 35,
+  "observations": 12,
+  "preparation_base": "52a12398df58d19efcf2768112cef9335ce6cd12",
+  "preparation_inventory_issuer_count": 30,
+  "preparation_inventory_sha256": "3dd696c78b75562dbe1b95c428e50095c939613bcae5b4c1b66298f481abe40b",
+  "release": "withheld pending final development inventory recheck and acceptance freeze",
+  "reviewed_rows": 4,
+  "reviewer_audit_sha256": "b1dc16838c7ca74ac47494a780e624b4d9d239f65c638fd4fdbdde58df9947d3",
+  "runner_sha256": "c8399b7091d0135626d2cce62fd4c642c517e908ad991c3216fa318f98520281",
+  "scorer_sha256": "85c602a00ee4b5f7c75a1d88e7abc886b531bb425a1ddabca800bcf0ad72956a",
+  "sealed_at_utc": "2026-11-27T12:07:20+00:00",
+  "statement_layouts": 3,
+  "synthetic_inputs": 1,
+  "version": 1
+}

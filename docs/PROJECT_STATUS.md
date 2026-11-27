@@ -285,3 +285,10 @@ Phase 2 calculator and its offline results.
   observations. The shared extractor rejects the absent-target choice.
   The independent review replays all nine cases offline.
   [Model-only run](../artifacts/phase06/REVENUE_SELECTION_MODEL.md)
+
+- Issue #59 seals five domestic 10-K primary documents and one synthetic
+  input for the SEC extraction comparison. The separate scoring archive
+  holds 12 reviewed observations across three statement layouts and two
+  absent-target labels. The preparation audit found zero issuer or original
+  overlaps. Release awaits the final inventory recheck and comparison freeze.
+  [Extraction holdout custody](../artifacts/phase06/REVENUE_SELECTION_HOLDOUT.md)
