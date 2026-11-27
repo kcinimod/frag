@@ -436,3 +436,11 @@ fiscal calendar to establish the visible period columns. Verify the filing
 cover, statement units, inline context, and applicable disclosures before
 answering. Preserve the names of unnumbered original disclosures in citations.
 [Ford, McDonald’s, and Disney validation](../artifacts/phase06/FORD_MCDONALDS_DISNEY_REVENUE.md)
+
+### Retain complete payloads for acceptance replay (#52)
+
+Store regenerated results and opened citation responses so scoring can
+verify equality independently. Treat missing payloads and replay
+differences as blocking findings. Preserve the #44 workflow by exporting
+its evaluator and production snapshots from their pinned commits.
+[Exact offline replay](../artifacts/phase06/EXACT_REPLAY.md)

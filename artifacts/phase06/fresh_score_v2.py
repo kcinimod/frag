@@ -19,6 +19,7 @@ sys.path[:0] = [str(PHASE), str(ROOT / "src"), str(PHASE.with_name("phase05"))]
 
 from acceptance_score import citation_response_matches, growth_amounts_match, reason_matches, unpack_report  # type: ignore[import-not-found]
 from development_score import memory_peaks, stop_details, summarize_cases  # type: ignore[import-not-found]
+from exact_replay import differing_payloads  # type: ignore[import-not-found]
 from holdout_score import evidence_gap, growth_presentation  # type: ignore[import-not-found]
 from revenue_score import truthful_gap  # type: ignore[import-not-found]
 from score import MODES, checked_span, position, visible, within  # type: ignore[import-not-found]
@@ -26,7 +27,7 @@ from fresh_score import amount_citation_supported as amount_cell_supported, obse
 from frag.income_html import is_statement_heading
 from frag.store import SourceError
 
-SCORING_REVISION = "phase06-evidence-v2"
+SCORING_REVISION = "phase06-evidence-v2-exact-replay"
 INLINE_LOCATORS = (("inline_fact", "inline_fact"), ("inline_context", "context"), ("currency_measure", "unit"))
 PRODUCTION_DEPENDENCIES = (
     "__init__.py", "citations.py", "dated_revenue.py", "growth.py", "income_html.py", "revenue.py",
@@ -511,10 +512,7 @@ def score_case(
         findings.append("unsupported_comparison_claim")
     if (numeric or abstention) and not identity_ok:
         findings.append("wrong_result_identity")
-    # Version 1 reports store a replay status for equal payloads and the differing payload on mismatch.
-    replay_ok = repeated.get("status") == "matched" and all(
-        key not in repeated or repeated[key] == run[key] for key in ("result", "citations")
-    )
+    replay_ok = repeated.get("status") == "matched" and not differing_payloads(run, repeated)
     if not replay_ok:
         findings.append("offline_replay_mismatch")
     grounded = abstention and outcome != "answerable" and reason_ok and not findings and not incomplete
@@ -587,6 +585,7 @@ def score(
     dependencies = {
         *(ROOT / relative for relative in frozen["scoring_files"]),
         Path(__file__).resolve(),
+        PHASE / "exact_replay.py",
         *(ROOT / "src/frag" / name for name in PRODUCTION_DEPENDENCIES),
     }
     scoring_files = {

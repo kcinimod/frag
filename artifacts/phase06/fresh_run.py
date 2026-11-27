@@ -6,18 +6,22 @@ from pathlib import Path
 import platform
 import subprocess
 import sys
+from typing import Any
 
 PHASE = Path(__file__).resolve().parent
 ROOT = PHASE.parents[1]
 sys.path.insert(0, str(PHASE.with_name("phase05")))
 
 from baseline import GPU_QUERY, evaluate, server_command, settings
+from exact_replay import PAYLOADS, differing_payloads
 from holdout import stage_inputs
-from sec_holdout_runner import digest, local_model, read_json, restrict_runner, runtime_hashes, write_json
+from sec_holdout_runner import (
+    ask_case, command, digest, local_model, open_citations, read_json, restrict_runner, runtime_hashes, write_json,
+)
 
-PRODUCTION = "208cca1e410a0811cba600ad93753b53b42cc43a"
 GATE_PRODUCTION = "d5ea2c36af63bb64b30721ceb94cb26236dc4b0a"
 SCORING_FILES = (
+    "artifacts/phase06/fresh_score_v2.py", "artifacts/phase06/exact_replay.py",
     "artifacts/phase06/fresh_score.py", "artifacts/phase06/development_score.py",
     "artifacts/phase06/revenue_score.py", "artifacts/phase06/observations.py",
     "artifacts/phase05/acceptance_score.py", "artifacts/phase05/holdout_score.py",
@@ -39,15 +43,42 @@ def configuration() -> dict:
     for field in ("python", "dependencies", "model", "weights_sha256", "retrieval"):
         if config[field] != baseline[field]:
             raise ValueError(f"{field} differs from the development gate baseline.")
-    for name in (Path(__file__), PHASE / "FRESH_PROTOCOL.md", PHASE / "acceptance.ps1", receipt_path, gate,
+    for name in (Path(__file__), PHASE / "exact_replay.py", PHASE / "EXACT_REPLAY.md", receipt_path, gate,
                  layout, historical, ROOT / "artifacts/phase05/custody.json",
                  ROOT / "artifacts/phase05/holdout.py"):
         config["files"][name.relative_to(ROOT).as_posix()] = digest(name)
     return {
-        **config, "production_revision": PRODUCTION, "development_gate_revision": GATE_PRODUCTION,
+        **config, "replay_protocol": "complete-payloads", "development_gate_revision": GATE_PRODUCTION,
         "thresholds_per_pass": {"supported_answers": 11, "grounded_abstentions": 3, "exact_replay": 15},
         "receipt": receipt, "runtime_files": baseline["runtime_files"], "port": baseline["port"],
     }
+
+
+def block_socket_creation(event: str, args: tuple[Any, ...]) -> None:
+    if event == "socket.__new__":
+        raise PermissionError("Sockets are blocked during offline replay.")
+
+
+def replay_question(
+    store: Path, case: dict[str, Any], source: dict[str, Any], saved: dict[str, Any],
+) -> dict[str, Any]:
+    record_path = store.parent / f'{case["case_id"]}.json'
+    record = saved.get("record")
+    if "command_error" in source or (record is None and (
+        saved.get("result", {}).get("status") == "clarify" or "command_error" in saved.get("result", {})
+    )):
+        outcome = ask_case(store, case, source, record_path)
+        payloads = {field: outcome[field] for field in PAYLOADS}
+    elif isinstance(record, dict) and record.get("question") == case["question"]:
+        write_json(record_path, record)
+        result = command("replay-ask", str(record_path), "--store", str(store))
+        payloads = {"result": result, "citations": open_citations(store, result)}
+    else:
+        return {"status": "mismatch", "replay_error": "No validation record for the manifest question."}
+    differences = differing_payloads(saved, payloads)
+    if differences:
+        return {"status": "mismatch", **payloads, "differing_payloads": differences}
+    return {"status": "matched", **payloads}
 
 
 def main() -> int:
@@ -91,6 +122,8 @@ def main() -> int:
         ["nvidia-smi", f"--query-gpu={GPU_QUERY}", "--format=csv,noheader,nounits"],
     )))
     restrict_runner(replay=replay, allowed_processes=processes)
+    if replay:
+        sys.addaudithook(block_socket_creation)
     args.work.mkdir()
     data = args.work / "inputs"
     binding = {
@@ -101,14 +134,25 @@ def main() -> int:
     previous = read_json(args.saved_run) if replay else None
     if previous is not None and previous["binding"] != binding:
         parser.error("Saved run and frozen inputs differ.")
-    report = evaluate(data, args.work / "run", frozen, args.model, previous)
+    report = evaluate(data, args.work / "run", frozen, args.model, previous,
+                      replay_question=replay_question, require_equal_intake=False)
     report["binding"] = binding
-    if replay:
+    if previous is not None:
         report["live_sha256"] = digest(args.saved_run)
+        live_sources = previous["sources"]
+        replay_sources = report["sources"]
+        report["differing_intake_sources"] = sorted(
+            key for key in live_sources.keys() | replay_sources.keys()
+            if live_sources.get(key, {}).get("evidence") != replay_sources.get(key, {}).get("evidence")
+        )
     write_json(args.work / "report.json", report)
     if replay:
         matches = sum(row[mode]["status"] == "matched" for row in report["cases"] for mode in ("cold", "warm"))
-        print(f"{matches}/{2 * len(report['cases'])} cold and warm results and citation sets matched")
+        total = 2 * len(report["cases"])
+        print(f"{matches}/{total} cold and warm results and citation sets matched")
+        if report["differing_intake_sources"]:
+            print("Reingested evidence differs for " + ", ".join(report["differing_intake_sources"]))
+        return 0 if matches == total and not report["differing_intake_sources"] else 2
     else:
         print(f"Measured {len(report['cases'])} cases, cold and warm")
     return 0

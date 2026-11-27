@@ -1,6 +1,7 @@
 """Run and replay the Phase 5 development questions against a frozen checkout."""
 
 import argparse
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from ctypes import Structure, WinDLL, byref, c_size_t, sizeof, wintypes
 from datetime import datetime, timezone
@@ -155,6 +156,8 @@ def measure(
 def evaluate(
     data: Path, work: Path, frozen: dict[str, Any], model: Path | None,
     previous: dict[str, Any] | None,
+    *, replay_question: Callable[[Path, dict[str, Any], dict[str, Any], dict[str, Any]], dict[str, Any]] = replay_case,
+    require_equal_intake: bool = True,
 ) -> dict[str, Any]:
     manifest = read_json(data / PHASE / "inputs.json")
     work.mkdir()
@@ -183,8 +186,8 @@ def evaluate(
     if previous is not None and (
         previous["freeze"] != frozen
         or [row["case"] for row in previous["cases"]] != cases
-        or {key: row["evidence"] for key, row in sources.items()}
-        != {key: row["evidence"] for key, row in previous["sources"].items()}
+        or (require_equal_intake and {key: row["evidence"] for key, row in sources.items()}
+            != {key: row["evidence"] for key, row in previous["sources"].items()})
     ):
         raise ValueError("Replay inputs or reingested evidence differ from the live run.")
     results = []
@@ -196,7 +199,7 @@ def evaluate(
             assert previous is not None
             saved = previous["cases"][index]
             row = {
-                mode: replay_case(
+                mode: replay_question(
                     store, {**case, "case_id": f'{case["case_id"]}-{mode}'}, source, saved[mode],
                 )
                 for mode in ("cold", "warm")

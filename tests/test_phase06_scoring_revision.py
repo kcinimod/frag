@@ -18,6 +18,19 @@ def locator(original: bytes, fragment: bytes) -> dict[str, int]:
     return {"line": 1, "character": original.index(fragment) + 1}
 
 
+@pytest.mark.parametrize("repeated", [
+    {"status": "matched"},
+    {"status": "matched", "result": {"status": "ingestion_failed", "detail": "new"}, "citations": {}},
+    {"status": "matched", "result": {"status": "ingestion_failed"}, "citations": {"extra": {}}},
+])
+def test_ingestion_failure_requires_both_equal_replay_payloads(repeated: dict[str, Any]) -> None:
+    run = {"result": {"status": "ingestion_failed"}, "citations": {}}
+    scored = scorer.score_case(run, repeated, {}, {"kind": "lookup", "outcome": "answerable", "years": ["2024"]},
+                               {"facts": {}}, b"", sha256(b"").hexdigest(), observations=[])
+    assert not scored["offline_replay_matched"]
+    assert scored["findings"] == ["offline_replay_mismatch"]
+
+
 def opened(original: bytes, result: dict[str, Any]) -> dict[str, Any]:
     source = result["source_id"]
     route = f"/api/sources/{source}/growth/citations"
@@ -74,7 +87,8 @@ def test_period_inventory_is_credited_without_the_required_companion(defect: str
         }],
     }
     label = {"kind": "growth", "outcome": "absent_year", "years": ["2022", "2024"], "partial_years": [2024]}
-    scored = scorer.score_case({"result": result, "citations": opened(original, result)}, {"status": "matched"},
+    run = {"result": result, "citations": opened(original, result)}
+    scored = scorer.score_case(run, {"status": "matched", **run},
                                {}, label, review, original, digest, observations=[])
     assert scored["citations_supported"] is (defect is None)
     assert scored["findings"] == (["unsupported_citation"] if defect else [])
@@ -200,7 +214,7 @@ def test_growth_caveats_and_stops_use_reviewed_evidence(
     label = {"kind": "growth", "outcome": "answerable", "years": ["2023", "2024"],
              "absolute_change": "20000000", "percent": "20"}
     run = {"result": result, "citations": opened(original, result)}
-    scored = scorer.score_case(run, {"status": "matched"}, intake, label, review, original, digest,
+    scored = scorer.score_case(run, {"status": "matched", **run}, intake, label, review, original, digest,
                                observations=observed)
     assert scored["findings"] == expected
     assert scored["end_to_end_complete"] == (not expected)
@@ -219,7 +233,7 @@ def test_growth_caveats_and_stops_use_reviewed_evidence(
     result.update(status="unavailable", percent=None, trace=[], scope_caveats=[], comparison_basis=None, issues=[
         {"code": "incompatible", "role": None, "fiscal_year": None, "detail": "FY2024 spans 51 weeks."},
     ])
-    scored = scorer.score_case(run, {"status": "matched"}, intake, {
+    scored = scorer.score_case(run, {"status": "matched", **run}, intake, {
         **label, "outcome": "incompatible_periods", "period_weeks": [52, 53], "partial_years": [2023, 2024],
     }, review, original, digest, observations=observed)
     assert scored["supported_companions"] == ["current", "prior"]
@@ -256,7 +270,7 @@ def test_displayed_unverifiable_revenue_requires_the_reviewed_reason(case: str) 
         "reason": "The preserved original has no matching inline XBRL fact, context, and unit.",
     }
     intake: dict[str, Any] = {}
-    scored = scorer.score_case(run, {"status": "matched"}, intake, label,
+    scored = scorer.score_case(run, {"status": "matched", **run}, intake, label,
                                {"facts": {"2018": fact}, "applicable_notes": []}, original, digest,
                                observations=observations)
     assert scored["grounded_abstention"] is (case == "supported")

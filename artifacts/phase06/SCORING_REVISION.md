@@ -37,6 +37,10 @@ hash-checked enclosing `citation_locator` alongside the narrower note
 
 ## Reproduce on Windows
 
+The commands and digest below describe the #51 checkout at `edd0d79`.
+The [#52 continuation scorer](EXACT_REPLAY.md) requires the complete replay
+payloads and rejects the retained status-only matches.
+
 Run from the repository root with the pinned Python environment and both
 archives from [scorer custody](SEC_HOLDOUT.md).
 

@@ -10,6 +10,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $python = Join-Path $repo '.venv/Scripts/python.exe'
 $revision = '208cca1e410a0811cba600ad93753b53b42cc43a'
+$evaluation = 'af6f34eb8d10c7535d4a30e4b5bdf624e16becc5'
 $phase = 'artifacts/phase06'
 $runnerBundle = 'runner/inputs.zip'
 
@@ -33,10 +34,11 @@ if ($Mode -eq 'Freeze') {
     foreach ($role in @('runner', 'scoring')) {
         Expand-Archive -LiteralPath "$session/production.zip" -DestinationPath "$session/$role"
         $files = if ($role -eq 'runner') { @('fresh_run.py', 'FRESH_PROTOCOL.md', 'acceptance.ps1') } else { @('fresh_score.py') }
-        foreach ($name in $files) {
-            $source = [IO.File]::ReadAllText((Join-Path $PSScriptRoot $name)).Replace("`r`n", "`n")
-            [IO.File]::WriteAllText("$session/$role/$phase/$name", $source, [Text.UTF8Encoding]::new($false))
-        }
+        $evaluationPaths = @($files | ForEach-Object { "$phase/$_" })
+        $historical = "$session/$role-evaluation.zip"
+        git -C $repo -c core.autocrlf=false archive --format=zip --output=$historical $evaluation -- @evaluationPaths
+        if ($LASTEXITCODE -ne 0) { throw 'Could not export the frozen #44 evaluation revision.' }
+        Expand-Archive -LiteralPath $historical -DestinationPath "$session/$role"
     }
     $runner = "$session/runner"
     if ($SavedFreeze) {

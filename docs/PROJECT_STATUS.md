@@ -235,3 +235,9 @@ Phase 2 calculator and its offline results.
   separate incomplete findings for its missing companion and NVIDIA's
   extraction stop. The retained acceptance decision still fails.
   [Scoring revision](../artifacts/phase06/SCORING_REVISION.md)
+
+- Issue #52 requires complete result and opened citation equality for cold
+  and warm acceptance replay. The synthetic controls cover ingestion
+  failure and clarification, including changed payloads that block the
+  score. The pinned #44 workflow reproduced its 30 historical matches.
+  [Exact offline replay](../artifacts/phase06/EXACT_REPLAY.md)

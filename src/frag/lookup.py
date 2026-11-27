@@ -45,6 +45,11 @@ CLARIFICATION = (
     "For growth, name both fiscal years in order, such as “How did revenue change from FY2022 to FY2023?”"
 )
 GENERATION_SETTINGS = {"model": MODEL_ALIAS, "temperature": 0, "seed": 42, "cache_prompt": False}
+MODEL_FAILURE_MESSAGES = {
+    "model_unavailable": "Start the local planner and try again.",
+    "model_timeout": "The local planner timed out.",
+    "invalid_plan": "The local planner returned an invalid response.",
+}
 GROWTH_STEPS = (("subtract", 2), ("divide", 2), ("to_percent", 1))
 
 
@@ -397,11 +402,11 @@ def ask_revenue(
         try:
             proposal = planner(payload)
         except ModelUnavailable:
-            outcome = {"status": "model_unavailable", "message": "Start the local planner and try again."}
+            outcome = {"status": "model_unavailable", "message": MODEL_FAILURE_MESSAGES["model_unavailable"]}
         except TimeoutError:
-            outcome = {"status": "model_timeout", "message": "The local planner timed out."}
+            outcome = {"status": "model_timeout", "message": MODEL_FAILURE_MESSAGES["model_timeout"]}
         except InvalidModelResponse:
-            outcome = {"status": "invalid_plan", "message": "The local planner returned an invalid response."}
+            outcome = {"status": "invalid_plan", "message": MODEL_FAILURE_MESSAGES["invalid_plan"]}
         else:
             execution_start = perf_counter()
             outcome = _execute(source, facts, request, proposal)
@@ -495,6 +500,10 @@ def replay_revenue(source: dict[str, Any], record: dict[str, Any]) -> dict[str, 
         legacy_dated and _matches_legacy_dated_payload(saved_payload, expected_payload)
     ):
         raise SourceError("The saved source or evidence does not match the current filing evidence.")
+    recorded_status = record.get("validation_status")
+    if ("proposed_plan" in record and proposal is None and isinstance(recorded_status, str)
+            and recorded_status in MODEL_FAILURE_MESSAGES):
+        return {**identity, "status": recorded_status, "message": MODEL_FAILURE_MESSAGES[recorded_status]}
     if not isinstance(proposal, str):
         raise SourceError("The validation record must contain a supported saved proposal.")
     if legacy_growth:
