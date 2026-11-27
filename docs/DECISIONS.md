@@ -1,5 +1,14 @@
 # Decision log
 
+## Issue #56 rules-alone extraction baseline
+
+Capture the common visible HTML inventory before shortlisting. Select table
+and row IDs, then pass the selected label's physical coordinates to the shared
+original-evidence extractor. Score the resulting observations against the
+sealed review after selection. Record provisional observations and each
+downstream gap, keeping the #45 acceptance record as the historical baseline.
+[Baseline record](../artifacts/phase06/REVENUE_SELECTION_BASELINE.md)
+
 ## Issue #2: immutable local source preservation
 
 The source identifier is `sha256:<hash of unchanged input bytes>`. Original bytes

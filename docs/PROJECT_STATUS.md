@@ -1,5 +1,11 @@
 # Project status
 
+Issue #56 established the rules-alone baseline for the #55 selection
+experiment. It selected the reviewed consolidated revenue row on all seven
+opened #54 filings and matched 12 of 21 reviewed annual observations exactly.
+The result records three extraction gaps and four verification gaps.
+[Baseline and replay commands](../artifacts/phase06/REVENUE_SELECTION_BASELINE.md)
+
 Phase 1 acceptance checks passed for the retained original Microsoft FY2023
 10-K (accession `0000950170-23-035122`). FY2022 and FY2023 reported consolidated
 revenue are independently verified and compatible on their reported basis.

@@ -454,6 +454,7 @@ def inspect_dated_revenue(
 
 def inspect_original_revenue(
     document: StatementHTML, tables: list[Table], lines: list[str], source: dict[str, Any],
+    *, selected_label: tuple[int, int] | None = None,
 ) -> dict[str, Any]:
     """Find an annual observation and verify its evidence without a reviewed reference."""
     facts: list[dict[str, Any]] = []
@@ -464,19 +465,14 @@ def inspect_original_revenue(
     coverage = None
     try:
         table = _one(tables, "Expected one visible consolidated income statement.")
-        if len(document.tables) != 1:
+        if selected_label is None and len(document.tables) != 1:
             raise UnsupportedLayout("More than one statement table could contain consolidated revenue.")
         rows = [row.cells for row in table_grid(table)]
-        labels = SHARED_REVENUE_LABELS | {"net revenue"} if table.separate_title else SHARED_REVENUE_LABELS
-        candidates = [cell for row in rows for cell in row
-                      if (cell.cell.text.casefold() in labels or TOTAL_REVENUE_NOTE.fullmatch(cell.cell.text))
-                      and any(entry is not cell and entry.cell.text for entry in row)]
-        if table.embedded_heading:
-            candidates = [cell for cell in candidates if cell.cell.text.casefold().startswith("total ")]
-        # Net sales may be a subtotal when the statement also reports total revenue.
-        if not candidates:
-            candidates = [cell for row in rows for cell in row if cell.cell.text.casefold() == "net sales"]
-        label = _one(candidates, "Expected one total revenue row in the consolidated statement.")
+        if selected_label is None:
+            label = _original_revenue_label(table, rows)
+        else:
+            row_number, cell_number = selected_label
+            label = rows[row_number - 1][cell_number - 1]
         headers = rows[:label.row - 1]
         date_prefixes: dict[date, GridCell] = {}
         fiscal_labels: dict[date, int] = {}
@@ -668,6 +664,19 @@ def inspect_original_revenue(
         "verification_reference": None, "real_source_acceptance": False,
         **({"statement_periods": coverage} if coverage else {}),
     }
+
+
+def _original_revenue_label(table: Table, rows: list[list[GridCell]]) -> GridCell:
+    labels = SHARED_REVENUE_LABELS | {"net revenue"} if table.separate_title else SHARED_REVENUE_LABELS
+    candidates = [cell for row in rows for cell in row
+                  if (cell.cell.text.casefold() in labels or TOTAL_REVENUE_NOTE.fullmatch(cell.cell.text))
+                  and any(entry is not cell and entry.cell.text for entry in row)]
+    if table.embedded_heading:
+        candidates = [cell for cell in candidates if cell.cell.text.casefold().startswith("total ")]
+    # Net sales may be a subtotal when the statement also reports total revenue.
+    if not candidates:
+        candidates = [cell for row in rows for cell in row if cell.cell.text.casefold() == "net sales"]
+    return _one(candidates, "Expected one total revenue row in the consolidated statement.")
 
 
 def _dated_columns(

@@ -14,6 +14,30 @@
 
 [Issue #45 second fresh acceptance decision and replay commands](CONTINUATION_ACCEPTANCE.md)
 
+[Issue #56 rules-alone extraction baseline and retained records](REVENUE_SELECTION_BASELINE.md)
+
+## Reproduce the rules-alone extraction baseline on Windows
+
+Run from the repository root with the project Python environment and the
+local [opened #54 archives](CONTINUATION_HOLDOUT.md). The first command reads
+the runner archive and saves the inventory and extraction records. The
+second command reads the independent review archive and adds the score.
+Both commands block socket operations.
+
+```powershell
+$custody = '../FRAG-SEC-Holdout-54'
+$run = "build/revenue-selection-56-$([guid]::NewGuid())"
+$script = 'artifacts/phase06/revenue_selection_baseline.py'
+.venv/Scripts/python.exe $script run "$custody/runner/inputs.zip" $run
+if ($LASTEXITCODE -ne 0) { throw 'Rules baseline failed.' }
+.venv/Scripts/python.exe $script score "$custody/runner/inputs.zip" "$custody/scorer/expected.zip" $run
+if ($LASTEXITCODE -ne 0) { throw 'Independent scoring failed.' }
+Get-Content "$run/score.json"
+.venv/Scripts/python.exe -m pytest -p no:cacheprovider tests/test_revenue_selection.py -q
+```
+
+## Earlier development runs
+
 Issue #36 ran 30 fixed questions against 14 preserved SEC originals. In
 each cold and warm pass, the opened cohort completed 1 of 15 cases and the
 earlier development cohort completed 13 of 15. All 60 results and citation

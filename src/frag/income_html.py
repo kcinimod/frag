@@ -128,6 +128,9 @@ class Table:
     separate_title: bool = False
     wrapper: tuple[int, int] | None = None
     embedded_heading: bool = False
+    html_id: str | None = None
+    nearby: list[TextBlock] = field(default_factory=list)
+    row_sources: list[tuple[tuple[int, int], str | None]] = field(default_factory=list)
 
     def locator(self) -> dict[str, int]:
         return {"table": self.number, **EvidenceText(self.position).locator()}
@@ -136,9 +139,13 @@ class Table:
 class StatementHTML(HTMLParser):
     """Collect physical rows without letting nested or outside cells leak into them."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, inventory: bool = False) -> None:
         super().__init__()
         self.tables: list[Table] = []
+        self.visible_tables: list[Table] = []
+        self._inventory = inventory
+        self._outer_tables: list[tuple[Table, Cell | None, EvidenceText | None, InlineFact | None]] = []
+        self._blocks_before_table = 0
         self.unit_measures: dict[str, list[EvidenceText]] = {}
         self.contexts: dict[str, list[InlineContext]] = {}
         self.cover_facts: dict[str, list[EvidenceText]] = {}
@@ -218,6 +225,19 @@ class StatementHTML(HTMLParser):
                 self._separate_title = False
             elif self._table:
                 self._table.nested = True
+                if self._inventory:
+                    self._outer_tables.append((self._table, self._cell, self._caption, self._inline_fact))
+                    self._table = Table(self._count, self.getpos(), None)
+                    self._cell = self._caption = self._inline_fact = None
+            if self._inventory and self._table:
+                self._table.html_id = attrs.get("id")
+                if self._depth == 1:
+                    self._table.nearby = self.blocks[max(self._blocks_before_table, len(self.blocks) - 4):]
+                    if self._block and self._block.text:
+                        self._table.nearby = [
+                            *self._table.nearby[-3:], TextBlock(self._block.position, [self._block.text]),
+                        ]
+                self.visible_tables.append(self._table)
             return
         if self._depth == 0:
             if tag in BLOCK_TAGS:
@@ -225,13 +245,15 @@ class StatementHTML(HTMLParser):
                 self._block = TextBlock(self.getpos())
             return
         table = self._table
-        if self._depth != 1 or table is None:
+        if (self._depth != 1 and not self._inventory) or table is None:
             return
         if tag == "caption":
             self._caption = table.caption = EvidenceText(self.getpos())
         elif tag == "tr":
             self._cell = None
             table.rows.append([])
+            if self._inventory:
+                table.row_sources.append((self.getpos(), attrs.get("id")))
         elif tag in {"td", "th"} and table.rows:
             self._cell = Cell(self.getpos(), attrs=attrs)
             table.rows[-1].append(self._cell)
@@ -266,10 +288,14 @@ class StatementHTML(HTMLParser):
             return
         if tag == "table" and self._depth:
             self._depth -= 1
-            if self._depth == 0 and self._table:
+            if self._outer_tables and self._table:
+                self._table.complete = True
+                self._table, self._cell, self._caption, self._inline_fact = self._outer_tables.pop()
+            elif self._depth == 0 and self._table:
                 self._table.complete = True
                 self._finish_table()
-        elif self._depth == 1:
+                self._blocks_before_table = len(self.blocks)
+        elif self._depth == 1 or (self._inventory and self._depth):
             if tag in {"ix:nonfraction", "td", "th", "tr"}:
                 self._inline_fact = None
             if tag in {"td", "th", "tr"}:
@@ -293,7 +319,7 @@ class StatementHTML(HTMLParser):
             self._context_field.parts.append(data)
         if self._visibility.hidden:
             return
-        if self._depth == 1:
+        if self._depth == 1 or (self._inventory and self._depth):
             if self._inline_fact:
                 self._inline_fact.parts.append(data)
             active = self._cell or self._caption
@@ -309,6 +335,8 @@ class StatementHTML(HTMLParser):
 
     def close(self) -> None:
         super().close()
+        if self._outer_tables:
+            self._table = self._outer_tables[0][0]
         self._finish_table()
 
     def _finish_block(self) -> None:
@@ -415,8 +443,8 @@ def statement_periods(
     }
 
 
-def table_grid(table: Table) -> list[GridRow]:
-    if table.nested or not table.complete:
+def table_grid(table: Table, *, inventory: bool = False) -> list[GridRow]:
+    if not inventory and (table.nested or not table.complete):
         raise UnsupportedLayout("The income statement has nested or incomplete table markup.")
     reserved_until: dict[int, int] = {}
     grid: list[GridRow] = []
