@@ -35,15 +35,16 @@ The preparation machine holds two separate archives outside the checkout in
 and original HTML. The scoring archive contains independently reviewed
 references, lineages, per-original layout signatures, and the audit verifier.
 
-The #53 opened-cohort development gate has passed. The acceptance freeze is
-pending, so the runner archive is still in custody. At freeze, recheck the
+The #53 opened-cohort development gate had passed when the archives were
+sealed. The runner archive was held for the acceptance freeze. At freeze, recheck the
 sealed inventory against the candidate's development evidence and record the
 protocol, thresholds, production and evaluation revisions, runtime, retrieval,
 and scorer. Once both conditions are recorded, give only the runner archive to
 the isolated runner and keep the scoring archive outside its workspace.
-The prior #44 acceptance workflow uses its historical receipt. The next
-acceptance run must explicitly bind the receipt for this cohort.
-[Opened-cohort gate](CONTINUATION_GATE.md) · [Historical checkpoint](SEC_ACCEPTANCE.md)
+Issue #45 completed the recheck and controlled release using this receipt.
+The #44 workflow uses its historical receipt.
+[Opened-cohort gate](CONTINUATION_GATE.md) · [#45 acceptance](CONTINUATION_ACCEPTANCE.md) ·
+[Historical checkpoint](SEC_ACCEPTANCE.md)
 
 ## Verify the seals
 

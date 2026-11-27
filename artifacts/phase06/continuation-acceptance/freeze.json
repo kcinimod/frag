@@ -1,0 +1,201 @@
+{
+  "continuation_audit_sha256": "8e424718e8724ecedc9b6d7be0c92d6218363f41aebb02443ad0e384ebeac5d3",
+  "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+  "created_at_utc": "2026-11-27T08:41:58.538958+00:00",
+  "dependencies": {
+    "blinker": "1.9.0",
+    "click": "8.5.1",
+    "colorama": "0.4.6",
+    "flask": "3.1.3",
+    "itsdangerous": "2.2.0",
+    "jinja2": "3.1.6",
+    "markupsafe": "3.0.4",
+    "werkzeug": "3.1.9"
+  },
+  "development_gate_revision": "bd5bbeff77d380cbaa59237abfb85389eaf47c13",
+  "evaluation_revision": "6f4f06c8741919a06ffcfbb45a1473c3928cb388",
+  "files": {
+    "artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md": "c3cd81f2d496570277973ab8201344c8b5e28e297f558721869576b1ca9b11c3",
+    "artifacts/phase04/sec-holdout-receipt.json": "521d21b9c36c61bffc6208bd7b36517bb05fcec22b56ea2ff60b87e4f6c2147f",
+    "artifacts/phase04/sec_holdout_runner.py": "03ea1dd4c2551622be3328653bab97573e68402b17cfa70c2478f923d4637153",
+    "artifacts/phase04/sec_holdout_score.py": "4cb7b67fab83eaa70231676d4722103899b5b539e718d34ea861a0b763f4b950",
+    "artifacts/phase05/baseline.py": "c613aa28f1a9c84901e348b01a93b03c2a6a4f4328a2d12ec751c78f75813030",
+    "artifacts/phase05/custody.json": "3cc15d8f70fd0194dac83aeb52120953bb635db700c093f484f800997f757679",
+    "artifacts/phase05/holdout-freeze.json": "1233e12a819e3596abf536b798a40e6184346bb6af5354c8ad0dcf4992d1b0f3",
+    "artifacts/phase05/holdout.py": "f5b656dfcc7deaee9592d6fd6598aa7c3c72894e691cc0a9f5bf2c70fcca6663",
+    "artifacts/phase05/score.py": "7fc35b9207254d0295de9dd9d9aa3a00f82e9152c6faccdc39399a7eeef4bfa6",
+    "artifacts/phase06/CONTINUATION_PROTOCOL.md": "30a7f7b7a63d82d048ce8b6847441f55fefa34358f429d4926dc3988c737774f",
+    "artifacts/phase06/DEVELOPMENT_LAYOUTS.md": "13ab8c49b17136a41cc4c3da5377a1163f59fc01f1b6928a900f781830539f7e",
+    "artifacts/phase06/EXACT_REPLAY.md": "3b8695e015546edb1b96d5ee0e6b56d099de3702245a95ee5e2f64814d45cb6d",
+    "artifacts/phase06/acceptance.ps1": "7ec44201170c3f3cdabce0d26a0a9bb939df7689049b2ce7618bdbe3a04c0698",
+    "artifacts/phase06/continuation-holdout-receipt.json": "d11a802fb1abdfb9373c6c6de6cfeaad1e7a51e0d8db1c20b591d082c375d9d7",
+    "artifacts/phase06/continuation-opened-score.json": "f0ec54d860e3f8beb127c5b66ef71ae31d95a1d4df5c9166c186e2a0ef59ad15",
+    "artifacts/phase06/exact_replay.py": "323141041de644ba0fb46a4f7cdb8955c8cb7c5bea06a62712d6e649f3fa73fb",
+    "artifacts/phase06/fresh_run.py": "0c93d65a34bf310f8637f5efc716f89301876e23cfe0856456ee217d41ff2316",
+    "pyproject.toml": "6ed9903bae7f75c0243238cc9b8cd956bb46b74e92ac6daed7fee505d7b36164",
+    "scripts/setup-local-model.ps1": "abd50c642a753045feed6fbd1d2c602ffe41f80ddefa3ca0e60017ffa623e2f2",
+    "scripts/start-local-model.ps1": "4166fad2d6da1b4a70c99e25e8cd6e6370d1673cc42a1f8d4ea0f528fe3e0ab5",
+    "src/frag/__init__.py": "0eab3d094882d193bf2cce627975d7811d20384a7a9d88ca4bbc4806a0fd3187",
+    "src/frag/apple-revenue-reference.json": "a0b9af8b737f95feff11b862185de653d750f567f598452c9895babbb771b0db",
+    "src/frag/citations.py": "0e2f31f1ec61a05ed69987e9841df90673366ec692ab4feeb8104ddb3404822c",
+    "src/frag/cli.py": "0c381ec1858a75eae2f129fcea0c06550c957f77063bc4ef6eb1f356aff382b3",
+    "src/frag/collection.py": "d3b35924a6cb83133572d28c49fb3ed4b9006f4867509f0c463a5aa1763bdba7",
+    "src/frag/dated_revenue.py": "223ff9377f261da8b18bf849ae94f38a1140fe23b0d1229b9f2552f028c4b1a0",
+    "src/frag/finqa.py": "0a8fd1969cf491b9aacf4c80cf5ab7c12af7fb71efce9b8bbbdbce97786c1ed4",
+    "src/frag/finqa_comparison.py": "ac4be414f3d39951f001dcbb11c2bd9027bf883c421fd6fabd6bc8f7926c6dae",
+    "src/frag/finqa_program.py": "329a711e1dc33f17145253076e9c2994733f26635c3ba8d3d17e3e62b15d4166",
+    "src/frag/finqa_resources.py": "f32a85c82260ece3648c6d45999795cb7bc982b65ae30072d8a27cd28ab4bb82",
+    "src/frag/finqa_scoring.py": "c02c9195ea5159c0128b9ca16defc72d93e47493ed5dd3823b8905722a53169a",
+    "src/frag/finqa_test.py": "baa7dc2fed36e4d7ea2f42639a2f52fa511c672f596f60db6a0560501b82df2d",
+    "src/frag/growth.py": "6b48cb5be717acdb5a8fed24181d333ee1bad30c5ae25f920e04aef2b74be500",
+    "src/frag/income_html.py": "45f0a82fc74e12a02623b3bc5860d2968bd5d6045eab12e1b46317ff7d920b3e",
+    "src/frag/local_model.py": "c3b8adf5e3105bdcc5a949275f6bfb65aa404259a8926909dae63c4619e50978",
+    "src/frag/lookup.py": "a6ab8d962aadc5c17c79263dba41efc309f6815a323499d4f778d5bd26252d26",
+    "src/frag/microsoft-revenue-reference.json": "06e4f52f8b65dd750119684c3ed7702dec5e1896cbb54150017346600f3b6093",
+    "src/frag/revenue.py": "66f35ed80b5de4605bb10de2c363509d1de66beb39cf692ca42d38b0feaa1ca1",
+    "src/frag/revenue_notes.py": "140d5fb9f361eb7e2a7345fc90b579788ba752d35758a59c1ff733f2fe356c3e",
+    "src/frag/sec.py": "34505af56e4476b86af715f34bb7d4d4c0e1f282f852660a40e9f07b26d84fc1",
+    "src/frag/store.py": "c5db36a3ab732fe96dff21f4650a8c54b1a9d98262ce83a94af25114ecccd479",
+    "src/frag/verification.py": "1832b59783bd2c9abb86bc39679fa6fb672b80763379a531fed35cd5ef0db5f5",
+    "src/frag/web.py": "4396a75d5a46149c4a207765f3cdc9f47fbd60bfd22b32350d63daf935a06532",
+    "uv.lock": "1f4c0fcf046eb9732f41eea5cd1d09561f2cad528ac355f2393005fa5c8a406c"
+  },
+  "gpu_sampler": "C:\\Windows\\System32\\nvidia-smi.exe",
+  "model": {
+    "context_size": 4096,
+    "gpu_layers": 0,
+    "offline": true,
+    "parallel": 1,
+    "quantization": "Q4_K_M",
+    "revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+    "runtime": "llama.cpp b6500-a7a98e0f",
+    "threads": 4,
+    "timeout_seconds": 30,
+    "weights": "Qwen/Qwen2.5-0.5B-Instruct-GGUF"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "port": 18089,
+  "production_revision": "f400e2eb7d7223ea07a001626c237ec958ac3bc5",
+  "python": "3.12.14",
+  "receipt": {
+    "answerable_counts_by_kind": {
+      "growth": 6,
+      "lookup": 6
+    },
+    "audit_sha256": {
+      "company-facts.json": "fdfdeb33dcdf1f176f17028e3037e81f98b2b574c17829058d8cbd0698309a1b",
+      "edgar-transfer-audit.json": "c18cd6a5678af2e96b34877ceef16c1343cefa82768c58e1a7f3787352337518",
+      "full-company-facts.zip": "13b5b80516a04d32b7fa9ff3c47b42d2a8ccc6b9f90632cc524f4b405936eee5",
+      "originals-audit/amendment.htm": "82364461cf7455477ae0f74f6b3ee33435cc03a92e45fbc8e844d311c6dceba8",
+      "overlap-audit.json": "488d8bbc0731eb07690fb2ce978f3153b753a8b9e6fbb66acf48f63a408654b8",
+      "registrant-indexes.zip": "1c84b3aa3077839d24297c4d87c2f04b110c028511ade3e2b7156e2b798f2bfb",
+      "reviewer-audit.json": "357e2bb85e7ad37cac3558ca5250f7aee4b2d07af44b5b64b37029a2aec86116",
+      "verify.py": "11c6394eb62d4a12e17f46bd38e6f017a53ee39ac34d11ba169de2ae6183d7f8"
+    },
+    "case_count": 15,
+    "case_counts_by_outcome": {
+      "absent_year": 1,
+      "answerable": 12,
+      "incompatible_periods": 1,
+      "present_unverifiable": 1
+    },
+    "cohort": "sec-phase06-holdout-54-v1",
+    "custody": {
+      "acceptance_freeze": "pending",
+      "development_gate": "passed",
+      "location_relative_to_checkout": "../FRAG-SEC-Holdout-54",
+      "runner_release": "withheld pending acceptance freeze",
+      "scorer_access": "scorer only",
+      "sealed_at_utc": "2026-11-27T02:49:27+00:00"
+    },
+    "development_gate_record_path": "artifacts/phase06/continuation-opened-score.json",
+    "development_gate_record_sha256": "f0ec54d860e3f8beb127c5b66ef71ae31d95a1d4df5c9166c186e2a0ef59ad15",
+    "development_layout_inventory_path": "artifacts/phase06/DEVELOPMENT_LAYOUTS.md",
+    "development_layout_inventory_sha256": "13ab8c49b17136a41cc4c3da5377a1163f59fc01f1b6928a900f781830539f7e",
+    "independent_review": {
+      "overlapping_issuer_families": 0,
+      "overlapping_originals": 0,
+      "sha256": "357e2bb85e7ad37cac3558ca5250f7aee4b2d07af44b5b64b37029a2aec86116",
+      "status": "passed"
+    },
+    "issuer_count": 6,
+    "lineage_accession_count": 197,
+    "new_statement_layout_count": 2,
+    "observation_count": 21,
+    "original_count": 7,
+    "preparation_base": "bd5bbeff77d380cbaa59237abfb85389eaf47c13",
+    "runner_bundle": {
+      "path": "runner/inputs.zip",
+      "sha256": "60a47c03051b11e4600afa40fdb335c043a4cb3f8462bdcb0268bd18d8d1c4f6"
+    },
+    "scorer_bundle": {
+      "path": "scorer/expected.zip",
+      "sha256": "c548cc4b73a619267145901c722eda1ed0a61d5aaadc90611efd8025ac17789f"
+    },
+    "statement_layout_count": 6,
+    "version": 1
+  },
+  "replay_protocol": "complete-payloads",
+  "retrieval": {
+    "context_fields": [
+      "fact_id",
+      "metric",
+      "reporting_period",
+      "normalized_amount",
+      "currency",
+      "scale"
+    ],
+    "entry_point": "filing-scoped frag ask",
+    "generation": {
+      "cache_prompt": false,
+      "model": "frag-qwen25-05b-q4km",
+      "seed": 42,
+      "temperature": 0
+    },
+    "growth": "dated parser selects the requested pair; Microsoft retains eligible facts",
+    "index": "selected filing's verified annual revenue facts",
+    "lookup": "dated parser filters eligible facts to requested FY; Microsoft retains eligible facts",
+    "max_tokens": {
+      "growth": 320,
+      "lookup": 120
+    }
+  },
+  "runtime_files": {
+    "ggml-base.dll": "0264afa371c8098add67f4227a804b3d2e026b11496d0c259dc2509113afb427",
+    "ggml-cpu-alderlake.dll": "e23e8b688051ec5b8bc95779801f2537f12c3f43b3ca2b3fa8b066f7a1e9e5ff",
+    "ggml-cpu-haswell.dll": "67785d8c3028e24b97696900de5ec47a7ecaed9969fbc2596b05a407bab1bb02",
+    "ggml-cpu-icelake.dll": "0c829f886f12ab1623d71bdd7213fa4ef07f65ec2f191de81a4b0f0a580ef711",
+    "ggml-cpu-sandybridge.dll": "d19f88678585b5d85aed68f62ecd5f879ef936aef89e755397d750a7cbb553d9",
+    "ggml-cpu-sapphirerapids.dll": "8019e8576cb2dc66eaaebfafaa2ee3ecca11bad0fe4f1a8d801121418f478c32",
+    "ggml-cpu-skylakex.dll": "e697936d0ece658ca67165d04a229bde21f1bfffbf6f5904ffcc6c71cd434036",
+    "ggml-cpu-sse42.dll": "984d0713046fe5bb88d6dcc49f9ccb620695f50f76f1f02fecf5ef09d6ea92ad",
+    "ggml-cpu-x64.dll": "d1cf3e3c0a111e8ff151bdf3856c0d206f6545fe02ad9cd0ef694062c5524afd",
+    "ggml-rpc.dll": "778973539d7b92bfdff34489bb9b0e2e920a4686c235a0ccaa5e6d0622e1d634",
+    "ggml.dll": "a20e4824a96e2ecb9c8689c4b454dba26ac195f0a47981399b453dc3eba43775",
+    "libcurl-x64.dll": "5bd5fda8cf2bef630dd4eed5e60b65af2aed9c76c1818c36133701c09cf6d0ac",
+    "libomp140.x86_64.dll": "9ab1cb787e52b2a36133899c01c1db1f876067d1471cd224ead85f40a8152b99",
+    "llama-server.exe": "62e6a5fec588ff3ea6d26a507db4373e56c850db19b39239bd30f5e7d87751cd",
+    "llama.dll": "0357a6eb8397617ab5d0a6a4a0d7c211f11617669d8173f161f53d09438f2cee",
+    "mtmd.dll": "e70e444966d9c0e37a4da7d5c6210283ddb0b57dd66be87b3f7b5ad59f7fd370"
+  },
+  "scoring_files": {
+    "artifacts/phase04/sec_holdout_score.py": "4cb7b67fab83eaa70231676d4722103899b5b539e718d34ea861a0b763f4b950",
+    "artifacts/phase05/acceptance_score.py": "22ad3a37a9e7c679c53d6fe80e93e553ab731b66b270b8b8ff46e9aaa16859ac",
+    "artifacts/phase05/holdout-score.json": "3b315f446cb5d9df8a549d86755a626581f950e4661364eef54b3c59a5ca0a58",
+    "artifacts/phase05/holdout_score.py": "d3178583530042d4e5e4a7571927142fa02742ad4c31454cca3991d32d858d68",
+    "artifacts/phase05/score.py": "7fc35b9207254d0295de9dd9d9aa3a00f82e9152c6faccdc39399a7eeef4bfa6",
+    "artifacts/phase06/development_score.py": "ad9740cb2c09fb643c1d9915ca62fb7961b944fe199f8d394f55ac0ad022364c",
+    "artifacts/phase06/exact_replay.py": "323141041de644ba0fb46a4f7cdb8955c8cb7c5bea06a62712d6e649f3fa73fb",
+    "artifacts/phase06/fresh_score.py": "0bfe84a3740d8a816980d8eee4bbd1df9b77711d473c2a6dce0a5669663be0c3",
+    "artifacts/phase06/fresh_score_v2.py": "2d312638af1943e99fcb71c48cff4378b9d7c86a324c9657a37ab7802df9bb1d",
+    "artifacts/phase06/observations.py": "1dc930bd293ebe4a7cd057499b9a4c24e1f4e10c3275638bcfc3b954ec36aad4",
+    "artifacts/phase06/revenue_score.py": "48d73076ec9baf27814f6bd7aff4ab46b260e961df799864890d45dcd282c9f4",
+    "artifacts/phase06/verify_continuation_custody.py": "ee42324582fcb07984250286930f3c07adc7d30fa72344dd93e3a53bbd9745f1"
+  },
+  "thresholds_per_pass": {
+    "exact_replay": 15,
+    "grounded_abstentions": 3,
+    "supported_answers": 11
+  },
+  "weights_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db"
+}

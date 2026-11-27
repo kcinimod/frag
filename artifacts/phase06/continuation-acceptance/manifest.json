@@ -1,0 +1,181 @@
+{
+  "cases": [
+    {
+      "case_id": "P6F-01",
+      "question": "What was reported consolidated revenue in FY2024?",
+      "source_id": "0001141391-25-000011"
+    },
+    {
+      "case_id": "P6F-02",
+      "question": "How did consolidated revenue change from FY2023 to FY2024 as reported?",
+      "source_id": "0001141391-25-000011"
+    },
+    {
+      "case_id": "P6F-03",
+      "question": "What was reported consolidated revenue in FY2024?",
+      "source_id": "0000950170-24-075605"
+    },
+    {
+      "case_id": "P6F-04",
+      "question": "How did consolidated revenue change from FY2023 to FY2024 as reported?",
+      "source_id": "0000950170-24-075605"
+    },
+    {
+      "case_id": "P6F-05",
+      "question": "What was reported consolidated revenue in FY2024?",
+      "source_id": "0000077476-25-000007"
+    },
+    {
+      "case_id": "P6F-06",
+      "question": "How did consolidated revenue change from FY2023 to FY2024 as reported?",
+      "source_id": "0000077476-25-000007"
+    },
+    {
+      "case_id": "P6F-07",
+      "question": "What was reported consolidated revenue in FY2024?",
+      "source_id": "0000796343-25-000004"
+    },
+    {
+      "case_id": "P6F-08",
+      "question": "How did consolidated revenue change from FY2023 to FY2024 as reported?",
+      "source_id": "0000796343-25-000004"
+    },
+    {
+      "case_id": "P6F-09",
+      "question": "What was reported consolidated revenue in FY2024?",
+      "source_id": "0001065088-25-000037"
+    },
+    {
+      "case_id": "P6F-10",
+      "question": "How did consolidated revenue change from FY2023 to FY2024 as reported?",
+      "source_id": "0001065088-25-000037"
+    },
+    {
+      "case_id": "P6F-11",
+      "question": "What was reported consolidated revenue in FY2024?",
+      "source_id": "0001108524-24-000005"
+    },
+    {
+      "case_id": "P6F-12",
+      "question": "How did consolidated revenue change from FY2023 to FY2024 as reported?",
+      "source_id": "0001108524-24-000005"
+    },
+    {
+      "case_id": "P6F-13",
+      "question": "What was reported consolidated revenue growth from FY2021 to FY2024?",
+      "source_id": "0001065088-25-000037"
+    },
+    {
+      "case_id": "P6F-14",
+      "question": "What was reported consolidated revenue in FY2017?",
+      "source_id": "0000796343-18-000015"
+    },
+    {
+      "case_id": "P6F-15",
+      "question": "What was reported consolidated revenue growth from FY2022 to FY2023? Compare equal-length fiscal periods only.",
+      "source_id": "0000077476-25-000007"
+    }
+  ],
+  "cohort": "sec-phase06-holdout-54-v1",
+  "sources": [
+    {
+      "accession": "0001141391-25-000011",
+      "byte_length": 3138367,
+      "cik": "0001141391",
+      "filing_date": "2025-02-12",
+      "form": "10-K",
+      "issuer": "Mastercard Inc",
+      "original_filename": "ma-20241231.htm",
+      "path": "originals/0001141391-25-000011/ma-20241231.htm",
+      "report_end": "2024-12-31",
+      "sha256": "486842e936df62a80c43bddfef191e3eaa5a9cde78fd4475f7d6a71cae0627f0",
+      "source_id": "0001141391-25-000011",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1141391/000114139125000011/ma-20241231.htm"
+    },
+    {
+      "accession": "0000950170-24-075605",
+      "byte_length": 5321450,
+      "cik": "0001341439",
+      "filing_date": "2024-06-20",
+      "form": "10-K",
+      "issuer": "ORACLE CORP",
+      "original_filename": "orcl-20240531.htm",
+      "path": "originals/0000950170-24-075605/orcl-20240531.htm",
+      "report_end": "2024-05-31",
+      "sha256": "f2063faf375c66c029c8677cc7ca200c607811d9fb85a4d50df95f84b778bd5a",
+      "source_id": "0000950170-24-075605",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1341439/000095017024075605/orcl-20240531.htm"
+    },
+    {
+      "accession": "0000077476-25-000007",
+      "byte_length": 3911080,
+      "cik": "0000077476",
+      "filing_date": "2025-02-04",
+      "form": "10-K",
+      "issuer": "PEPSICO INC",
+      "original_filename": "pep-20241228.htm",
+      "path": "originals/0000077476-25-000007/pep-20241228.htm",
+      "report_end": "2024-12-28",
+      "sha256": "d7dd6082d58dcfb48168b4a73ce556089c3a4d41da8e4c5ced34ee38d5a8e99f",
+      "source_id": "0000077476-25-000007",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/77476/000007747625000007/pep-20241228.htm"
+    },
+    {
+      "accession": "0000796343-18-000015",
+      "byte_length": 3491230,
+      "cik": "0000796343",
+      "filing_date": "2018-01-22",
+      "form": "10-K",
+      "issuer": "ADOBE INC.",
+      "original_filename": "adbe10kfy17.htm",
+      "path": "originals/0000796343-18-000015/adbe10kfy17.htm",
+      "report_end": "2017-12-01",
+      "sha256": "915c7dab4ffa862646da0d2105a567b9366364c0fbfa3b4ed4b73c5eb99e4751",
+      "source_id": "0000796343-18-000015",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634318000015/adbe10kfy17.htm"
+    },
+    {
+      "accession": "0000796343-25-000004",
+      "byte_length": 2405137,
+      "cik": "0000796343",
+      "filing_date": "2025-01-13",
+      "form": "10-K",
+      "issuer": "ADOBE INC.",
+      "original_filename": "adbe-20241129.htm",
+      "path": "originals/0000796343-25-000004/adbe-20241129.htm",
+      "report_end": "2024-11-29",
+      "sha256": "1cd532bff238db2a21a5635e57f70305a149c838172041c1941990dc35a9ffe4",
+      "source_id": "0000796343-25-000004",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634325000004/adbe-20241129.htm"
+    },
+    {
+      "accession": "0001065088-25-000037",
+      "byte_length": 2807405,
+      "cik": "0001065088",
+      "filing_date": "2025-02-27",
+      "form": "10-K",
+      "issuer": "EBAY INC",
+      "original_filename": "ebay-20241231.htm",
+      "path": "originals/0001065088-25-000037/ebay-20241231.htm",
+      "report_end": "2024-12-31",
+      "sha256": "7ef07075cec5e5831d539b2adbd54a08bbb5ca3e3dc6d878cf430c11b0e602ec",
+      "source_id": "0001065088-25-000037",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1065088/000106508825000037/ebay-20241231.htm"
+    },
+    {
+      "accession": "0001108524-24-000005",
+      "byte_length": 2407228,
+      "cik": "0001108524",
+      "filing_date": "2024-03-06",
+      "form": "10-K",
+      "issuer": "Salesforce, Inc.",
+      "original_filename": "crm-20240131.htm",
+      "path": "originals/0001108524-24-000005/crm-20240131.htm",
+      "report_end": "2024-01-31",
+      "sha256": "db79afd39528300b6c11512f31492618efedcd383b386ca85a32cd1b693df3df",
+      "source_id": "0001108524-24-000005",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1108524/000110852424000005/crm-20240131.htm"
+    }
+  ],
+  "version": 1
+}

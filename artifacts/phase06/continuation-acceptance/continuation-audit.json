@@ -1,0 +1,17 @@
+{
+  "case_count": 15,
+  "cohort": "sec-phase06-holdout-54-v1",
+  "development_inventory_revision": "bd5bbeff77d380cbaa59237abfb85389eaf47c13",
+  "evaluation_revision": "6f4f06c8741919a06ffcfbb45a1473c3928cb388",
+  "issuer_count": 6,
+  "lineage_accession_count": 197,
+  "new_statement_layout_count": 2,
+  "observation_count": 21,
+  "original_count": 7,
+  "overlapping_issuer_families": 0,
+  "overlapping_originals": 0,
+  "passed": true,
+  "production_revision": "f400e2eb7d7223ea07a001626c237ec958ac3bc5",
+  "receipt_sha256": "d11a802fb1abdfb9373c6c6de6cfeaad1e7a51e0d8db1c20b591d082c375d9d7",
+  "statement_layout_count": 6
+}

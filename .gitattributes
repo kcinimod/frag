@@ -18,3 +18,5 @@ artifacts/phase05/sec-holdout-receipt.json -text diff
 
 # Preserve the report and freeze bytes used in the Phase 6 baseline.
 artifacts/phase06/*.json -text diff
+artifacts/phase06/continuation-acceptance/*.json -text diff
+artifacts/phase06/continuation-acceptance/SHA256SUMS -text diff

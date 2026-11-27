@@ -459,3 +459,11 @@ Keep the new seal and issuer and layout audit distinct from the historical
 #44 receipt. Keep case-specific evidence in scorer custody. Recheck the
 issuer lineages and layout inventory at the acceptance freeze before
 releasing runner inputs. [Continuation holdout custody](../artifacts/phase06/CONTINUATION_HOLDOUT.md)
+
+### Record the second fresh Phase 6 decision (#45)
+
+Retain the #54 run with its fixed production and evaluation revisions and
+the separate scoring archive. Both passes failed the gate and exactly
+reproduced their results and citation sets offline. Keep #44's original
+result and scoring policy as the historical checkpoint.
+[Second fresh acceptance decision](../artifacts/phase06/CONTINUATION_ACCEPTANCE.md)

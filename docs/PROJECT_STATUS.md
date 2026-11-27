@@ -256,3 +256,12 @@ Phase 2 calculator and its offline results.
   six issuer families and seven preserved domestic 10-Ks. Its runner inputs
   remain in custody pending the acceptance freeze. The scoring references
   are held separately. [Continuation holdout custody](../artifacts/phase06/CONTINUATION_HOLDOUT.md)
+
+- Issue #45 evaluates the fresh #54 cohort after rechecking both seals
+  against the final development inventory and freezing the runner and
+  scorer. Both passes fail with 0/12 supported answers and 0/3 grounded
+  abstentions, with 15/15 exact socket-blocked replays per pass. Extraction
+  matches 3/21 observations and reusable verification matches 0/21.
+  Thirteen cases stop at extraction and two at verification. The original
+  #44 decision remains the historical baseline.
+  [Second fresh decision and reproduction](../artifacts/phase06/CONTINUATION_ACCEPTANCE.md)
