@@ -1,12 +1,14 @@
 param(
     [Parameter(Mandatory)][ValidateSet('Freeze', 'Live', 'Replay', 'Score')][string]$Mode,
     [Parameter(Mandatory)][string]$Destination,
-    [string]$Custody = (Join-Path $PSScriptRoot '../../../FRAG-SEC-Holdout-43'),
+    [string]$Custody,
     [string]$SavedFreeze,
-    [string]$SavedLive
+    [string]$SavedLive,
+    [switch]$Continuation
 )
 
 $ErrorActionPreference = 'Stop'
+$Custody = if ($Custody) { $Custody } else { Join-Path $PSScriptRoot '../../../FRAG-SEC-Holdout-43' }
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $python = Join-Path $repo '.venv/Scripts/python.exe'
 $revision = '208cca1e410a0811cba600ad93753b53b42cc43a'
@@ -19,6 +21,12 @@ function Invoke-CheckedPython {
     if ($LASTEXITCODE -ne 0) { throw "Python command failed ($LASTEXITCODE): $args" }
 }
 
+function Export-Snapshot($Commit, $Archive, $Directory, $Paths) {
+    git -C $repo -c core.autocrlf=false archive --format=zip --output=$Archive $Commit -- @Paths
+    if ($LASTEXITCODE -ne 0) { throw "Could not export the Phase 6 snapshot at $Commit." }
+    Expand-Archive -LiteralPath $Archive -DestinationPath $Directory
+}
+
 if ($Mode -eq 'Freeze') {
     $session = (New-Item -ItemType Directory -Path $Destination).FullName
     $paths = @('src', 'scripts', 'pyproject.toml', 'uv.lock',
@@ -29,16 +37,20 @@ if ($Mode -eq 'Freeze') {
         'artifacts/phase05/acceptance_score.py', 'artifacts/phase05/holdout_score.py', 'artifacts/phase05/holdout-score.json',
         "$phase/sec-holdout-receipt.json", "$phase/DEVELOPMENT_LAYOUTS.md", "$phase/gate-score.json",
         "$phase/development_score.py", "$phase/revenue_score.py", "$phase/observations.py")
-    git -C $repo -c core.autocrlf=false archive --format=zip --output="$session/production.zip" $revision -- @paths
-    if ($LASTEXITCODE -ne 0) { throw 'Could not export the Phase 6 production revision.' }
+    if ($Continuation) {
+        $revision = git -C $repo rev-parse HEAD
+        if ($LASTEXITCODE -ne 0) { throw 'Could not identify the committed continuation revision.' }
+        $evaluation = $revision
+    }
     foreach ($role in @('runner', 'scoring')) {
-        Expand-Archive -LiteralPath "$session/production.zip" -DestinationPath "$session/$role"
+        Export-Snapshot $revision "$session/$role-production.zip" "$session/$role" $paths
         $files = if ($role -eq 'runner') { @('fresh_run.py', 'FRESH_PROTOCOL.md', 'acceptance.ps1') } else { @('fresh_score.py') }
+        if ($Continuation) {
+            $files += 'exact_replay.py'
+            $files += if ($role -eq 'runner') { 'EXACT_REPLAY.md' } else { 'fresh_score_v2.py' }
+        }
         $evaluationPaths = @($files | ForEach-Object { "$phase/$_" })
-        $historical = "$session/$role-evaluation.zip"
-        git -C $repo -c core.autocrlf=false archive --format=zip --output=$historical $evaluation -- @evaluationPaths
-        if ($LASTEXITCODE -ne 0) { throw 'Could not export the frozen #44 evaluation revision.' }
-        Expand-Archive -LiteralPath $historical -DestinationPath "$session/$role"
+        Export-Snapshot $evaluation "$session/$role-evaluation.zip" "$session/$role" $evaluationPaths
     }
     $runner = "$session/runner"
     if ($SavedFreeze) {
@@ -82,9 +94,13 @@ if ($expected.StartsWith("$runner\", [StringComparison]::OrdinalIgnoreCase)) {
 }
 $live = "$runner/live/report.json"
 if (Test-Path -LiteralPath "$runner/retained-live.json") { $live = "$runner/retained-live.json" }
-& $python "$session/scoring/$phase/fresh_score.py" $freeze $inputs $expected $live "$runner/replay/report.json" "$session/scoring/score.json"
+$scoreProgram = "$session/scoring/$phase/fresh_score_v2.py"
+$exactScore = Test-Path -LiteralPath $scoreProgram -PathType Leaf
+if (-not $exactScore) { $scoreProgram = "$session/scoring/$phase/fresh_score.py" }
+& $python $scoreProgram $freeze $inputs $expected $live "$runner/replay/report.json" "$session/scoring/score.json"
 if ($LASTEXITCODE -eq 2 -and (Test-Path -LiteralPath "$session/scoring/score.json")) {
     Write-Output 'The recorded acceptance decision is a failure.'
+    if ($exactScore) { exit 2 }
 } elseif ($LASTEXITCODE -ne 0) {
     throw "Scorer failed ($LASTEXITCODE)."
 }

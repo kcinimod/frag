@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path("artifacts/phase06").resolve()))
 from fresh_run import PHASE, ask_case, configuration, digest, read_json, settings, stage_inputs, write_json
-from sec_holdout_runner import ingest
+from baseline import ingest_evidence
 
 # The synthetic freeze uses the interpreter and dependencies running the test.
 historical = PHASE.with_name("phase05") / "holdout-freeze.json"
@@ -44,11 +44,7 @@ with ZipFile("inputs.zip") as inputs:
         key = filing["source_id"]
         original = Path(filing["original_filename"])
         original.write_bytes(inputs.read(filing["path"]))
-        source = ingest(Path("store"), original, filing)
-        source.pop("original_path", None)
-        if "provenance" in source:
-            source["provenance"].pop("input_path")
-            source["provenance"].pop("preserved_at")
+        source = ingest_evidence(Path("store"), original, filing)
         sources[key] = {"evidence": source}
         cold = ask_case(Path("store"), case, source, Path("cold.json"))
         warm = ask_case(Path("store"), case, source, Path("warm.json"))
@@ -123,7 +119,7 @@ def cohort(tmp_path: Path) -> tuple[Path, Path, dict[str, Any]]:
 @pytest.mark.parametrize(
     ("fault", "changed_payload"),
     [(None, None), ("add_failure_field", "result"), ("change_failure_field", "result"),
-     ("open_extra_citation", "citations")],
+     ("open_extra_citation", "citations"), ("change_clarification_status", "result")],
 )
 def test_acceptance_replay_and_score_require_complete_payload_equality(
     cohort: tuple[Path, Path, dict[str, Any]], fault: str | None, changed_payload: str | None,
@@ -132,13 +128,16 @@ def test_acceptance_replay_and_score_require_complete_payload_equality(
     failure, clarification = live["cases"]
     assert failure["cold"]["result"] == {"status": "ingestion_failed"}
     assert clarification["warm"]["result"]["status"] == "clarify"
-    expected_failure = deepcopy(failure["cold"])
+    changed_case = 1 if fault == "change_clarification_status" else 0
+    expected_original = deepcopy(live["cases"][changed_case]["cold"])
     if fault == "add_failure_field":
         failure["cold"]["result"]["detail"] = "Synthetic changed failure detail"
     elif fault == "change_failure_field":
         failure["cold"]["result"]["status"] = "other_failure"
     elif fault == "open_extra_citation":
         failure["cold"]["citations"]["extra"] = {"http_status": 200, "path": "/synthetic", "text": "synthetic"}
+    elif fault == "change_clarification_status":
+        clarification["cold"]["result"]["status"] = "other_failure"
     (snapshot / "live.json").write_text(json.dumps(live), encoding="utf-8")
     runner = subprocess.run(
         [sys.executable, str(PHASE / "fresh_run.py"), "replay", "freeze.json", "--inputs", "inputs.zip",
@@ -152,13 +151,27 @@ def test_acceptance_replay_and_score_require_complete_payload_equality(
     for index, row in enumerate(replay["cases"]):
         for mode in ("cold", "warm"):
             repeated = row[mode]
-            changed = changed_payload is not None and index == 0 and mode == "cold"
-            original = expected_failure if changed else live["cases"][index][mode]
+            changed = changed_payload is not None and index == changed_case and mode == "cold"
+            original = expected_original if changed else live["cases"][index][mode]
             assert repeated["result"] == original["result"]
             assert repeated["citations"] == original["citations"]
             assert repeated["status"] == ("mismatch" if changed else "matched")
             if changed:
                 assert repeated["differing_payloads"] == [changed_payload]
+
+    if fault is None:
+        (snapshot / "live").mkdir()
+        copy2(snapshot / "live.json", snapshot / "live/report.json")
+        # The documented PowerShell entry point uses runner/ and a fresh replay directory.
+        (snapshot / "replay").rename(snapshot / "standalone-replay")
+        wrapped = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-File", str(ROOT / PHASE / "acceptance.ps1"),
+             "-Mode", "Replay", "-Destination", str(snapshot.parent)],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        assert wrapped.returncode == 0, wrapped.stderr
+        assert "4/4 cold and warm results and citation sets matched" in wrapped.stdout
+        assert json.loads(replay_file.read_bytes())["cases"] == replay["cases"]
 
     # Isolate the replay requirement in the synthetic score. The runner above
     # uses its normal freeze, while these counters require only exact replay.
@@ -171,7 +184,7 @@ def test_acceptance_replay_and_score_require_complete_payload_equality(
     replay.update(freeze=live["freeze"], binding=live["binding"], live_sha256=sha256(live_path.read_bytes()).hexdigest())
     if fault:
         # A forged status still cannot turn unequal payloads into score credit.
-        replay["cases"][0]["cold"]["status"] = "matched"
+        replay["cases"][changed_case]["cold"]["status"] = "matched"
     replay_file.write_text(json.dumps(replay), encoding="utf-8")
     score_path = snapshot / "score.json"
     scored = subprocess.run(
@@ -184,7 +197,7 @@ def test_acceptance_replay_and_score_require_complete_payload_equality(
     assert score["passed"] is (fault is None)
     assert score["cold"]["metrics"]["offline_replay"] == ([1, 2] if fault else [2, 2])
     assert score["warm"]["metrics"]["offline_replay"] == [2, 2]
-    assert ("offline_replay_mismatch" in score["cold"]["cases"][0]["findings"]) is (fault is not None)
+    assert ("offline_replay_mismatch" in score["cold"]["cases"][changed_case]["findings"]) is (fault is not None)
 
 
 @pytest.mark.parametrize(

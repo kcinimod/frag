@@ -153,6 +153,15 @@ def measure(
     }
 
 
+def ingest_evidence(store: Path, original: Path, filing: dict[str, Any]) -> dict[str, Any]:
+    evidence = ingest(store, original, filing)
+    evidence.pop("original_path", None)
+    if "provenance" in evidence:
+        evidence["provenance"].pop("input_path", None)
+        evidence["provenance"].pop("preserved_at", None)
+    return evidence
+
+
 def evaluate(
     data: Path, work: Path, frozen: dict[str, Any], model: Path | None,
     previous: dict[str, Any] | None,
@@ -172,24 +181,24 @@ def evaluate(
                 or len(original_bytes) != filing["byte_length"]):
             raise ValueError(f"Source identity mismatch for {original.name}.")
         start = perf_counter()
-        evidence = ingest(store, original, filing)
-        evidence.pop("original_path", None)
-        if "provenance" in evidence:
-            evidence["provenance"].pop("input_path", None)
-            evidence["provenance"].pop("preserved_at", None)
+        evidence = ingest_evidence(store, original, filing)
         if "command_error" not in evidence and evidence["source_hash"] != filing["sha256"]:
             raise ValueError(f"Ingestion identity mismatch for {original.name}.")
         sources[filing["source_id"]] = {
             "evidence": evidence, "ingest_ms": round((perf_counter() - start) * 1000, 3),
         }
     cases = manifest["cases"]
-    if previous is not None and (
-        previous["freeze"] != frozen
-        or [row["case"] for row in previous["cases"]] != cases
-        or (require_equal_intake and {key: row["evidence"] for key, row in sources.items()}
-            != {key: row["evidence"] for key, row in previous["sources"].items()})
-    ):
-        raise ValueError("Replay inputs or reingested evidence differ from the live run.")
+    intake_differences = []
+    if previous is not None:
+        if previous["freeze"] != frozen or [row["case"] for row in previous["cases"]] != cases:
+            raise ValueError("Replay inputs differ from the live run.")
+        live_sources = previous["sources"]
+        intake_differences = sorted(
+            key for key in live_sources.keys() | sources.keys()
+            if live_sources.get(key, {}).get("evidence") != sources.get(key, {}).get("evidence")
+        )
+        if require_equal_intake and intake_differences:
+            raise ValueError("Reingested evidence differs from the live run.")
     results = []
     for index, case in enumerate(cases):
         source = sources[case["source_id"]]["evidence"]
@@ -205,7 +214,10 @@ def evaluate(
                 for mode in ("cold", "warm")
             }
         results.append({"case": case, **row})
-    return {"freeze": frozen, "sources": sources, "cases": results}
+    report = {"freeze": frozen, "sources": sources, "cases": results}
+    if not require_equal_intake and previous is not None:
+        report["differing_intake_sources"] = intake_differences
+    return report
 
 
 def main() -> None:

@@ -18,6 +18,7 @@ from holdout import stage_inputs
 from sec_holdout_runner import (
     ask_case, command, digest, local_model, open_citations, read_json, restrict_runner, runtime_hashes, write_json,
 )
+from frag.lookup import resolve_request
 
 GATE_PRODUCTION = "d5ea2c36af63bb64b30721ceb94cb26236dc4b0a"
 SCORING_FILES = (
@@ -64,9 +65,9 @@ def replay_question(
 ) -> dict[str, Any]:
     record_path = store.parent / f'{case["case_id"]}.json'
     record = saved.get("record")
-    if "command_error" in source or (record is None and (
-        saved.get("result", {}).get("status") == "clarify" or "command_error" in saved.get("result", {})
-    )):
+    expected = saved.get("result")
+    if ("command_error" in source or resolve_request(case["question"]) is None
+            or (record is None and isinstance(expected, dict) and "command_error" in expected)):
         outcome = ask_case(store, case, source, record_path)
         payloads = {field: outcome[field] for field in PAYLOADS}
     elif isinstance(record, dict) and record.get("question") == case["question"]:
@@ -139,12 +140,6 @@ def main() -> int:
     report["binding"] = binding
     if previous is not None:
         report["live_sha256"] = digest(args.saved_run)
-        live_sources = previous["sources"]
-        replay_sources = report["sources"]
-        report["differing_intake_sources"] = sorted(
-            key for key in live_sources.keys() | replay_sources.keys()
-            if live_sources.get(key, {}).get("evidence") != replay_sources.get(key, {}).get("evidence")
-        )
     write_json(args.work / "report.json", report)
     if replay:
         matches = sum(row[mode]["status"] == "matched" for row in report["cases"] for mode in ("cold", "warm"))

@@ -24,5 +24,6 @@ runner and scorer CLI entry points using the installed Windows environment.
 The [#44 PowerShell workflow](SEC_ACCEPTANCE.md#reproduce-on-windows)
 exports its historical evaluator from the #44 commit and its production
 snapshot from the original pinned revision. Its status-only replay records
-remain historical. The continuation runner uses `fresh_run.py` with a
-freeze produced by the continuation revision.
+remain historical. Use the
+[continuation acceptance commands](../../README.md#phase-6-exact-acceptance-replay)
+to run complete-payload replay through the same PowerShell entry point.

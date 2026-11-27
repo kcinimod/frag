@@ -391,3 +391,23 @@ Replay reports 30 matches. The scorer exits with code 1 for the known
 Microsoft currency citation gap and writes the per-case findings to JSON.
 The negative controls alter a saved answer and a citation to verify that
 replay detects both mismatches. [Scorer and offline replay controls](artifacts/phase05/ACCEPTANCE_SCORER.md)
+
+## Phase 6 exact acceptance replay
+
+From the repository root in PowerShell, use the pinned Python and model
+environment and the opened Phase 6 archives from custody. The continuation
+freeze exports the committed revision. Supply `-Custody` to the live, replay,
+and score commands if the archive directory differs from the default.
+
+```powershell
+$run = "build/phase06-exact-$([guid]::NewGuid())"
+& artifacts/phase06/acceptance.ps1 -Mode Freeze -Continuation -Destination $run
+& artifacts/phase06/acceptance.ps1 -Mode Live -Destination $run
+& artifacts/phase06/acceptance.ps1 -Mode Replay -Destination $run
+& artifacts/phase06/acceptance.ps1 -Mode Score -Destination $run
+```
+
+Replay runs with sockets blocked and writes `runner/replay/report.json`.
+A mismatch fails the replay command and leaves the per-case payloads and
+diagnostics in the report. Score writes `scoring/score.json` and exits with
+code 2 if the acceptance gate fails. [Exact replay protocol and controls](artifacts/phase06/EXACT_REPLAY.md)
