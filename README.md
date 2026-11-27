@@ -418,3 +418,16 @@ The #53 PowerShell commands reproduce the retained #44-question run with
 the pinned candidate and reviewed citation ranges. They also rerun the
 earlier development, collection, and browser checks.
 [Opened-cohort results and reproduction commands](artifacts/phase06/CONTINUATION_GATE.md#reproduce-on-windows)
+
+## Phase 6 SEC extraction holdout
+
+From PowerShell at the repository root in scorer custody, verify the #59
+archives and original evidence without starting a selector.
+
+```powershell
+.venv/Scripts/python.exe artifacts/phase06/revenue_selection_holdout.py '../FRAG-SEC-Holdout-59'
+```
+
+The command reports the reviewed observation and control counts. Complete
+the final inventory recheck and freeze before releasing the runner archive.
+[Custody and final recheck commands](artifacts/phase06/REVENUE_SELECTION_HOLDOUT.md)

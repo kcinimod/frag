@@ -7,11 +7,13 @@ from io import BytesIO
 import json
 from pathlib import Path
 import re
+import subprocess
 from typing import Any
 from zipfile import ZipFile
 
 PHASE = Path(__file__).resolve().parent
 RECEIPT = PHASE / "revenue-selection-holdout-receipt.json"
+CELL = re.compile(rb"<t[dh]\b[^>]*(?:/>|>.*?</t[dh]>)", re.I | re.S)
 
 
 def sealed(path: Path, digest: str) -> bytes:
@@ -21,7 +23,7 @@ def sealed(path: Path, digest: str) -> bytes:
     return data
 
 
-def identities(sources: list[dict[str, Any]]) -> tuple[set[str], ...]:
+def identities(sources: list[dict[str, Any]]) -> dict[str, set[str]]:
     ciks: set[str] = set()
     accessions: set[str] = set()
     hashes: set[str] = set()
@@ -35,7 +37,11 @@ def identities(sources: list[dict[str, Any]]) -> tuple[set[str], ...]:
         names.update("".join(ch for ch in name.casefold() if ch.isalnum()) for name in [
             source["issuer"], *source.get("aliases", []),
         ])
-    return ciks, accessions, hashes, names
+    return {"cik": ciks, "accession": accessions, "sha256": hashes, "name": names}
+
+
+def overlaps(held: dict[str, set[str]], used: dict[str, set[str]]) -> bool:
+    return any(values & used[kind] for kind, values in held.items())
 
 
 def checked_span(original: bytes, locator: dict[str, Any]) -> bytes:
@@ -55,6 +61,15 @@ def inside(child: dict[str, Any], parent: dict[str, Any]) -> bool:
     return bool(parent["start_byte"] <= child["start_byte"] < child["end_byte"] <= parent["end_byte"])
 
 
+def matching_cells(original: bytes, locator: dict[str, Any], pattern: str) -> list[int]:
+    row = checked_span(original, locator)
+    return [
+        locator["start_byte"] + cell.start()
+        for cell in CELL.finditer(row)
+        if re.fullmatch(pattern, visible(cell[0]))
+    ]
+
+
 def audit_observations(
     original: bytes, source: dict[str, Any], review: dict[str, Any], company_facts: dict[str, Any],
 ) -> None:
@@ -67,6 +82,13 @@ def audit_observations(
         raise ValueError(f"Statement evidence differs for {source['source_id']}.")
     if str(int(company_facts["cik"])) != str(int(source["cik"])):
         raise ValueError("SEC Company Facts must belong to the filing registrant.")
+    # Compare the order of visible financial cells. Some headers span spacers
+    # or currency columns separately from the numeric cells beneath them.
+    years = matching_cells(original, locators["period_header"], r"(?:19|20)\d{2}")
+    amounts = matching_cells(original, locators["revenue_row"], r"\d[\d,]*")
+    if len(years) != len(amounts):
+        raise ValueError(f"Revenue and period columns differ for {source['source_id']}.")
+    value_by_period = dict(zip(years, amounts, strict=True))
     for year, fact in review["facts"].items():
         spans = fact["locators"]
         snippets = {key: checked_span(original, locator) for key, locator in spans.items()}
@@ -82,6 +104,7 @@ def audit_observations(
             or visible(snippets["period_cell"]) != year
             or not inside(spans["period_cell"], locators["period_header"])
             or not inside(spans["statement_cell"], locators["revenue_row"])
+            or value_by_period.get(spans["period_cell"]["start_byte"]) != spans["statement_cell"]["start_byte"]
             or not inside(spans["inline_fact"], spans["statement_cell"])
             or visible(snippets["statement_cell"]) != fact["raw_amount"]
             or visible(snippets["inline_fact"]) != fact["raw_amount"]
@@ -104,7 +127,7 @@ def audit_observations(
 
 def audit(
     scorer: ZipFile, manifest: dict[str, Any], originals: dict[str, bytes], receipt: dict[str, Any],
-) -> tuple[tuple[set[str], ...], tuple[set[str], ...]]:
+) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
     review_data = scorer.read("reviewer-audit.json")
     inventory_data = scorer.read("development-inventory.json")
     expected = json.loads(scorer.read("expected.json"))
@@ -115,7 +138,7 @@ def audit(
         raise ValueError("Scoring evidence does not bind to the receipt and inputs.")
     known = identities(json.loads(inventory_data)["sources"])
     reserved = identities(list(lineages.values()))
-    if any(held & used for held, used in zip(reserved, known, strict=True)):
+    if overlaps(reserved, known):
         raise ValueError("The preparation inventory overlaps the holdout.")
     filings = {source["source_id"]: source for source in manifest["sources"]}
     if lineages.keys() != filings.keys():
@@ -157,7 +180,7 @@ def audit(
     return known, reserved
 
 
-def verify(custody: Path, final_inventory: list[Path]) -> None:
+def verify(custody: Path, final_inventory: list[Path], development_revision: str | None) -> None:
     receipt = json.loads(RECEIPT.read_bytes())
     runner_bytes = sealed(custody / "runner/inputs.zip", receipt["runner_sha256"])
     scorer_bytes = sealed(custody / "scorer/expected.zip", receipt["scorer_sha256"])
@@ -183,17 +206,28 @@ def verify(custody: Path, final_inventory: list[Path]) -> None:
         known, reserved = audit(scorer, manifest, originals, receipt)
 
     if final_inventory:
+        if development_revision is None or re.fullmatch(r"[0-9a-f]{40}", development_revision) is None:
+            raise ValueError("Supply the full frozen Git commit for the final development inventory.")
+        ancestry = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", receipt["preparation_base"], development_revision],
+            cwd=PHASE.parents[1], check=False, capture_output=True,
+        )
+        if ancestry.returncode:
+            raise ValueError("The frozen development commit must include the preparation base.")
         final_sources = []
         for path in final_inventory:
             data = path.read_bytes()
-            final_sources.extend(json.loads(data)["sources"])
+            inventory = json.loads(data)
+            if inventory.get("development_revision") != development_revision:
+                raise ValueError("The final inventory does not identify the frozen development commit.")
+            final_sources.extend(inventory["sources"])
             print(f"Final inventory SHA-256 {sha256(data).hexdigest()}  {path}")
         final = identities(final_sources)
-        if any(not before <= after for before, after in zip(known, final, strict=True)):
+        if any(not values <= final[kind] for kind, values in known.items()):
             raise ValueError("The final inventory omits identities from the preparation inventory.")
-        if any(held & used for held, used in zip(reserved, final, strict=True)):
+        if overlaps(reserved, final):
             raise ValueError("The final development inventory overlaps the holdout.")
-        print("Final development inventory recheck passed.")
+        print(f"Final development inventory recheck passed for {development_revision}.")
     else:
         print("Preparation inventory verified. Final development inventory recheck remains pending.")
 
@@ -202,8 +236,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("custody", type=Path)
     parser.add_argument("--final-inventory", type=Path, action="append", default=[])
+    parser.add_argument("--development-revision")
     args = parser.parse_args()
-    verify(args.custody, args.final_inventory)
+    if bool(args.final_inventory) != bool(args.development_revision):
+        parser.error("--final-inventory and --development-revision are required together")
+    verify(args.custody, args.final_inventory, args.development_revision)
 
 
 if __name__ == "__main__":

@@ -44,7 +44,8 @@ preparation inventory without loading model weights.
 Before any selector receives the runner archive, assemble the final development
 inventory from the frozen candidate. Preserve the preparation inventory entries
 and add every development original or issuer lineage introduced since then.
-Use JSON with a `sources` array. Each entry supplies `cik`, `accession`,
+Use JSON with a `development_revision` field containing the full frozen Git
+commit and a `sources` array. Each source supplies `cik`, `accession`,
 `issuer`, and the uncompressed original's `sha256`. Include `related_ciks`,
 `aliases`, and `related_accessions` where applicable. Supply additional
 manifest files by repeating `--final-inventory`. Record their printed hashes
@@ -53,8 +54,9 @@ and evaluation revisions, batching, runtime, and scoring rules.
 
 ```powershell
 $custody = '../FRAG-SEC-Holdout-59'
+$developmentRevision = git rev-parse HEAD
 $finalInventory = Join-Path $custody 'scorer/final-development-inventory.json'
-.venv/Scripts/python.exe artifacts/phase06/revenue_selection_holdout.py $custody --final-inventory $finalInventory
+.venv/Scripts/python.exe artifacts/phase06/revenue_selection_holdout.py $custody --final-inventory $finalInventory --development-revision $developmentRevision
 ```
 
 After the freeze, provide only `runner/inputs.zip` to the isolated runner.
