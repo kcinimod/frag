@@ -76,7 +76,9 @@ no selection, no retained observations, and a valid abstention stop.
 
 Run from the repository root in the locked project Python environment. The
 live run uses the retained freeze, the independently sealed runner bundle,
-and the weights and Vulkan build used for the development comparison.
+and the weights and Vulkan build used for the development comparison. Live
+measurements require the original Windows host, GPU, and driver pinned in the
+freeze. Check the retained manifest and freeze before starting the selectors.
 The scorer also uses the sealed scorer bundle. Its replay blocks socket
 operations and checks every saved model response against its original prompt
 hash, batch membership, and deterministic extraction output.
@@ -90,6 +92,10 @@ $script = 'artifacts/phase06/revenue_selection_acceptance.py'
 $runtime = 'build/llama-b6500-vulkan/llama-server.exe'
 $weights = '.frag-model/qwen2.5-1.5b-instruct-q4_k_m.gguf'
 $run = "build/revenue-selection-60-$([guid]::NewGuid())"
+foreach ($line in Get-Content "$saved/SHA256SUMS") {
+    $digest, $name = $line -split '  ', 2
+    if ((Get-FileHash "$saved/$name").Hash -ne $digest) { throw "Hash mismatch for $name." }
+}
 .venv/Scripts/python.exe $script run "$saved/freeze.json" "$custody/runner/inputs.zip" $run $runtime $weights
 if ($LASTEXITCODE -ne 0) { throw 'Frozen comparison failed.' }
 .venv/Scripts/python.exe $script score "$saved/freeze.json" "$custody/runner/inputs.zip" "$custody/scorer/expected.zip" "$run/run.json.gz" "$run/score.json"
@@ -102,6 +108,7 @@ Replay the retained result without loading weights or running a server.
 $custody = '../FRAG-SEC-Holdout-59'
 $saved = 'artifacts/phase06/revenue-selection-acceptance'
 $script = 'artifacts/phase06/revenue_selection_acceptance.py'
+New-Item -ItemType Directory -Path build -Force | Out-Null
 $score = "build/revenue-selection-60-score-$([guid]::NewGuid()).json"
 .venv/Scripts/python.exe $script score "$saved/freeze.json" "$custody/runner/inputs.zip" "$custody/scorer/expected.zip" "$saved/run.json.gz" $score
 if ($LASTEXITCODE -ne 0) { throw 'Offline replay failed.' }
