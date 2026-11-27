@@ -579,6 +579,10 @@ def score(
 ) -> dict[str, Any]:
     frozen = json.loads(freeze_path.read_bytes())
     receipt = frozen["receipt"]
+    fresh_continuation = "continuation_audit_sha256" in frozen
+    custody_boundary = runner_path.resolve().parent if fresh_continuation else live_path.resolve().parent
+    if expected_path.resolve().is_relative_to(custody_boundary):
+        raise ValueError("Independent references must remain outside the run directory.")
     for kind, path in (("runner", runner_path), ("scorer", expected_path)):
         if sha256(path.read_bytes()).hexdigest() != receipt[f"{kind}_bundle"]["sha256"]:
             raise ValueError(f"{kind} archive differs from the seal.")
@@ -594,8 +598,11 @@ def score(
         path.relative_to(ROOT).as_posix(): sha256(path.read_bytes()).hexdigest()
         for path in sorted(dependencies)
     }
-    if expected_path.resolve().is_relative_to(live_path.resolve().parent):
-        raise ValueError("Independent references must remain outside the run directory.")
+    if fresh_continuation and any(
+        current != frozen["scoring_files"].get(name, frozen["files"].get(name))
+        for name, current in scoring_files.items()
+    ):
+        raise ValueError("Scoring code or production utilities differ from the continuation freeze.")
     with ZipFile(runner_path) as runner, ZipFile(expected_path) as scorer:
         expected = json.loads(scorer.read("expected.json"))
         manifest_bytes = runner.read("manifest.json")

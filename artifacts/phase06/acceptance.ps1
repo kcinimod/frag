@@ -5,17 +5,24 @@ param(
     [string]$SavedFreeze,
     [string]$SavedLive,
     [switch]$Continuation,
-    [string]$ContinuationRevision = 'HEAD'
+    [string]$ContinuationRevision = 'HEAD',
+    [switch]$FreshContinuation,
+    [string]$EvaluationRevision
 )
 
 $ErrorActionPreference = 'Stop'
-$Custody = if ($Custody) { $Custody } else { Join-Path $PSScriptRoot '../../../FRAG-SEC-Holdout-43' }
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $python = Join-Path $repo '.venv/Scripts/python.exe'
 $revision = '208cca1e410a0811cba600ad93753b53b42cc43a'
 $evaluation = 'af6f34eb8d10c7535d4a30e4b5bdf624e16becc5'
 $phase = 'artifacts/phase06'
 $runnerBundle = 'runner/inputs.zip'
+
+function Resolve-Custody([bool]$Fresh) {
+    if ($Custody) { return (Resolve-Path -LiteralPath $Custody).Path }
+    $number = if ($Fresh) { 54 } else { 43 }
+    return (Resolve-Path -LiteralPath "$repo/../FRAG-SEC-Holdout-$number").Path
+}
 
 function Invoke-CheckedPython {
     & $python @args
@@ -29,6 +36,14 @@ function Export-Snapshot($Commit, $Archive, $Directory, $Paths) {
 }
 
 if ($Mode -eq 'Freeze') {
+    if ($FreshContinuation) {
+        if ($Continuation -or $ContinuationRevision -notmatch '^[0-9a-f]{40}$') {
+            throw 'Specify the committed production revision as a full SHA with -ContinuationRevision.'
+        }
+        if ($EvaluationRevision -notmatch '^[0-9a-f]{40}$') {
+            throw 'Specify the committed evaluation revision as a full SHA with -EvaluationRevision.'
+        }
+    }
     $session = (New-Item -ItemType Directory -Path $Destination).FullName
     $paths = @('src', 'scripts', 'pyproject.toml', 'uv.lock',
         'artifacts/phase04/SEC_ACCEPTANCE_PROTOCOL.md', 'artifacts/phase04/sec-holdout-receipt.json',
@@ -43,18 +58,36 @@ if ($Mode -eq 'Freeze') {
         if ($LASTEXITCODE -ne 0) { throw 'Could not identify the committed continuation revision.' }
         $evaluation = $revision
     }
+    if ($FreshContinuation) {
+        $revision = $ContinuationRevision
+        $evaluation = $EvaluationRevision
+        $paths += @("$phase/continuation-holdout-receipt.json", "$phase/continuation-opened-score.json")
+    }
     foreach ($role in @('runner', 'scoring')) {
         Export-Snapshot $revision "$session/$role-production.zip" "$session/$role" $paths
         $files = @(if ($role -eq 'runner') { 'fresh_run.py', 'FRESH_PROTOCOL.md', 'acceptance.ps1' } else { 'fresh_score.py' })
-        if ($Continuation) {
+        if ($Continuation -or $FreshContinuation) {
             $files += 'exact_replay.py'
             $files += if ($role -eq 'runner') { 'EXACT_REPLAY.md' } else { 'fresh_score_v2.py' }
+        }
+        if ($FreshContinuation) {
+            $files += if ($role -eq 'runner') { 'CONTINUATION_PROTOCOL.md' } else { 'verify_continuation_custody.py' }
         }
         $evaluationPaths = @($files | ForEach-Object { "$phase/$_" })
         Export-Snapshot $evaluation "$session/$role-evaluation.zip" "$session/$role" $evaluationPaths
     }
     $runner = "$session/runner"
+    if ($FreshContinuation) {
+        $custodyRoot = Resolve-Custody $true
+        Invoke-CheckedPython "$session/scoring/$phase/verify_continuation_custody.py" $repo $revision $evaluation $custodyRoot $runner
+    }
     if ($SavedFreeze) {
+        if ($FreshContinuation) {
+            $frozen = Get-Content -Raw -LiteralPath $SavedFreeze | ConvertFrom-Json
+            if ($frozen.continuation_audit_sha256 -ne (Get-FileHash "$runner/continuation-audit.json").Hash) {
+                throw 'The retained freeze differs from the verified continuation snapshot.'
+            }
+        }
         Copy-Item -LiteralPath $SavedFreeze -Destination "$runner/freeze.json"
     } else {
         $model = (New-Item -ItemType Directory -Path "$runner/model").FullName
@@ -69,10 +102,22 @@ $session = (Resolve-Path -LiteralPath $Destination).Path
 $runner = "$session/runner"
 $freeze = "$runner/freeze.json"
 $inputs = "$runner/inputs.zip"
+$fresh = Test-Path -LiteralPath "$runner/continuation-audit.json" -PathType Leaf
 if ($Mode -eq 'Live' -or $Mode -eq 'Replay') {
     if (-not (Test-Path -LiteralPath $freeze -PathType Leaf)) { throw 'Freeze the workspace before releasing inputs.' }
     if (-not (Test-Path -LiteralPath $inputs -PathType Leaf)) {
-        Copy-Item -LiteralPath (Join-Path $Custody $runnerBundle) -Destination $inputs
+        $custodyRoot = Resolve-Custody $fresh
+        if ($fresh) {
+            $frozen = Get-Content -Raw -LiteralPath $freeze | ConvertFrom-Json
+            if ($frozen.continuation_audit_sha256 -ne (Get-FileHash "$runner/continuation-audit.json").Hash) {
+                throw 'The freeze differs from the verified continuation snapshot.'
+            }
+            $runnerBundle = $frozen.receipt.runner_bundle.path
+            if ((Get-FileHash -LiteralPath (Join-Path $custodyRoot $runnerBundle)).Hash -ne $frozen.receipt.runner_bundle.sha256) {
+                throw 'The runner archive differs from the frozen seal.'
+            }
+        }
+        Copy-Item -LiteralPath (Join-Path $custodyRoot $runnerBundle) -Destination $inputs
     }
     $program = "$runner/$phase/fresh_run.py"
     if ($Mode -eq 'Live') {
@@ -84,12 +129,14 @@ if ($Mode -eq 'Live' -or $Mode -eq 'Replay') {
             $unpack = 'import gzip, pathlib, sys; pathlib.Path(sys.argv[2]).write_bytes(gzip.decompress(pathlib.Path(sys.argv[1]).read_bytes()))'
             Invoke-CheckedPython -c $unpack $SavedLive $live
         }
-        Invoke-CheckedPython $program replay $freeze --inputs $inputs --work "$runner/replay" --saved-run $live
+        & $python $program replay $freeze --inputs $inputs --work "$runner/replay" --saved-run $live
+        if ($fresh -and $LASTEXITCODE -eq 2 -and (Test-Path -LiteralPath "$runner/replay/report.json")) { exit 2 }
+        if ($LASTEXITCODE -ne 0) { throw "Replay failed ($LASTEXITCODE)." }
     }
     return
 }
 
-$expected = (Resolve-Path -LiteralPath (Join-Path $Custody 'scorer/expected.zip')).Path
+$expected = (Resolve-Path -LiteralPath (Join-Path (Resolve-Custody $fresh) 'scorer/expected.zip')).Path
 if ($expected.StartsWith("$runner\", [StringComparison]::OrdinalIgnoreCase)) {
     throw 'The scorer archive must remain outside the runner workspace.'
 }

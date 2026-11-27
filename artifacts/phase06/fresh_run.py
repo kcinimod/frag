@@ -32,10 +32,12 @@ SCORING_FILES = (
 
 def configuration() -> dict:
     config = settings(None)
-    receipt_path = PHASE / "sec-holdout-receipt.json"
+    audit_path = ROOT / "continuation-audit.json"
+    fresh_continuation = audit_path.is_file()
+    receipt_path = PHASE / ("continuation-holdout-receipt.json" if fresh_continuation else "sec-holdout-receipt.json")
     receipt = read_json(receipt_path)
-    gate = PHASE / "gate-score.json"
-    layout = PHASE / "DEVELOPMENT_LAYOUTS.md"
+    gate = ROOT / receipt.get("development_gate_record_path", "artifacts/phase06/gate-score.json")
+    layout = ROOT / receipt.get("development_layout_inventory_path", "artifacts/phase06/DEVELOPMENT_LAYOUTS.md")
     if (digest(gate) != receipt["development_gate_record_sha256"] or not read_json(gate)["passed"]
             or digest(layout) != receipt["development_layout_inventory_sha256"]):
         raise ValueError("The required development gate or layout inventory differs from the custody receipt.")
@@ -48,8 +50,21 @@ def configuration() -> dict:
                  PHASE / "acceptance.ps1", receipt_path, gate, layout, historical, ROOT / "artifacts/phase05/custody.json",
                  ROOT / "artifacts/phase05/holdout.py"):
         config["files"][name.relative_to(ROOT).as_posix()] = digest(name)
+    continuation = {}
+    if fresh_continuation:
+        audit = read_json(audit_path)
+        if not audit["passed"] or audit["receipt_sha256"] != digest(receipt_path):
+            raise ValueError("The continuation audit must confirm the receipt before release.")
+        protocol = PHASE / "CONTINUATION_PROTOCOL.md"
+        config["files"][protocol.relative_to(ROOT).as_posix()] = digest(protocol)
+        continuation = {
+            "continuation_audit_sha256": digest(audit_path),
+            "production_revision": audit["production_revision"],
+            "evaluation_revision": audit["evaluation_revision"],
+        }
+    gate_revision = receipt["preparation_base"] if fresh_continuation else GATE_PRODUCTION
     return {
-        **config, "replay_protocol": "complete-payloads", "development_gate_revision": GATE_PRODUCTION,
+        **config, **continuation, "replay_protocol": "complete-payloads", "development_gate_revision": gate_revision,
         "thresholds_per_pass": {"supported_answers": 11, "grounded_abstentions": 3, "exact_replay": 15},
         "receipt": receipt, "runtime_files": baseline["runtime_files"], "port": baseline["port"],
     }
@@ -105,8 +120,11 @@ def main() -> int:
         if any(digest(args.scoring / name) != config["files"][name]
                for name in config["files"] if name.startswith("src/")):
             parser.error("Scorer's production utilities differ from the runner snapshot.")
+        scoring_files = SCORING_FILES
+        if "continuation_audit_sha256" in config:
+            scoring_files += ("artifacts/phase06/verify_continuation_custody.py",)
         write_json(args.freeze, {
-            **config, "scoring_files": {name: digest(args.scoring / name) for name in SCORING_FILES},
+            **config, "scoring_files": {name: digest(args.scoring / name) for name in scoring_files},
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "platform": platform.platform(), "cpu": platform.processor(),
             "gpu_sampler": subprocess.check_output(["where.exe", "nvidia-smi.exe"], text=True).splitlines()[0],

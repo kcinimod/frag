@@ -58,6 +58,19 @@ write_json(Path("live.json"), {
 """
 
 
+def test_fresh_continuation_freeze_requires_an_explicit_evaluation_revision(tmp_path: Path) -> None:
+    destination = tmp_path / "session"
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-File", str(ROOT / PHASE / "acceptance.ps1"),
+         "-Mode", "Freeze", "-Destination", str(destination), "-FreshContinuation",
+         "-ContinuationRevision", "a" * 40],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert result.returncode != 0
+    assert "Specify the committed evaluation revision" in result.stderr
+    assert not destination.exists()
+
+
 @pytest.fixture
 def cohort(tmp_path: Path) -> tuple[Path, Path, dict[str, Any]]:
     snapshot = tmp_path / "runner"
