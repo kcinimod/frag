@@ -229,3 +229,9 @@ Phase 2 calculator and its offline results.
   observations. The FY2024 lookups and the FY2023 to FY2024 reported growth
   comparisons reproduced offline with their original citation responses.
   [Ford, McDonald’s, and Disney validation](../artifacts/phase06/FORD_MCDONALDS_DISNEY_REVENUE.md)
+
+- Issue #51 adds a corrected evidence scorer for the retained Phase 6
+  reports. Both passes credit the Netflix period inventory and record
+  separate incomplete findings for its missing companion and NVIDIA's
+  extraction stop. The retained acceptance decision still fails.
+  [Scoring revision](../artifacts/phase06/SCORING_REVISION.md)
