@@ -1,14 +1,19 @@
 param(
     [Parameter(Mandatory)][string]$Destination,
     [string]$Custody = (Join-Path $PSScriptRoot '../../../FRAG-SEC-Holdout-32'),
-    [switch]$ReplayRetained
+    [switch]$ReplayRetained,
+    [string]$Revision
 )
 
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $custody = (Resolve-Path -LiteralPath $Custody).Path
 $python = Join-Path $repo '.venv/Scripts/python.exe'
-$revision = 'd5ea2c36af63bb64b30721ceb94cb26236dc4b0a'
+$historicalRevision = 'd5ea2c36af63bb64b30721ceb94cb26236dc4b0a'
+if (-not $Revision) { $Revision = $historicalRevision }
+if ($ReplayRetained -and $Revision -ne $historicalRevision) {
+    throw 'The retained #42 run requires its original production revision.'
+}
 $snapshot = (New-Item -ItemType Directory -Path $Destination).FullName
 $paths = @('src', 'scripts', 'pyproject.toml', 'uv.lock', 'artifacts/phase01', 'artifacts/phase02',
     'artifacts/phase03', 'artifacts/phase04', 'artifacts/phase05', 'artifacts/phase06', 'tests', 'web')

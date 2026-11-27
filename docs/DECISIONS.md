@@ -444,3 +444,11 @@ verify equality independently. Treat missing payloads and replay
 differences as blocking findings. Preserve the #44 workflow by exporting
 its evaluator and production snapshots from their pinned commits.
 [Exact offline replay](../artifacts/phase06/EXACT_REPLAY.md)
+
+### Review enclosing citation spans for the opened cohort (#53)
+
+Bind the reviewed citation excerpts to the sealed scorer archive and the
+original filing bytes. Each added span must enclose the sealed disclosure
+it supports. Use this separate review and the stricter development gate
+only for the opened #44 cohort.
+[Opened-cohort gate and citation review](../artifacts/phase06/CONTINUATION_GATE.md)

@@ -199,6 +199,21 @@ def test_acceptance_replay_and_score_require_complete_payload_equality(
     assert score["warm"]["metrics"]["offline_replay"] == [2, 2]
     assert ("offline_replay_mismatch" in score["cold"]["cases"][changed_case]["findings"]) is (fault is not None)
 
+    if fault is None:
+        review = expected.with_name("unapproved-review.json")
+        review.write_text(json.dumps({
+            "scorer_bundle_sha256": sha256(expected.read_bytes()).hexdigest(), "sources": {},
+        }), encoding="utf-8")
+        unapproved_score = snapshot / "unapproved-score.json"
+        rejected = subprocess.run(
+            [sys.executable, str(ROOT / PHASE / "fresh_score_v2.py"), str(freeze_path),
+             str(snapshot / "inputs.zip"), str(expected), str(live_path), str(replay_file), str(unapproved_score),
+             "--reviewed-citations", str(review)], cwd=snapshot, capture_output=True, text=True,
+        )
+        assert rejected.returncode != 0
+        assert "Citation review differs from the pinned opened #44 review" in rejected.stderr
+        assert not unapproved_score.exists()
+
 
 @pytest.mark.parametrize(
     ("error", "status"),

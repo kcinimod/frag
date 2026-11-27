@@ -4,7 +4,8 @@ param(
     [string]$Custody,
     [string]$SavedFreeze,
     [string]$SavedLive,
-    [switch]$Continuation
+    [switch]$Continuation,
+    [string]$ContinuationRevision = 'HEAD'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,7 +39,7 @@ if ($Mode -eq 'Freeze') {
         "$phase/sec-holdout-receipt.json", "$phase/DEVELOPMENT_LAYOUTS.md", "$phase/gate-score.json",
         "$phase/development_score.py", "$phase/revenue_score.py", "$phase/observations.py")
     if ($Continuation) {
-        $revision = git -C $repo rev-parse HEAD
+        $revision = git -C $repo rev-parse --verify "$ContinuationRevision^{commit}"
         if ($LASTEXITCODE -ne 0) { throw 'Could not identify the committed continuation revision.' }
         $evaluation = $revision
     }

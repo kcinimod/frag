@@ -1,0 +1,107 @@
+{
+  "scorer_bundle_sha256": "2140f69d74b6546ef4bfdc0942b6e6bbd138db8d2e638150f5f54878f2c3372e",
+  "sources": {
+    "0000027419-24-000032": {
+      "Consolidation": {
+        "end_byte": 1070916,
+        "sha256": "10540e64092d97a0535ca796623c7b786e375e961400426ac113e37170fc3c3e",
+        "start_byte": 1070261
+      },
+      "Fiscal year": {
+        "end_byte": 1072553,
+        "sha256": "32bc6e069e6533e9ed6124d8b8828e3e4e8c75c1dffe2855dfb40826e84df79e",
+        "start_byte": 1071837
+      },
+      "Revenues": {
+        "end_byte": 1108346,
+        "sha256": "80f43659fc5791ad39dbc24ed01bc7f746eb8a9040c53acdfd391f458f7d04b4",
+        "start_byte": 1077977
+      }
+    },
+    "0000037996-25-000013": {
+      "Note 4: Revenue": {
+        "end_byte": 3069257,
+        "sha256": "d9e16964cd4c8ac41ce704b5b7e77f9dbcc4d2afd5596c2d40c9f4590e529d6b",
+        "start_byte": 3029098
+      },
+      "Presentation": {
+        "end_byte": 2931658,
+        "sha256": "235e7590a41d3e3d0bb1b394b3c1861e3d5d137a39b664bf8fea77306cad12a3",
+        "start_byte": 2930348
+      },
+      "Presentation and reclassifications": {
+        "end_byte": 2931658,
+        "sha256": "235e7590a41d3e3d0bb1b394b3c1861e3d5d137a39b664bf8fea77306cad12a3",
+        "start_byte": 2930348
+      }
+    },
+    "0000063908-25-000012": {
+      "Consolidation": {
+        "end_byte": 1280523,
+        "sha256": "58ca95472c2d7a3656416af39d5a58ea37735917b3c9ed03320c3f71f65e35d8",
+        "start_byte": 1278467
+      },
+      "Revenue recognition": {
+        "end_byte": 1289779,
+        "sha256": "2d52d857d61cb29a14fec0ec7dd21dcd58374cf9ff10ce7188521ff4e75622c0",
+        "start_byte": 1287585
+      },
+      "Revenue sources": {
+        "end_byte": 1289779,
+        "sha256": "2d52d857d61cb29a14fec0ec7dd21dcd58374cf9ff10ce7188521ff4e75622c0",
+        "start_byte": 1287585
+      }
+    },
+    "0001045810-25-000023": {
+      "Fiscal year": {
+        "end_byte": 1072467,
+        "sha256": "09209249d535ab7c57402878b2d721d4a697987b3e8a805225c92cef48cabf78",
+        "start_byte": 1071975
+      },
+      "Principles of consolidation": {
+        "end_byte": 1073158,
+        "sha256": "2e579f9e03d5d457879d42f3b8b209da6bcbaf867c622d382dcf0b19a45844fd",
+        "start_byte": 1072584
+      },
+      "Revenue recognition": {
+        "end_byte": 1076010,
+        "sha256": "6dbe739fc8fca9c64ce43e2359f59fb22e65b07bad20b976c766c141c4e21a96",
+        "start_byte": 1074733
+      }
+    },
+    "0001065280-25-000044": {
+      "Basis of presentation": {
+        "end_byte": 1013460,
+        "sha256": "bb604021ca87a9fb1f282f6d4e8c7cea1ece38bd90fd675aa70176590712ee27",
+        "start_byte": 1012570
+      },
+      "Revenue recognition": {
+        "end_byte": 1032530,
+        "sha256": "a9da3e9cae27fdad094837cf20f2a623a7add7bc9a8bb881015b09b948171f1e",
+        "start_byte": 1030218
+      }
+    },
+    "0001744489-24-000276": {
+      "Comparative presentation": {
+        "end_byte": 2566658,
+        "sha256": "7d8decf801b869e89e38bd7dc7680554451a795e6f61e6fd3bd2e1b2a4a4c987",
+        "start_byte": 2566132
+      },
+      "Fiscal year": {
+        "end_byte": 2565995,
+        "sha256": "db29188c21c6d928723500c86806b3a5345eafa6e8d44842e50fa0ab6023a473",
+        "start_byte": 2565265
+      },
+      "Principles of consolidation": {
+        "end_byte": 2563724,
+        "sha256": "de79dd4f5248fc60d3fe981082e67ce45fdac4d0a8800640c06cb9fad170440d",
+        "start_byte": 2563109
+      },
+      "Revenue recognition": {
+        "end_byte": 2579022,
+        "sha256": "39b56e18b90cafa938b69c9870c55abe83ab4ba8c5c600222f793cb5fc563cfb",
+        "start_byte": 2577802
+      }
+    }
+  }
+}

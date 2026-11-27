@@ -1,0 +1,5753 @@
+{
+  "binding": {
+    "freeze_sha256": "45c94ed9c94a1e5e85a5c7c3ac2e2f3168d8f01c8cf0b38798aaf72d520b286f",
+    "manifest_sha256": "e6102e562edd1af63d319acaff84df4dac4e4bf1cc39ad77f680d31182b64526",
+    "runner_sha256": "42a49717074b7f2eb299313e80e57bd2aed0ff810e24edb3b2cefc5351fcbceb"
+  },
+  "cold": {
+    "cases": [
+      {
+        "answer_accurate": true,
+        "case_id": "P6-01",
+        "citations_supported": true,
+        "elapsed_ms": 1869.645,
+        "eligible_fact_ids": [
+          "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true
+        },
+        "observations_verified": {
+          "2023": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2023?",
+        "source_id": "0000027419-24-000032",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-3-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-02",
+        "citations_supported": true,
+        "elapsed_ms": 6080.645,
+        "eligible_fact_ids": [
+          "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508",
+          "fact:b4af33787b9535a39b98ceb9b6fbc30afacacc1162a888a01bccf59784d92347"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2022": true,
+          "2023": true
+        },
+        "observations_verified": {
+          "2022": true,
+          "2023": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023 as reported?",
+        "source_id": "0000027419-24-000032",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-3-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-03",
+        "citations_supported": true,
+        "elapsed_ms": 1697.459,
+        "eligible_fact_ids": [
+          "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 3,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-consolidation",
+          "note-1-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-04",
+        "citations_supported": true,
+        "elapsed_ms": 5945.271,
+        "eligible_fact_ids": [
+          "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f",
+          "fact:41cde244269a7e2ff846cbd8107b451811a3942e6d0da13ecec981b3e04eeaf4"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001065280-25-000044",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-05",
+        "citations_supported": true,
+        "elapsed_ms": 1659.596,
+        "eligible_fact_ids": [
+          "fact:9502d4a73c0dfe387f96d0c2663e7b4079dabedb45bcc8e44a40901ccadd739b"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 3,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000037996-25-000013",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-presentation",
+          "note-4-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-06",
+        "citations_supported": true,
+        "elapsed_ms": 5781.865,
+        "eligible_fact_ids": [
+          "fact:9502d4a73c0dfe387f96d0c2663e7b4079dabedb45bcc8e44a40901ccadd739b",
+          "fact:6a63d14ee167ee45d297db1cebd2968ed77b63179180fd218cbc926222d0690b"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000037996-25-000013",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-presentation",
+          "note-4-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-07",
+        "citations_supported": true,
+        "elapsed_ms": 1914.283,
+        "eligible_fact_ids": [
+          "fact:1f418c4be33b10ae56d77a18bb47e4cd224ff7582350384e05a28f3018f6aa25"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2025": true
+        },
+        "observations_verified": {
+          "2025": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2025?",
+        "source_id": "0001045810-25-000023",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-comparative-presentation",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-1-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-08",
+        "citations_supported": true,
+        "elapsed_ms": 5935.32,
+        "eligible_fact_ids": [
+          "fact:1f418c4be33b10ae56d77a18bb47e4cd224ff7582350384e05a28f3018f6aa25",
+          "fact:c6d8d96a3d6e20fcdb55f2f708f115700a01480e065ae00fcc8748442d2aefdf"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true,
+          "2025": true
+        },
+        "observations_verified": {
+          "2024": true,
+          "2025": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 6,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2024 to FY2025 as reported?",
+        "source_id": "0001045810-25-000023",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-comparative-presentation",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-1-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-09",
+        "citations_supported": true,
+        "elapsed_ms": 1665.48,
+        "eligible_fact_ids": [
+          "fact:9509447c2c7db4a34e53fd21f4a28e77a45b2f95fad9278b5bbf944ca045e167"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 3,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000063908-25-000012",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-consolidation-and-presentation",
+          "note-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-10",
+        "citations_supported": true,
+        "elapsed_ms": 6000.533,
+        "eligible_fact_ids": [
+          "fact:9509447c2c7db4a34e53fd21f4a28e77a45b2f95fad9278b5bbf944ca045e167",
+          "fact:4a585af76f5f25c0b7d55330f8cfda7e8f6afb7a7e59a0bd14b2bda169cf93ec"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000063908-25-000012",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-consolidation-and-presentation",
+          "note-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-11",
+        "citations_supported": true,
+        "elapsed_ms": 1864.106,
+        "eligible_fact_ids": [
+          "fact:a39cf6161225ff5fb25d03b61aa8b850245833dd1ca87a740e8e498dcfb923e0"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001744489-24-000276",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-2-comparative-presentation",
+          "note-2-consolidation",
+          "note-2-fiscal-year",
+          "note-2-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-12",
+        "citations_supported": true,
+        "elapsed_ms": 6034.486,
+        "eligible_fact_ids": [
+          "fact:a39cf6161225ff5fb25d03b61aa8b850245833dd1ca87a740e8e498dcfb923e0",
+          "fact:0e56451adb80728902f9726fb05be87195eb1543529c2168fbf674d1d516df32"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 6,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001744489-24-000276",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-2-comparative-presentation",
+          "note-2-consolidation",
+          "note-2-fiscal-year",
+          "note-2-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-13",
+        "citations_supported": true,
+        "elapsed_ms": 38.61,
+        "eligible_fact_ids": [
+          "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "absent_year",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": true,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2021 to FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "unavailable",
+        "stop": {
+          "reasons": [
+            "absent"
+          ],
+          "stage": "statement_period_inventory"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-revenue",
+          "statement-periods"
+        ],
+        "supported_companions": [
+          "current"
+        ],
+        "validation_status": "unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-14",
+        "citations_supported": false,
+        "elapsed_ms": 38.997,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": true,
+        "expected_outcome": "present_unverifiable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": true,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [
+          "unsupported_observation",
+          "unsupported_observation",
+          "unsupported_observation"
+        ],
+        "missing_citations": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2018": true
+        },
+        "observations_verified": {
+          "2018": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "inline_xbrl_verification",
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2018?",
+        "source_id": "0001045810-18-000010",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "verification"
+        },
+        "supported_citation_ids": [],
+        "supported_companions": [],
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-15",
+        "citations_supported": true,
+        "elapsed_ms": 53.037,
+        "eligible_fact_ids": [
+          "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508",
+          "fact:b4af33787b9535a39b98ceb9b6fbc30afacacc1162a888a01bccf59784d92347"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "incompatible_periods",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": true,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2022": true,
+          "2023": true
+        },
+        "observations_verified": {
+          "2022": true,
+          "2023": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023? Compare equal-length fiscal periods only.",
+        "source_id": "0000027419-24-000032",
+        "status": "unavailable",
+        "stop": {
+          "reasons": [
+            "incompatible"
+          ],
+          "stage": "comparison_compatibility"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-3-revenue",
+          "prior"
+        ],
+        "supported_companions": [
+          "current",
+          "prior"
+        ],
+        "validation_status": "unavailable"
+      }
+    ],
+    "metrics": {
+      "accuracy": [
+        12,
+        12
+      ],
+      "citation_support_emitted": [
+        12,
+        12
+      ],
+      "coverage": [
+        12,
+        15
+      ],
+      "end_to_end": [
+        15,
+        15
+      ],
+      "grounded_abstentions": 3,
+      "incomplete_cases": 0,
+      "latency_ms": {
+        "max": 6080.645,
+        "median": 1869.645,
+        "min": 38.61
+      },
+      "offline_replay": [
+        15,
+        15
+      ],
+      "planner_calls": 12,
+      "supported_answers": 12,
+      "supported_citations": 61,
+      "supported_companions": 3,
+      "timed_cases": 15
+    },
+    "passed": true
+  },
+  "extraction_coverage": [
+    21,
+    21
+  ],
+  "historical_phase05": {
+    "accepted": false,
+    "cold": {
+      "findings": {
+        "contradicted_abstention": 4,
+        "unsupported_citation": 1,
+        "unsupported_partial": 2
+      },
+      "latency_ms": {
+        "max": 64.714,
+        "median": 17.172,
+        "min": 11.89
+      },
+      "metrics": {
+        "accuracy": [
+          0,
+          12
+        ],
+        "citation_support_emitted": [
+          0,
+          0
+        ],
+        "coverage": [
+          0,
+          15
+        ],
+        "end_to_end": [
+          1,
+          15
+        ],
+        "grounded_abstentions": 1,
+        "offline_replay": [
+          15,
+          15
+        ],
+        "supported_answers": 0
+      },
+      "stages": {
+        "complete": 1,
+        "extraction": 14
+      }
+    },
+    "peak_device_vram_mib": 0,
+    "peak_working_set_mib": {
+      "planner": 513.11,
+      "runner": 61.29
+    },
+    "warm": {
+      "findings": {
+        "contradicted_abstention": 4,
+        "unsupported_citation": 1,
+        "unsupported_partial": 2
+      },
+      "latency_ms": {
+        "max": 18.868,
+        "median": 14.727,
+        "min": 10.435
+      },
+      "metrics": {
+        "accuracy": [
+          0,
+          12
+        ],
+        "citation_support_emitted": [
+          0,
+          0
+        ],
+        "coverage": [
+          0,
+          15
+        ],
+        "end_to_end": [
+          1,
+          15
+        ],
+        "grounded_abstentions": 1,
+        "offline_replay": [
+          15,
+          15
+        ],
+        "supported_answers": 0
+      },
+      "stages": {
+        "complete": 1,
+        "extraction": 14
+      }
+    }
+  },
+  "live_sha256": "3c1dcd1fd12b968ff794a2642a14ca9cecdf285c71618cfb0e20d109e4bdb184",
+  "observations": [
+    {
+      "expected": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-11",
+        "currency": "USD",
+        "element_id": "f-46",
+        "fiscal_year": 2021,
+        "locators": {
+          "context": {
+            "end_byte": 10923,
+            "sha256": "74262af85f75d1918d22b63c836b42226b65c81b00c542c69d835a6802bb909f",
+            "start_byte": 10659
+          },
+          "inline_fact": {
+            "end_byte": 826290,
+            "sha256": "28e8a953b75b18d6d26b7aee8407c263c44364f522b0ffe6be1344487a7e6dad",
+            "start_byte": 826088
+          },
+          "period_cell": {
+            "end_byte": 819817,
+            "sha256": "3e77068d69fca49358a116efd77117163e4e837ca42bb42395dfa31381b55dc5",
+            "start_byte": 819585
+          },
+          "statement_cell": {
+            "end_byte": 826308,
+            "sha256": "f184d534a835dd83894a494175def7e2c71154121249634edc2b9982841a129c",
+            "start_byte": 825714
+          },
+          "unit": {
+            "end_byte": 7664,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 7588
+          }
+        },
+        "normalized_amount": "106005000000",
+        "period_days": 364,
+        "period_end": "2022-01-29",
+        "period_start": "2021-01-31",
+        "precision_decimals": -6,
+        "raw_amount": "106,005",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1070071,
+                "line": 5
+              },
+              "start": {
+                "character": 1069416,
+                "line": 5
+              }
+            },
+            "number": 1,
+            "title": "Consolidation"
+          },
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071708,
+                "line": 5
+              },
+              "start": {
+                "character": 1070992,
+                "line": 5
+              }
+            },
+            "number": 1,
+            "title": "Fiscal year"
+          },
+          {
+            "id": "note-3-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1107501,
+                "line": 5
+              },
+              "start": {
+                "character": 1077132,
+                "line": 5
+              }
+            },
+            "number": 3,
+            "title": "3. Revenues"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "TARGET CORPORATION",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:b13bf63b2cd6d11f31ad897e3712ddbd512256eafb88c6f6bba43ac2d23e147f",
+        "filing_date": "2024-03-13",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-11",
+          "fact_element_id": "f-46",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 1,
+            "character": 818017,
+            "column": 1,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          },
+          "currency_measure": {
+            "character": 6764,
+            "line": 5
+          },
+          "currency_symbol": {
+            "cell": 8,
+            "character": 820875,
+            "column": 10,
+            "line": 5,
+            "row": 3,
+            "table": 111
+          },
+          "inline_context": {
+            "character": 9814,
+            "line": 5
+          },
+          "inline_fact": {
+            "character": 825243,
+            "line": 5
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 823546,
+            "column": 1,
+            "line": 5,
+            "row": 5,
+            "table": 111
+          },
+          "statement_heading": {
+            "character": 817306,
+            "line": 5
+          },
+          "table": {
+            "character": 817583,
+            "line": 5,
+            "table": 111
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 818017,
+            "column": 1,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          },
+          "value": {
+            "cell": 6,
+            "character": 824997,
+            "column": 10,
+            "line": 5,
+            "row": 5,
+            "table": 111
+          },
+          "year_header": {
+            "cell": 4,
+            "character": 818740,
+            "column": 10,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenue",
+        "normalized_amount": "106005000000",
+        "parent_table_id": "sha256:f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167#table-111",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "106,005",
+        "reporting_period": {
+          "end": "2022-01-29",
+          "fiscal_year": 2021,
+          "kind": "annual",
+          "start": "2021-01-31"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+      "reusable_verification_matched": true,
+      "source_id": "0000027419-24-000032"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-10",
+        "currency": "USD",
+        "element_id": "f-45",
+        "fiscal_year": 2022,
+        "locators": {
+          "context": {
+            "end_byte": 10659,
+            "sha256": "c115aec754aa59226cfad9d46e625d4014ca89f2f7bfb85ede763c026d0c53ed",
+            "start_byte": 10395
+          },
+          "inline_fact": {
+            "end_byte": 825696,
+            "sha256": "84ac6e253d174037ebe898d48b5d0b49bfbe7b34ee8fc352a91f933aad8083c7",
+            "start_byte": 825494
+          },
+          "period_cell": {
+            "end_byte": 819585,
+            "sha256": "7fb4069b3347c93c1340fcd104bf6f61c3ea7cc2d57dd4876ae3fa58fb3faab8",
+            "start_byte": 819353
+          },
+          "statement_cell": {
+            "end_byte": 825714,
+            "sha256": "c3c6776c58d2dd21b563df32334f0126fa00d75dbb88b43673290f4c55eaea46",
+            "start_byte": 825120
+          },
+          "unit": {
+            "end_byte": 7664,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 7588
+          }
+        },
+        "normalized_amount": "109120000000",
+        "period_days": 364,
+        "period_end": "2023-01-28",
+        "period_start": "2022-01-30",
+        "precision_decimals": -6,
+        "raw_amount": "109,120",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1070071,
+                "line": 5
+              },
+              "start": {
+                "character": 1069416,
+                "line": 5
+              }
+            },
+            "number": 1,
+            "title": "Consolidation"
+          },
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071708,
+                "line": 5
+              },
+              "start": {
+                "character": 1070992,
+                "line": 5
+              }
+            },
+            "number": 1,
+            "title": "Fiscal year"
+          },
+          {
+            "id": "note-3-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1107501,
+                "line": 5
+              },
+              "start": {
+                "character": 1077132,
+                "line": 5
+              }
+            },
+            "number": 3,
+            "title": "3. Revenues"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "TARGET CORPORATION",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:b4af33787b9535a39b98ceb9b6fbc30afacacc1162a888a01bccf59784d92347",
+        "filing_date": "2024-03-13",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-10",
+          "fact_element_id": "f-45",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 1,
+            "character": 818017,
+            "column": 1,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          },
+          "currency_measure": {
+            "character": 6764,
+            "line": 5
+          },
+          "currency_symbol": {
+            "cell": 5,
+            "character": 820056,
+            "column": 7,
+            "line": 5,
+            "row": 3,
+            "table": 111
+          },
+          "inline_context": {
+            "character": 9550,
+            "line": 5
+          },
+          "inline_fact": {
+            "character": 824649,
+            "line": 5
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 823546,
+            "column": 1,
+            "line": 5,
+            "row": 5,
+            "table": 111
+          },
+          "statement_heading": {
+            "character": 817306,
+            "line": 5
+          },
+          "table": {
+            "character": 817583,
+            "line": 5,
+            "table": 111
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 818017,
+            "column": 1,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          },
+          "value": {
+            "cell": 4,
+            "character": 824403,
+            "column": 7,
+            "line": 5,
+            "row": 5,
+            "table": 111
+          },
+          "year_header": {
+            "cell": 3,
+            "character": 818508,
+            "column": 7,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenue",
+        "normalized_amount": "109120000000",
+        "parent_table_id": "sha256:f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167#table-111",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "109,120",
+        "reporting_period": {
+          "end": "2023-01-28",
+          "fiscal_year": 2022,
+          "kind": "annual",
+          "start": "2022-01-30"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+      "reusable_verification_matched": true,
+      "source_id": "0000027419-24-000032"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-44",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 7370,
+            "sha256": "ecaf1bdab7d048e612bd5d061f5d0904ae41a715c95dc247a6a8b97918d569da",
+            "start_byte": 7107
+          },
+          "inline_fact": {
+            "end_byte": 825102,
+            "sha256": "e6db4126c4fc179049573afa9915717b507b4eaa39d8b29bee386ab6671e0828",
+            "start_byte": 824901
+          },
+          "period_cell": {
+            "end_byte": 819353,
+            "sha256": "8cf72432e7e2fbacfafdb4d754ff3a7132ae051950c301445ba3ba18fa1dc302",
+            "start_byte": 819121
+          },
+          "statement_cell": {
+            "end_byte": 825120,
+            "sha256": "b1e9c4d1326a85a5db13d08323ead0f638f86af4edfe4d08338495bcd9c37f5b",
+            "start_byte": 824655
+          },
+          "unit": {
+            "end_byte": 7664,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 7588
+          }
+        },
+        "normalized_amount": "107412000000",
+        "period_days": 371,
+        "period_end": "2024-02-03",
+        "period_start": "2023-01-29",
+        "precision_decimals": -6,
+        "raw_amount": "107,412",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1070071,
+                "line": 5
+              },
+              "start": {
+                "character": 1069416,
+                "line": 5
+              }
+            },
+            "number": 1,
+            "title": "Consolidation"
+          },
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071708,
+                "line": 5
+              },
+              "start": {
+                "character": 1070992,
+                "line": 5
+              }
+            },
+            "number": 1,
+            "title": "Fiscal year"
+          },
+          {
+            "id": "note-3-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1107501,
+                "line": 5
+              },
+              "start": {
+                "character": 1077132,
+                "line": 5
+              }
+            },
+            "number": 3,
+            "title": "3. Revenues"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "TARGET CORPORATION",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508",
+        "filing_date": "2024-03-13",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-1",
+          "fact_element_id": "f-44",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 1,
+            "character": 818017,
+            "column": 1,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          },
+          "currency_measure": {
+            "character": 6764,
+            "line": 5
+          },
+          "currency_symbol": {
+            "cell": 2,
+            "character": 819237,
+            "column": 4,
+            "line": 5,
+            "row": 3,
+            "table": 111
+          },
+          "inline_context": {
+            "character": 6262,
+            "line": 5
+          },
+          "inline_fact": {
+            "character": 824056,
+            "line": 5
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 823546,
+            "column": 1,
+            "line": 5,
+            "row": 5,
+            "table": 111
+          },
+          "statement_heading": {
+            "character": 817306,
+            "line": 5
+          },
+          "table": {
+            "character": 817583,
+            "line": 5,
+            "table": 111
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 818017,
+            "column": 1,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          },
+          "value": {
+            "cell": 2,
+            "character": 823810,
+            "column": 4,
+            "line": 5,
+            "row": 5,
+            "table": 111
+          },
+          "year_header": {
+            "cell": 2,
+            "character": 818276,
+            "column": 4,
+            "line": 5,
+            "row": 2,
+            "table": 111
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenue",
+        "normalized_amount": "107412000000",
+        "parent_table_id": "sha256:f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167#table-111",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "107,412",
+        "reporting_period": {
+          "end": "2024-02-03",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2023-01-29"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "f97abecf1383588a8e8297f71b553be0e961bee30f334d4b874885906ae0c167",
+      "reusable_verification_matched": true,
+      "source_id": "0000027419-24-000032"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-22",
+        "currency": "USD",
+        "element_id": "f-122",
+        "fiscal_year": 2022,
+        "locators": {
+          "context": {
+            "end_byte": 13108,
+            "sha256": "633bdbfb8d03486da00b270f7e633ea84d74b61960e3cfc72bdb01888e399fd0",
+            "start_byte": 12844
+          },
+          "inline_fact": {
+            "end_byte": 738349,
+            "sha256": "a0411f9f75f73d07b64334f06e033f62e5a2995fece8e07d4e7b44a05c26ca7d",
+            "start_byte": 738186
+          },
+          "period_cell": {
+            "end_byte": 735664,
+            "sha256": "03c6f5987c9cf8db472381dc0f579933e14b2343d72fbbb65e29be68f6b0c26c",
+            "start_byte": 735355
+          },
+          "statement_cell": {
+            "end_byte": 738367,
+            "sha256": "ce1befaf567e5cebaee95f2caa6f27f95663a2343c84553bc01a643f3fab624c",
+            "start_byte": 737950
+          },
+          "unit": {
+            "end_byte": 4318,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 4242
+          }
+        },
+        "normalized_amount": "31615550000",
+        "period_days": 365,
+        "period_end": "2022-12-31",
+        "period_start": "2022-01-01",
+        "precision_decimals": -3,
+        "raw_amount": "31,615,550",
+        "scale": 1000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1012324,
+                "line": 8
+              },
+              "start": {
+                "character": 1011434,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Basis of Presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1031394,
+                "line": 8
+              },
+              "start": {
+                "character": 1029082,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "Netflix, Inc.",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:7c644adba032dcd932fc072a8ac39a09a75894bed2878f6a0d3267b26a002350",
+        "filing_date": "2025-01-27",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-22",
+          "fact_element_id": "f-122",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 3,
+            "character": 733031,
+            "column": 7,
+            "line": 8,
+            "row": 2,
+            "table": 33
+          },
+          "currency_measure": {
+            "character": 3127,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 11,
+            "character": 736558,
+            "column": 19,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "inline_context": {
+            "character": 11708,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 737050,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 734537,
+            "column": 1,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "statement_heading": {
+            "character": 731404,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 731230,
+            "line": 8
+          },
+          "table": {
+            "character": 731983,
+            "line": 8,
+            "table": 33
+          },
+          "unit_header": {
+            "character": 731617,
+            "line": 8,
+            "table": 33
+          },
+          "value": {
+            "cell": 12,
+            "character": 736814,
+            "column": 20,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "year_header": {
+            "cell": 7,
+            "character": 734287,
+            "column": 19,
+            "line": 8,
+            "row": 3,
+            "table": 33
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenues",
+        "normalized_amount": "31615550000",
+        "parent_table_id": "sha256:0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50#table-33",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "31,615,550",
+        "reporting_period": {
+          "end": "2022-12-31",
+          "fiscal_year": 2022,
+          "kind": "annual",
+          "start": "2022-01-01"
+        },
+        "scale": 1000,
+        "scope": "consolidated",
+        "source_id": "sha256:0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+      "reusable_verification_matched": true,
+      "source_id": "0001065280-25-000044"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-21",
+        "currency": "USD",
+        "element_id": "f-121",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 12844,
+            "sha256": "6822f7050b91b43876c3b3e756cdf83321993eff74473d1dbbf32e728109e00c",
+            "start_byte": 12580
+          },
+          "inline_fact": {
+            "end_byte": 737484,
+            "sha256": "c7536425b0ba33f1d74ddd4d6a3f58a3c68ffd49b94cd749732a728859fd92a5",
+            "start_byte": 737321
+          },
+          "period_cell": {
+            "end_byte": 735355,
+            "sha256": "2e6efac2d283f115d301a9993c64d562ce472220d7f61f689686718d35e1d326",
+            "start_byte": 735046
+          },
+          "statement_cell": {
+            "end_byte": 737502,
+            "sha256": "bef3cd9b65d94960450894a890ccf6e3a1d5e8242b72a150ff68f6d685ab3e24",
+            "start_byte": 737085
+          },
+          "unit": {
+            "end_byte": 4318,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 4242
+          }
+        },
+        "normalized_amount": "33723297000",
+        "period_days": 365,
+        "period_end": "2023-12-31",
+        "period_start": "2023-01-01",
+        "precision_decimals": -3,
+        "raw_amount": "33,723,297",
+        "scale": 1000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1012324,
+                "line": 8
+              },
+              "start": {
+                "character": 1011434,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Basis of Presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1031394,
+                "line": 8
+              },
+              "start": {
+                "character": 1029082,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "Netflix, Inc.",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:41cde244269a7e2ff846cbd8107b451811a3942e6d0da13ecec981b3e04eeaf4",
+        "filing_date": "2025-01-27",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-21",
+          "fact_element_id": "f-121",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 3,
+            "character": 733031,
+            "column": 7,
+            "line": 8,
+            "row": 2,
+            "table": 33
+          },
+          "currency_measure": {
+            "character": 3127,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 7,
+            "character": 735693,
+            "column": 13,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "inline_context": {
+            "character": 11444,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 736185,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 734537,
+            "column": 1,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "statement_heading": {
+            "character": 731404,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 731230,
+            "line": 8
+          },
+          "table": {
+            "character": 731983,
+            "line": 8,
+            "table": 33
+          },
+          "unit_header": {
+            "character": 731617,
+            "line": 8,
+            "table": 33
+          },
+          "value": {
+            "cell": 8,
+            "character": 735949,
+            "column": 14,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "year_header": {
+            "cell": 5,
+            "character": 733978,
+            "column": 13,
+            "line": 8,
+            "row": 3,
+            "table": 33
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenues",
+        "normalized_amount": "33723297000",
+        "parent_table_id": "sha256:0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50#table-33",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "33,723,297",
+        "reporting_period": {
+          "end": "2023-12-31",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2023-01-01"
+        },
+        "scale": 1000,
+        "scope": "consolidated",
+        "source_id": "sha256:0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+      "reusable_verification_matched": true,
+      "source_id": "0001065280-25-000044"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-120",
+        "fiscal_year": 2024,
+        "locators": {
+          "context": {
+            "end_byte": 5464,
+            "sha256": "fc5da75cb5420eb6cc8eaeb06ca478bd9326b61e1456936a81ca3e6594ac9efd",
+            "start_byte": 5201
+          },
+          "inline_fact": {
+            "end_byte": 736622,
+            "sha256": "638187f8bc1fa7f659165acdf821ec5a5c21c760b33aa5856deb3c3984113717",
+            "start_byte": 736460
+          },
+          "period_cell": {
+            "end_byte": 735046,
+            "sha256": "586c2d91e4505f9174cb0bfb5db92e3cbc95f1e00d7840f3dd4c4461995ac859",
+            "start_byte": 734766
+          },
+          "statement_cell": {
+            "end_byte": 736640,
+            "sha256": "3e9e789376bcba31f93f0ce4bc5c3e0c544da3a3498a030f85377d017afa8fa9",
+            "start_byte": 736227
+          },
+          "unit": {
+            "end_byte": 4318,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 4242
+          }
+        },
+        "normalized_amount": "39000966000",
+        "period_days": 366,
+        "period_end": "2024-12-31",
+        "period_start": "2024-01-01",
+        "precision_decimals": -3,
+        "raw_amount": "39,000,966",
+        "scale": 1000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1012324,
+                "line": 8
+              },
+              "start": {
+                "character": 1011434,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Basis of Presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1031394,
+                "line": 8
+              },
+              "start": {
+                "character": 1029082,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "Netflix, Inc.",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f",
+        "filing_date": "2025-01-27",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-1",
+          "fact_element_id": "f-120",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 3,
+            "character": 733031,
+            "column": 7,
+            "line": 8,
+            "row": 2,
+            "table": 33
+          },
+          "currency_measure": {
+            "character": 3127,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 3,
+            "character": 734838,
+            "column": 7,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "inline_context": {
+            "character": 4065,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 735324,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 734537,
+            "column": 1,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "statement_heading": {
+            "character": 731404,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 731230,
+            "line": 8
+          },
+          "table": {
+            "character": 731983,
+            "line": 8,
+            "table": 33
+          },
+          "unit_header": {
+            "character": 731617,
+            "line": 8,
+            "table": 33
+          },
+          "value": {
+            "cell": 4,
+            "character": 735091,
+            "column": 8,
+            "line": 8,
+            "row": 4,
+            "table": 33
+          },
+          "year_header": {
+            "cell": 3,
+            "character": 733669,
+            "column": 7,
+            "line": 8,
+            "row": 3,
+            "table": 33
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenues",
+        "normalized_amount": "39000966000",
+        "parent_table_id": "sha256:0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50#table-33",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "39,000,966",
+        "reporting_period": {
+          "end": "2024-12-31",
+          "fiscal_year": 2024,
+          "kind": "annual",
+          "start": "2024-01-01"
+        },
+        "scale": 1000,
+        "scope": "consolidated",
+        "source_id": "sha256:0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "0423b83b0effc4bb425abbe6966dda9a7a8cfb63af22704b84c79ab085f29c50",
+      "reusable_verification_matched": true,
+      "source_id": "0001065280-25-000044"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-18",
+        "currency": "USD",
+        "element_id": "f-78",
+        "fiscal_year": 2022,
+        "locators": {
+          "context": {
+            "end_byte": 20067,
+            "sha256": "16e4523d01c4ae8d815edb3af064eceb26aa7dc19fce1e63a06e1f9a4446e9f4",
+            "start_byte": 19803
+          },
+          "inline_fact": {
+            "end_byte": 2550043,
+            "sha256": "30e4453db1696f089180da70671b544c0b25542f00ccda39c76da66c1e340326",
+            "start_byte": 2549841
+          },
+          "period_cell": {
+            "end_byte": 2543360,
+            "sha256": "aa8919704f4feb253f573a693611cfb69d86a53cabdf7c9f3e545d80b3fb2980",
+            "start_byte": 2543129
+          },
+          "statement_cell": {
+            "end_byte": 2550061,
+            "sha256": "c75a1706a8b49cbb3cfa42a942aabf90181b424e9bfdcd3adf2bca31f8738891",
+            "start_byte": 2549599
+          },
+          "unit": {
+            "end_byte": 12983,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 12907
+          }
+        },
+        "normalized_amount": "158057000000",
+        "period_days": 365,
+        "period_end": "2022-12-31",
+        "period_start": "2022-01-01",
+        "precision_decimals": -6,
+        "raw_amount": "158,057",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2930528,
+                "line": 8
+              },
+              "start": {
+                "character": 2929218,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Presentation and reclassifications"
+          },
+          {
+            "id": "note-4-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 3068127,
+                "line": 8
+              },
+              "start": {
+                "character": 3027968,
+                "line": 8
+              }
+            },
+            "number": 4,
+            "title": "Revenue by source"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "Ford Motor Co",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:6accdf36fbedba056a2be8bcb1ccb2c81c63d31a3165a3a6088a69f1a5135db1",
+        "filing_date": "2025-02-06",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-18",
+          "fact_element_id": "f-78",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 2541555,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 77
+          },
+          "currency_measure": {
+            "character": 11798,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 2,
+            "character": 2543908,
+            "column": 4,
+            "line": 8,
+            "row": 5,
+            "table": 77
+          },
+          "inline_context": {
+            "character": 18673,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 2548711,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 2548209,
+            "column": 1,
+            "line": 8,
+            "row": 7,
+            "table": 77
+          },
+          "statement_heading": {
+            "character": 2540569,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 2540383,
+            "line": 8
+          },
+          "table": {
+            "character": 2540934,
+            "line": 8,
+            "table": 77
+          },
+          "unit_header": {
+            "character": 2540750,
+            "line": 8,
+            "table": 77
+          },
+          "value": {
+            "cell": 2,
+            "character": 2548469,
+            "column": 4,
+            "line": 8,
+            "row": 7,
+            "table": 77
+          },
+          "year_header": {
+            "cell": 2,
+            "character": 2541999,
+            "column": 4,
+            "line": 8,
+            "row": 3,
+            "table": 77
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues (Note 4)",
+        "normalized_amount": "158057000000",
+        "parent_table_id": "sha256:98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a#table-77",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "158,057",
+        "reporting_period": {
+          "end": "2022-12-31",
+          "fiscal_year": 2022,
+          "kind": "annual",
+          "start": "2022-01-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+      "reusable_verification_matched": true,
+      "source_id": "0000037996-25-000013"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-19",
+        "currency": "USD",
+        "element_id": "f-79",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 20331,
+            "sha256": "d0af2ef0ff089dffa4ec267be86d2887604bae934e2f395828bacf6f9ce570fe",
+            "start_byte": 20067
+          },
+          "inline_fact": {
+            "end_byte": 2550694,
+            "sha256": "18a2099efa29d990bb1e0f7117efab0b50ac09c6502dbfd689d257558f261c24",
+            "start_byte": 2550492
+          },
+          "period_cell": {
+            "end_byte": 2543659,
+            "sha256": "679f09c8e3d9ab08bde5da4a2fa762f87314d2a8c9082a214a232d3f6a8cb116",
+            "start_byte": 2543360
+          },
+          "statement_cell": {
+            "end_byte": 2550712,
+            "sha256": "ce9d4e00d77ce65b851a42db2bc6fe2d75d43fb623b0bd40743e8926e73191da",
+            "start_byte": 2550061
+          },
+          "unit": {
+            "end_byte": 12983,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 12907
+          }
+        },
+        "normalized_amount": "176191000000",
+        "period_days": 365,
+        "period_end": "2023-12-31",
+        "period_start": "2023-01-01",
+        "precision_decimals": -6,
+        "raw_amount": "176,191",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2930528,
+                "line": 8
+              },
+              "start": {
+                "character": 2929218,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Presentation and reclassifications"
+          },
+          {
+            "id": "note-4-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 3068127,
+                "line": 8
+              },
+              "start": {
+                "character": 3027968,
+                "line": 8
+              }
+            },
+            "number": 4,
+            "title": "Revenue by source"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "Ford Motor Co",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:6a63d14ee167ee45d297db1cebd2968ed77b63179180fd218cbc926222d0690b",
+        "filing_date": "2025-02-06",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-19",
+          "fact_element_id": "f-79",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 2541555,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 77
+          },
+          "currency_measure": {
+            "character": 11798,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 6,
+            "character": 2544703,
+            "column": 10,
+            "line": 8,
+            "row": 5,
+            "table": 77
+          },
+          "inline_context": {
+            "character": 18937,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 2549362,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 2548209,
+            "column": 1,
+            "line": 8,
+            "row": 7,
+            "table": 77
+          },
+          "statement_heading": {
+            "character": 2540569,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 2540383,
+            "line": 8
+          },
+          "table": {
+            "character": 2540934,
+            "line": 8,
+            "table": 77
+          },
+          "unit_header": {
+            "character": 2540750,
+            "line": 8,
+            "table": 77
+          },
+          "value": {
+            "cell": 5,
+            "character": 2549120,
+            "column": 10,
+            "line": 8,
+            "row": 7,
+            "table": 77
+          },
+          "year_header": {
+            "cell": 4,
+            "character": 2542298,
+            "column": 10,
+            "line": 8,
+            "row": 3,
+            "table": 77
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues (Note 4)",
+        "normalized_amount": "176191000000",
+        "parent_table_id": "sha256:98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a#table-77",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "176,191",
+        "reporting_period": {
+          "end": "2023-12-31",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2023-01-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+      "reusable_verification_matched": true,
+      "source_id": "0000037996-25-000013"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-80",
+        "fiscal_year": 2024,
+        "locators": {
+          "context": {
+            "end_byte": 13552,
+            "sha256": "e295d4670d3dd7f4f5dd3150570253e806eddb75265b79e86026bbae537af366",
+            "start_byte": 13289
+          },
+          "inline_fact": {
+            "end_byte": 2551344,
+            "sha256": "1bf02af219134b5ca4e54211f6a419123090e4c93a28ca83ad41f851ba6fb60b",
+            "start_byte": 2551143
+          },
+          "period_cell": {
+            "end_byte": 2543958,
+            "sha256": "5912e8edc25b32db211d4519fe65d58e7df274f7292bb8b85bbdf2af41022289",
+            "start_byte": 2543659
+          },
+          "statement_cell": {
+            "end_byte": 2551475,
+            "sha256": "7dfb107d7e646c3710c595608fab46c028f60b41b1ce4bac37a2486e2fc10d98",
+            "start_byte": 2550712
+          },
+          "unit": {
+            "end_byte": 12983,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 12907
+          }
+        },
+        "normalized_amount": "184992000000",
+        "period_days": 366,
+        "period_end": "2024-12-31",
+        "period_start": "2024-01-01",
+        "precision_decimals": -6,
+        "raw_amount": "184,992",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2930528,
+                "line": 8
+              },
+              "start": {
+                "character": 2929218,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Presentation and reclassifications"
+          },
+          {
+            "id": "note-4-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 3068127,
+                "line": 8
+              },
+              "start": {
+                "character": 3027968,
+                "line": 8
+              }
+            },
+            "number": 4,
+            "title": "Revenue by source"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "Ford Motor Co",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:9502d4a73c0dfe387f96d0c2663e7b4079dabedb45bcc8e44a40901ccadd739b",
+        "filing_date": "2025-02-06",
+        "inline_xbrl": {
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_id": "c-1",
+          "fact_element_id": "f-80",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 2541555,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 77
+          },
+          "currency_measure": {
+            "character": 11798,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 10,
+            "character": 2545498,
+            "column": 16,
+            "line": 8,
+            "row": 5,
+            "table": 77
+          },
+          "inline_context": {
+            "character": 12159,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 2550013,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 2548209,
+            "column": 1,
+            "line": 8,
+            "row": 7,
+            "table": 77
+          },
+          "statement_heading": {
+            "character": 2540569,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 2540383,
+            "line": 8
+          },
+          "table": {
+            "character": 2540934,
+            "line": 8,
+            "table": 77
+          },
+          "unit_header": {
+            "character": 2540750,
+            "line": 8,
+            "table": 77
+          },
+          "value": {
+            "cell": 8,
+            "character": 2549771,
+            "column": 16,
+            "line": 8,
+            "row": 7,
+            "table": 77
+          },
+          "year_header": {
+            "cell": 6,
+            "character": 2542597,
+            "column": 16,
+            "line": 8,
+            "row": 3,
+            "table": 77
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues (Note 4)",
+        "normalized_amount": "184992000000",
+        "parent_table_id": "sha256:98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a#table-77",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "184,992",
+        "reporting_period": {
+          "end": "2024-12-31",
+          "fiscal_year": 2024,
+          "kind": "annual",
+          "start": "2024-01-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "98225dcd75ba47bc984918fdddbcc42593a455186e23c30439db8607aa0a636a",
+      "reusable_verification_matched": true,
+      "source_id": "0000037996-25-000013"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-12",
+        "currency": "USD",
+        "element_id": "f-79",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 8158,
+            "sha256": "29fb3aae8ea96e5d13ebf40f0cc6eb76df1e3f147c21d0b13f100892ebe5957b",
+            "start_byte": 7894
+          },
+          "inline_fact": {
+            "end_byte": 775685,
+            "sha256": "e98b86ced3455745f134caddd4a60579dafe990de4a2d5e3784781e9d6946f33",
+            "start_byte": 775527
+          },
+          "period_cell": {
+            "end_byte": 773107,
+            "sha256": "200fabc5a5e5fc8992eedad44eef8efb24275b868ea5618add92914cbecb2647",
+            "start_byte": 772800
+          },
+          "statement_cell": {
+            "end_byte": 775703,
+            "sha256": "0e5f9e7ad98419ebff8c53879274e320706bc092b4ba8e07581dbbab536c1219",
+            "start_byte": 775297
+          },
+          "unit": {
+            "end_byte": 3330,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 3254
+          }
+        },
+        "normalized_amount": "26974000000",
+        "period_days": 364,
+        "period_end": "2023-01-29",
+        "period_start": "2022-01-31",
+        "precision_decimals": -6,
+        "raw_amount": "26,974",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071289,
+                "line": 8
+              },
+              "start": {
+                "character": 1070797,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Fiscal Year"
+          },
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071980,
+                "line": 8
+              },
+              "start": {
+                "character": 1071406,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-1-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1070282,
+                "line": 8
+              },
+              "start": {
+                "character": 1069998,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Comparative presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1074832,
+                "line": 8
+              },
+              "start": {
+                "character": 1073555,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "NVIDIA CORP",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:1ed7dbc7165f4cc9bc66797aa096f5394730379cbe3a6bd5ddd9a18167b883d1",
+        "filing_date": "2025-02-26",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-12",
+          "fact_element_id": "f-79",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 770756,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 22
+          },
+          "currency_measure": {
+            "character": 2097,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 10,
+            "character": 773869,
+            "column": 16,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "inline_context": {
+            "character": 6716,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 774349,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 771938,
+            "column": 1,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "statement_heading": {
+            "character": 769660,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 769469,
+            "line": 8
+          },
+          "table": {
+            "character": 770108,
+            "line": 8,
+            "table": 22
+          },
+          "unit_header": {
+            "character": 769849,
+            "line": 8,
+            "table": 22
+          },
+          "value": {
+            "cell": 11,
+            "character": 774119,
+            "column": 17,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "year_header": {
+            "cell": 6,
+            "character": 771687,
+            "column": 16,
+            "line": 8,
+            "row": 3,
+            "table": 22
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenue",
+        "normalized_amount": "26974000000",
+        "parent_table_id": "sha256:34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe#table-22",
+        "parser_version": "dated-columns-revenue-v1",
+        "raw_amount": "26,974",
+        "reporting_period": {
+          "end": "2023-01-29",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2022-01-31"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+      "reusable_verification_matched": true,
+      "source_id": "0001045810-25-000023"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-11",
+        "currency": "USD",
+        "element_id": "f-78",
+        "fiscal_year": 2024,
+        "locators": {
+          "context": {
+            "end_byte": 7894,
+            "sha256": "713089f47e92b41a4e6c24daf97264d37070bfa1c3f7c64d5a3f78cb54d702cb",
+            "start_byte": 7630
+          },
+          "inline_fact": {
+            "end_byte": 774838,
+            "sha256": "2979b1ba4140bed331f5a0a10516a5e6f01d6bbeb4c0aaf9f12c29699fb05568",
+            "start_byte": 774680
+          },
+          "period_cell": {
+            "end_byte": 772800,
+            "sha256": "70d77d32effdf8475155b555e7655bf10c4bd3b44df0198a6ddb3ed25b1c9bda",
+            "start_byte": 772493
+          },
+          "statement_cell": {
+            "end_byte": 774856,
+            "sha256": "c85ec02eea71042f7be90d763833cadda0eed6f5346c019eb7f0973118d9ded2",
+            "start_byte": 774450
+          },
+          "unit": {
+            "end_byte": 3330,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 3254
+          }
+        },
+        "normalized_amount": "60922000000",
+        "period_days": 364,
+        "period_end": "2024-01-28",
+        "period_start": "2023-01-30",
+        "precision_decimals": -6,
+        "raw_amount": "60,922",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071289,
+                "line": 8
+              },
+              "start": {
+                "character": 1070797,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Fiscal Year"
+          },
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071980,
+                "line": 8
+              },
+              "start": {
+                "character": 1071406,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-1-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1070282,
+                "line": 8
+              },
+              "start": {
+                "character": 1069998,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Comparative presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1074832,
+                "line": 8
+              },
+              "start": {
+                "character": 1073555,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "NVIDIA CORP",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:c6d8d96a3d6e20fcdb55f2f708f115700a01480e065ae00fcc8748442d2aefdf",
+        "filing_date": "2025-02-26",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-11",
+          "fact_element_id": "f-78",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 770756,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 22
+          },
+          "currency_measure": {
+            "character": 2097,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 6,
+            "character": 773022,
+            "column": 10,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "inline_context": {
+            "character": 6452,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 773502,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 771938,
+            "column": 1,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "statement_heading": {
+            "character": 769660,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 769469,
+            "line": 8
+          },
+          "table": {
+            "character": 770108,
+            "line": 8,
+            "table": 22
+          },
+          "unit_header": {
+            "character": 769849,
+            "line": 8,
+            "table": 22
+          },
+          "value": {
+            "cell": 7,
+            "character": 773272,
+            "column": 11,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "year_header": {
+            "cell": 4,
+            "character": 771380,
+            "column": 10,
+            "line": 8,
+            "row": 3,
+            "table": 22
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenue",
+        "normalized_amount": "60922000000",
+        "parent_table_id": "sha256:34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe#table-22",
+        "parser_version": "dated-columns-revenue-v1",
+        "raw_amount": "60,922",
+        "reporting_period": {
+          "end": "2024-01-28",
+          "fiscal_year": 2024,
+          "kind": "annual",
+          "start": "2023-01-30"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+      "reusable_verification_matched": true,
+      "source_id": "0001045810-25-000023"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-77",
+        "fiscal_year": 2025,
+        "locators": {
+          "context": {
+            "end_byte": 4157,
+            "sha256": "9f81105deae1fade3dc739c8f185503481c23f721507e62ecc15a717513f90ec",
+            "start_byte": 3894
+          },
+          "inline_fact": {
+            "end_byte": 773991,
+            "sha256": "86de4bbed6e030d836f0119ddc344c70099d2afcfae5af07f668e3bce966ae29",
+            "start_byte": 773833
+          },
+          "period_cell": {
+            "end_byte": 772493,
+            "sha256": "5158fabe4dc6274a2ed1e8ba721595fd52168201c712618931e5a43508bda8c8",
+            "start_byte": 772186
+          },
+          "statement_cell": {
+            "end_byte": 774009,
+            "sha256": "d95f6b4d9418c158aec1061e3bdda849ade735a8c53578c49d8713b2157f9ddd",
+            "start_byte": 773603
+          },
+          "unit": {
+            "end_byte": 3330,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 3254
+          }
+        },
+        "normalized_amount": "130497000000",
+        "period_days": 364,
+        "period_end": "2025-01-26",
+        "period_start": "2024-01-29",
+        "precision_decimals": -6,
+        "raw_amount": "130,497",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071289,
+                "line": 8
+              },
+              "start": {
+                "character": 1070797,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Fiscal Year"
+          },
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1071980,
+                "line": 8
+              },
+              "start": {
+                "character": 1071406,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-1-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1070282,
+                "line": 8
+              },
+              "start": {
+                "character": 1069998,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Comparative presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1074832,
+                "line": 8
+              },
+              "start": {
+                "character": 1073555,
+                "line": 8
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "NVIDIA CORP",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:1f418c4be33b10ae56d77a18bb47e4cd224ff7582350384e05a28f3018f6aa25",
+        "filing_date": "2025-02-26",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-1",
+          "fact_element_id": "f-77",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 770756,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 22
+          },
+          "currency_measure": {
+            "character": 2097,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 2,
+            "character": 772175,
+            "column": 4,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "inline_context": {
+            "character": 2716,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 772655,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 771938,
+            "column": 1,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "statement_heading": {
+            "character": 769660,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 769469,
+            "line": 8
+          },
+          "table": {
+            "character": 770108,
+            "line": 8,
+            "table": 22
+          },
+          "unit_header": {
+            "character": 769849,
+            "line": 8,
+            "table": 22
+          },
+          "value": {
+            "cell": 3,
+            "character": 772425,
+            "column": 5,
+            "line": 8,
+            "row": 4,
+            "table": 22
+          },
+          "year_header": {
+            "cell": 2,
+            "character": 771073,
+            "column": 4,
+            "line": 8,
+            "row": 3,
+            "table": 22
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenue",
+        "normalized_amount": "130497000000",
+        "parent_table_id": "sha256:34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe#table-22",
+        "parser_version": "dated-columns-revenue-v1",
+        "raw_amount": "130,497",
+        "reporting_period": {
+          "end": "2025-01-26",
+          "fiscal_year": 2025,
+          "kind": "annual",
+          "start": "2024-01-29"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "34447b87eb4fc6a3fb82d923d9ade7731fb4d20b50d2a710fc968cbd991554fe",
+      "reusable_verification_matched": true,
+      "source_id": "0001045810-25-000023"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-5",
+        "currency": "USD",
+        "element_id": "f-48",
+        "fiscal_year": 2022,
+        "locators": {
+          "context": {
+            "end_byte": 4967,
+            "sha256": "a48ef3d9f1e6d1ff67c3faf574e7e00cc6b4db52e7e10c52cfcd8e3ee661c27e",
+            "start_byte": 4704
+          },
+          "inline_fact": {
+            "end_byte": 942463,
+            "sha256": "0d673cd9b1f154f66600dcb12c2abf383840227c4445a472453cc2ff46b09c07",
+            "start_byte": 942306
+          },
+          "period_cell": {
+            "end_byte": 934161,
+            "sha256": "8a3f05de52a836087e92fe873dae8ca71282886bc0117da65f54a51c488be00b",
+            "start_byte": 933844
+          },
+          "statement_cell": {
+            "end_byte": 942481,
+            "sha256": "545446c631e660d37d5d17bde5e96032ecfc2543f7b2d776025173474678717d",
+            "start_byte": 941911
+          },
+          "unit": {
+            "end_byte": 3252,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 3176
+          }
+        },
+        "normalized_amount": "23183000000",
+        "period_days": 365,
+        "period_end": "2022-12-31",
+        "period_start": "2022-01-01",
+        "precision_decimals": -6,
+        "raw_amount": "23,183",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-consolidation-and-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1279417,
+                "line": 8
+              },
+              "start": {
+                "character": 1277361,
+                "line": 8
+              }
+            },
+            "number": null,
+            "title": "Consolidation and rounding presentation"
+          },
+          {
+            "id": "note-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1288673,
+                "line": 8
+              },
+              "start": {
+                "character": 1286479,
+                "line": 8
+              }
+            },
+            "number": null,
+            "title": "REVENUE RECOGNITION"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "McDONALD\u2019S CORPORATION",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:0cf77525b60749598d28c353ed473511d8bb9e045d9316ce20a1c45b8cbc8491",
+        "filing_date": "2025-02-25",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-5",
+          "fact_element_id": "f-48",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 931980,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          },
+          "currency_measure": {
+            "character": 2091,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 10,
+            "character": 935334,
+            "column": 19,
+            "line": 8,
+            "row": 4,
+            "table": 40
+          },
+          "inline_context": {
+            "character": 3598,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 941200,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 939474,
+            "column": 1,
+            "line": 8,
+            "row": 7,
+            "table": 40
+          },
+          "statement_heading": {
+            "character": 930713,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 929690,
+            "line": 8
+          },
+          "table": {
+            "character": 931050,
+            "line": 8,
+            "table": 40
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 931703,
+            "column": 1,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          },
+          "value": {
+            "cell": 8,
+            "character": 940978,
+            "column": 19,
+            "line": 8,
+            "row": 7,
+            "table": 40
+          },
+          "year_header": {
+            "cell": 6,
+            "character": 932806,
+            "column": 19,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues",
+        "normalized_amount": "23183000000",
+        "parent_table_id": "sha256:2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c#table-40",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "23,183",
+        "reporting_period": {
+          "end": "2022-12-31",
+          "fiscal_year": 2022,
+          "kind": "annual",
+          "start": "2022-01-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+      "reusable_verification_matched": true,
+      "source_id": "0000063908-25-000012"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-4",
+        "currency": "USD",
+        "element_id": "f-47",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 4704,
+            "sha256": "bdfa70835eeb1b5edd33ab19faf8a3e336387b5026887b9524917cdde5d1e6ad",
+            "start_byte": 4441
+          },
+          "inline_fact": {
+            "end_byte": 941893,
+            "sha256": "71f95162e3bcb6363707cfb06c0527612b574f746bfded2f6d63fb680431c52c",
+            "start_byte": 941736
+          },
+          "period_cell": {
+            "end_byte": 933844,
+            "sha256": "a974d6d91b80b1a003003bb1fd33a7d92ffd6972aab2aa87cfc6a712653eaffa",
+            "start_byte": 933527
+          },
+          "statement_cell": {
+            "end_byte": 941911,
+            "sha256": "c990beba1a0e267b9e0027d176016863ea4dcc9068fa68d13b7a5c9a2d88e9cd",
+            "start_byte": 941341
+          },
+          "unit": {
+            "end_byte": 3252,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 3176
+          }
+        },
+        "normalized_amount": "25494000000",
+        "period_days": 365,
+        "period_end": "2023-12-31",
+        "period_start": "2023-01-01",
+        "precision_decimals": -6,
+        "raw_amount": "25,494",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-consolidation-and-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1279417,
+                "line": 8
+              },
+              "start": {
+                "character": 1277361,
+                "line": 8
+              }
+            },
+            "number": null,
+            "title": "Consolidation and rounding presentation"
+          },
+          {
+            "id": "note-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1288673,
+                "line": 8
+              },
+              "start": {
+                "character": 1286479,
+                "line": 8
+              }
+            },
+            "number": null,
+            "title": "REVENUE RECOGNITION"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "McDONALD\u2019S CORPORATION",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:4a585af76f5f25c0b7d55330f8cfda7e8f6afb7a7e59a0bd14b2bda169cf93ec",
+        "filing_date": "2025-02-25",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-4",
+          "fact_element_id": "f-47",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 931980,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          },
+          "currency_measure": {
+            "character": 2091,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 6,
+            "character": 934661,
+            "column": 13,
+            "line": 8,
+            "row": 4,
+            "table": 40
+          },
+          "inline_context": {
+            "character": 3335,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 940630,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 939474,
+            "column": 1,
+            "line": 8,
+            "row": 7,
+            "table": 40
+          },
+          "statement_heading": {
+            "character": 930713,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 929690,
+            "line": 8
+          },
+          "table": {
+            "character": 931050,
+            "line": 8,
+            "table": 40
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 931703,
+            "column": 1,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          },
+          "value": {
+            "cell": 5,
+            "character": 940408,
+            "column": 13,
+            "line": 8,
+            "row": 7,
+            "table": 40
+          },
+          "year_header": {
+            "cell": 4,
+            "character": 932489,
+            "column": 13,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues",
+        "normalized_amount": "25494000000",
+        "parent_table_id": "sha256:2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c#table-40",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "25,494",
+        "reporting_period": {
+          "end": "2023-12-31",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2023-01-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+      "reusable_verification_matched": true,
+      "source_id": "0000063908-25-000012"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-46",
+        "fiscal_year": 2024,
+        "locators": {
+          "context": {
+            "end_byte": 4005,
+            "sha256": "6c44e3676956ebcbb5dc73f6fa0f781c78f1a888e50c63f14050481909ddb9e8",
+            "start_byte": 3742
+          },
+          "inline_fact": {
+            "end_byte": 941209,
+            "sha256": "487e44486fb2717558d5321e3c974ee5ba2068c2a6e5cd8244972f9d44863280",
+            "start_byte": 941052
+          },
+          "period_cell": {
+            "end_byte": 933527,
+            "sha256": "32796cde4526d2abd277b95fa49589e29ef5333b3bcdd68149c21d81775e3bef",
+            "start_byte": 933086
+          },
+          "statement_cell": {
+            "end_byte": 941341,
+            "sha256": "35df0c889ca96b8d1723c9e3aa2d658e7d49ccc27065498e81f1b95a0271d4dd",
+            "start_byte": 940830
+          },
+          "unit": {
+            "end_byte": 3252,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 3176
+          }
+        },
+        "normalized_amount": "25920000000",
+        "period_days": 366,
+        "period_end": "2024-12-31",
+        "period_start": "2024-01-01",
+        "precision_decimals": -6,
+        "raw_amount": "25,920",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-consolidation-and-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1279417,
+                "line": 8
+              },
+              "start": {
+                "character": 1277361,
+                "line": 8
+              }
+            },
+            "number": null,
+            "title": "Consolidation and rounding presentation"
+          },
+          {
+            "id": "note-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1288673,
+                "line": 8
+              },
+              "start": {
+                "character": 1286479,
+                "line": 8
+              }
+            },
+            "number": null,
+            "title": "REVENUE RECOGNITION"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "McDONALD\u2019S CORPORATION",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:9509447c2c7db4a34e53fd21f4a28e77a45b2f95fad9278b5bbf944ca045e167",
+        "filing_date": "2025-02-25",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-1",
+          "fact_element_id": "f-46",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 931980,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          },
+          "currency_measure": {
+            "character": 2091,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 2,
+            "character": 933874,
+            "column": 7,
+            "line": 8,
+            "row": 4,
+            "table": 40
+          },
+          "inline_context": {
+            "character": 2636,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 939946,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 939474,
+            "column": 1,
+            "line": 8,
+            "row": 7,
+            "table": 40
+          },
+          "statement_heading": {
+            "character": 930713,
+            "line": 8
+          },
+          "statement_issuer": {
+            "character": 929690,
+            "line": 8
+          },
+          "table": {
+            "character": 931050,
+            "line": 8,
+            "table": 40
+          },
+          "unit_header": {
+            "cell": 1,
+            "character": 931703,
+            "column": 1,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          },
+          "value": {
+            "cell": 2,
+            "character": 939724,
+            "column": 7,
+            "line": 8,
+            "row": 7,
+            "table": 40
+          },
+          "year_header": {
+            "cell": 2,
+            "character": 931980,
+            "column": 7,
+            "line": 8,
+            "row": 2,
+            "table": 40
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues",
+        "normalized_amount": "25920000000",
+        "parent_table_id": "sha256:2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c#table-40",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "25,920",
+        "reporting_period": {
+          "end": "2024-12-31",
+          "fiscal_year": 2024,
+          "kind": "annual",
+          "start": "2024-01-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "2293f4c60bd1ba585abffc91a8f543621a196fad3d73f976fef0335757640b6c",
+      "reusable_verification_matched": true,
+      "source_id": "0000063908-25-000012"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-12",
+        "currency": "USD",
+        "element_id": "f-165",
+        "fiscal_year": 2022,
+        "locators": {
+          "context": {
+            "end_byte": 30948,
+            "sha256": "cdd423216c14613ce2a2a590e7133895e1fc4d44e56bff4ea3f284883b088a8a",
+            "start_byte": 30684
+          },
+          "inline_fact": {
+            "end_byte": 1895873,
+            "sha256": "d8239b0d20d2f370b985a30063720030f18b8a7c46fa46b053cf66238d44ad4f",
+            "start_byte": 1895714
+          },
+          "period_cell": {
+            "end_byte": 1887459,
+            "sha256": "5bdbf5b0e16a95572db3b4ba783ebd5ea2d28c7f53d4fd4f54d56d8b1a21a180",
+            "start_byte": 1887208
+          },
+          "statement_cell": {
+            "end_byte": 1895891,
+            "sha256": "36a89a86edac77eccf2876540e81465c073d26387c0cad8f73406ad676b9f9de",
+            "start_byte": 1895395
+          },
+          "unit": {
+            "end_byte": 26016,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 25940
+          }
+        },
+        "normalized_amount": "82722000000",
+        "period_days": 364,
+        "period_end": "2022-10-01",
+        "period_start": "2021-10-03",
+        "precision_decimals": -6,
+        "raw_amount": "82,722",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-2-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2562671,
+                "line": 8
+              },
+              "start": {
+                "character": 2562056,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-2-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 2564942,
+                "line": 8
+              },
+              "start": {
+                "character": 2564212,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Reporting Period"
+          },
+          {
+            "id": "note-2-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2565605,
+                "line": 8
+              },
+              "start": {
+                "character": 2565079,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Reclassifications"
+          },
+          {
+            "id": "note-2-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 2577969,
+                "line": 8
+              },
+              "start": {
+                "character": 2576749,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Revenue"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "WALT DISNEY CO/",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:05c0c4c56b495bed8211d912b14afa0868f54871e3c6fccdefa80d9b347a5ff8",
+        "filing_date": "2024-11-14",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-12",
+          "fact_element_id": "f-165",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 1885692,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 72
+          },
+          "currency_measure": {
+            "character": 24908,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 10,
+            "character": 1889253,
+            "column": 16,
+            "line": 8,
+            "row": 4,
+            "table": 72
+          },
+          "inline_context": {
+            "character": 29631,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 1894661,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 1892514,
+            "column": 1,
+            "line": 8,
+            "row": 6,
+            "table": 72
+          },
+          "statement_heading": {
+            "character": 1884547,
+            "line": 8
+          },
+          "table": {
+            "character": 1885072,
+            "line": 8,
+            "table": 72
+          },
+          "unit_header": {
+            "character": 1884741,
+            "line": 8,
+            "table": 72
+          },
+          "value": {
+            "cell": 8,
+            "character": 1894406,
+            "column": 16,
+            "line": 8,
+            "row": 6,
+            "table": 72
+          },
+          "year_header": {
+            "cell": 6,
+            "character": 1886194,
+            "column": 16,
+            "line": 8,
+            "row": 2,
+            "table": 72
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues",
+        "normalized_amount": "82722000000",
+        "parent_table_id": "sha256:8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316#table-72",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "82,722",
+        "reporting_period": {
+          "end": "2022-10-01",
+          "fiscal_year": 2022,
+          "kind": "annual",
+          "start": "2021-10-03"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+      "reusable_verification_matched": true,
+      "source_id": "0001744489-24-000276"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-8",
+        "currency": "USD",
+        "element_id": "f-164",
+        "fiscal_year": 2023,
+        "locators": {
+          "context": {
+            "end_byte": 29380,
+            "sha256": "df58e2efcbd3000126ad7e35da9614186a07829113f6fb440bb8c1092fce8e52",
+            "start_byte": 29117
+          },
+          "inline_fact": {
+            "end_byte": 1895116,
+            "sha256": "2787224460ea8c7829ee972e687a128b0955b9f6e0a28f9f39d7040931bbad63",
+            "start_byte": 1894958
+          },
+          "period_cell": {
+            "end_byte": 1887208,
+            "sha256": "4dd4e96965ab7221c09052d1a912e1bbed546f461ac9e355e0eb19ae6b6c51df",
+            "start_byte": 1886957
+          },
+          "statement_cell": {
+            "end_byte": 1895134,
+            "sha256": "c9ad9149ca8336587a54a77cb37c52999e4efd17e66e5e799f3c95dd664a1057",
+            "start_byte": 1894639
+          },
+          "unit": {
+            "end_byte": 26016,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 25940
+          }
+        },
+        "normalized_amount": "88898000000",
+        "period_days": 364,
+        "period_end": "2023-09-30",
+        "period_start": "2022-10-02",
+        "precision_decimals": -6,
+        "raw_amount": "88,898",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-2-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2562671,
+                "line": 8
+              },
+              "start": {
+                "character": 2562056,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-2-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 2564942,
+                "line": 8
+              },
+              "start": {
+                "character": 2564212,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Reporting Period"
+          },
+          {
+            "id": "note-2-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2565605,
+                "line": 8
+              },
+              "start": {
+                "character": 2565079,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Reclassifications"
+          },
+          {
+            "id": "note-2-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 2577969,
+                "line": 8
+              },
+              "start": {
+                "character": 2576749,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Revenue"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "WALT DISNEY CO/",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:0e56451adb80728902f9726fb05be87195eb1543529c2168fbf674d1d516df32",
+        "filing_date": "2024-11-14",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-8",
+          "fact_element_id": "f-164",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 1885692,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 72
+          },
+          "currency_measure": {
+            "character": 24908,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 6,
+            "character": 1888349,
+            "column": 10,
+            "line": 8,
+            "row": 4,
+            "table": 72
+          },
+          "inline_context": {
+            "character": 28064,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 1893905,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 1892514,
+            "column": 1,
+            "line": 8,
+            "row": 6,
+            "table": 72
+          },
+          "statement_heading": {
+            "character": 1884547,
+            "line": 8
+          },
+          "table": {
+            "character": 1885072,
+            "line": 8,
+            "table": 72
+          },
+          "unit_header": {
+            "character": 1884741,
+            "line": 8,
+            "table": 72
+          },
+          "value": {
+            "cell": 5,
+            "character": 1893650,
+            "column": 10,
+            "line": 8,
+            "row": 6,
+            "table": 72
+          },
+          "year_header": {
+            "cell": 4,
+            "character": 1885943,
+            "column": 10,
+            "line": 8,
+            "row": 2,
+            "table": 72
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues",
+        "normalized_amount": "88898000000",
+        "parent_table_id": "sha256:8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316#table-72",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "88,898",
+        "reporting_period": {
+          "end": "2023-09-30",
+          "fiscal_year": 2023,
+          "kind": "annual",
+          "start": "2022-10-02"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+      "reusable_verification_matched": true,
+      "source_id": "0001744489-24-000276"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": "c-1",
+        "currency": "USD",
+        "element_id": "f-163",
+        "fiscal_year": 2024,
+        "locators": {
+          "context": {
+            "end_byte": 27085,
+            "sha256": "868e6de9132bdcdb66e766ec2cb4557d34857726b64a1b666560d8536137122f",
+            "start_byte": 26822
+          },
+          "inline_fact": {
+            "end_byte": 1894237,
+            "sha256": "c85eb3703390ea13b750e7f7a0966e2f65627a3fa8e059ed45d040e988549e88",
+            "start_byte": 1894079
+          },
+          "period_cell": {
+            "end_byte": 1886957,
+            "sha256": "620cbef1c110da471e95ee40e56c9597d78723aa3a126bddc199c196e9430266",
+            "start_byte": 1886706
+          },
+          "statement_cell": {
+            "end_byte": 1894378,
+            "sha256": "45545be995e995c254b98ef6fc24a953523e796e6b8581fac7d41ec355e09340",
+            "start_byte": 1893824
+          },
+          "unit": {
+            "end_byte": 26016,
+            "sha256": "85566c0471d66a6a65161f62bd35a84da937efe9bc5974ff2a452eed5669f125",
+            "start_byte": 25940
+          }
+        },
+        "normalized_amount": "91361000000",
+        "period_days": 364,
+        "period_end": "2024-09-28",
+        "period_start": "2023-10-01",
+        "precision_decimals": -6,
+        "raw_amount": "91,361",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "inline_corroborated"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-2-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2562671,
+                "line": 8
+              },
+              "start": {
+                "character": 2562056,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-2-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 2564942,
+                "line": 8
+              },
+              "start": {
+                "character": 2564212,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Reporting Period"
+          },
+          {
+            "id": "note-2-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 2565605,
+                "line": 8
+              },
+              "start": {
+                "character": 2565079,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Reclassifications"
+          },
+          {
+            "id": "note-2-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 2577969,
+                "line": 8
+              },
+              "start": {
+                "character": 2576749,
+                "line": 8
+              }
+            },
+            "number": 2,
+            "title": "Revenue"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "WALT DISNEY CO/",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:a39cf6161225ff5fb25d03b61aa8b850245833dd1ca87a740e8e498dcfb923e0",
+        "filing_date": "2024-11-14",
+        "inline_xbrl": {
+          "concept": "us-gaap:Revenues",
+          "context_id": "c-1",
+          "fact_element_id": "f-163",
+          "unit_id": "usd"
+        },
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 1885692,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 72
+          },
+          "currency_measure": {
+            "character": 24908,
+            "line": 8
+          },
+          "currency_symbol": {
+            "cell": 2,
+            "character": 1887322,
+            "column": 4,
+            "line": 8,
+            "row": 4,
+            "table": 72
+          },
+          "inline_context": {
+            "character": 25769,
+            "line": 8
+          },
+          "inline_fact": {
+            "character": 1893026,
+            "line": 8
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 1892514,
+            "column": 1,
+            "line": 8,
+            "row": 6,
+            "table": 72
+          },
+          "statement_heading": {
+            "character": 1884547,
+            "line": 8
+          },
+          "table": {
+            "character": 1885072,
+            "line": 8,
+            "table": 72
+          },
+          "unit_header": {
+            "character": 1884741,
+            "line": 8,
+            "table": 72
+          },
+          "value": {
+            "cell": 2,
+            "character": 1892771,
+            "column": 4,
+            "line": 8,
+            "row": 6,
+            "table": 72
+          },
+          "year_header": {
+            "cell": 2,
+            "character": 1885692,
+            "column": 4,
+            "line": 8,
+            "row": 2,
+            "table": 72
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Total revenues",
+        "normalized_amount": "91361000000",
+        "parent_table_id": "sha256:8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316#table-72",
+        "parser_version": "shared-year-revenue-v1",
+        "raw_amount": "91,361",
+        "reporting_period": {
+          "end": "2024-09-28",
+          "fiscal_year": 2024,
+          "kind": "annual",
+          "start": "2023-10-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+        "status": "verified",
+        "unresolved_requirements": []
+      },
+      "original_sha256": "8de71657559a7c88576a064a4616e9edcecc0e5a439a11998c2d88be28daf316",
+      "reusable_verification_matched": true,
+      "source_id": "0001744489-24-000276"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": null,
+        "currency": "USD",
+        "element_id": null,
+        "fiscal_year": 2016,
+        "locators": {
+          "period_cell": {
+            "end_byte": 764215,
+            "sha256": "d79b7dc37a5ef0d10cd89efff55275462f8b851d9ba7268bab9d295f1f877f12",
+            "start_byte": 763883
+          },
+          "statement_cell": {
+            "end_byte": 766824,
+            "sha256": "e2e1aa54f40f53236dfe44e5750bd90b71d75fb66fbaa56d0a3b4a5c00446ca6",
+            "start_byte": 766585
+          }
+        },
+        "normalized_amount": "5010000000",
+        "period_days": 371,
+        "period_end": "2016-01-31",
+        "period_start": "2015-01-26",
+        "precision_decimals": -6,
+        "raw_amount": "5,010",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "provisional"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1213778,
+                "line": 15
+              },
+              "start": {
+                "character": 1213188,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Fiscal Year"
+          },
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1214916,
+                "line": 15
+              },
+              "start": {
+                "character": 1214298,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-1-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1214298,
+                "line": 15
+              },
+              "start": {
+                "character": 1214016,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Comparative presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1217600,
+                "line": 15
+              },
+              "start": {
+                "character": 1216176,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "NVIDIA Corporation",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:ccda323c091e9b8632d252b9879632734e0f1fabc2fb62c63a83aa31dbdd3d25",
+        "filing_date": "2018-02-28",
+        "inline_xbrl": null,
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 761856,
+            "column": 2,
+            "line": 15,
+            "row": 3,
+            "table": 90
+          },
+          "currency_symbol": {
+            "cell": 10,
+            "character": 765952,
+            "column": 10,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 763842,
+            "column": 1,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "statement_heading": {
+            "character": 760503,
+            "line": 15
+          },
+          "statement_issuer": {
+            "character": 760279,
+            "line": 15
+          },
+          "table": {
+            "character": 761117,
+            "line": 15,
+            "table": 90
+          },
+          "unit_header": {
+            "character": 760725,
+            "line": 15,
+            "table": 90
+          },
+          "value": {
+            "cell": 11,
+            "character": 766203,
+            "column": 11,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "year_header": {
+            "cell": 6,
+            "character": 763501,
+            "column": 10,
+            "line": 15,
+            "row": 4,
+            "table": 90
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenue",
+        "normalized_amount": "5010000000",
+        "parent_table_id": "sha256:d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544#table-90",
+        "parser_version": "dated-columns-revenue-v1",
+        "raw_amount": "5,010",
+        "reporting_period": {
+          "end": "2016-01-31",
+          "fiscal_year": 2016,
+          "kind": "annual",
+          "start": "2015-01-26"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+        "status": "provisional",
+        "unresolved_requirements": [
+          "source_identity_verification",
+          "inline_xbrl_verification"
+        ]
+      },
+      "original_sha256": "d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-18-000010"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": null,
+        "currency": "USD",
+        "element_id": null,
+        "fiscal_year": 2017,
+        "locators": {
+          "period_cell": {
+            "end_byte": 763659,
+            "sha256": "031f6c193fa233bead43a065f584aa604546020005cf24aadb3d98d551c8fac4",
+            "start_byte": 763327
+          },
+          "statement_cell": {
+            "end_byte": 765908,
+            "sha256": "4df4286fafa4739cef13a7bd7a225c0f922ec8c39a925476d7b808561095bff6",
+            "start_byte": 765669
+          }
+        },
+        "normalized_amount": "6910000000",
+        "period_days": 364,
+        "period_end": "2017-01-29",
+        "period_start": "2016-02-01",
+        "precision_decimals": -6,
+        "raw_amount": "6,910",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "provisional"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1213778,
+                "line": 15
+              },
+              "start": {
+                "character": 1213188,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Fiscal Year"
+          },
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1214916,
+                "line": 15
+              },
+              "start": {
+                "character": 1214298,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-1-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1214298,
+                "line": 15
+              },
+              "start": {
+                "character": 1214016,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Comparative presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1217600,
+                "line": 15
+              },
+              "start": {
+                "character": 1216176,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "NVIDIA Corporation",
+        "comparative": true,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:6dfe1898fc5cd90f063f7a66530185b0cc853271f82f5fa82468698f6200125f",
+        "filing_date": "2018-02-28",
+        "inline_xbrl": null,
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 761856,
+            "column": 2,
+            "line": 15,
+            "row": 3,
+            "table": 90
+          },
+          "currency_symbol": {
+            "cell": 6,
+            "character": 765036,
+            "column": 6,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 763842,
+            "column": 1,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "statement_heading": {
+            "character": 760503,
+            "line": 15
+          },
+          "statement_issuer": {
+            "character": 760279,
+            "line": 15
+          },
+          "table": {
+            "character": 761117,
+            "line": 15,
+            "table": 90
+          },
+          "unit_header": {
+            "character": 760725,
+            "line": 15,
+            "table": 90
+          },
+          "value": {
+            "cell": 7,
+            "character": 765287,
+            "column": 7,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "year_header": {
+            "cell": 4,
+            "character": 762945,
+            "column": 6,
+            "line": 15,
+            "row": 4,
+            "table": 90
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenue",
+        "normalized_amount": "6910000000",
+        "parent_table_id": "sha256:d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544#table-90",
+        "parser_version": "dated-columns-revenue-v1",
+        "raw_amount": "6,910",
+        "reporting_period": {
+          "end": "2017-01-29",
+          "fiscal_year": 2017,
+          "kind": "annual",
+          "start": "2016-02-01"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+        "status": "provisional",
+        "unresolved_requirements": [
+          "source_identity_verification",
+          "inline_xbrl_verification"
+        ]
+      },
+      "original_sha256": "d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-18-000010"
+    },
+    {
+      "expected": {
+        "concept": "us-gaap:Revenues",
+        "context_id": null,
+        "currency": "USD",
+        "element_id": null,
+        "fiscal_year": 2018,
+        "locators": {
+          "period_cell": {
+            "end_byte": 763103,
+            "sha256": "493fb9bc269806f79b712c8dab1a8fca3ad69c27f9a5765b026f8210b0581575",
+            "start_byte": 762771
+          },
+          "statement_cell": {
+            "end_byte": 764992,
+            "sha256": "964177947d6d90e1dc12119948601806a243cb0623f8bf83e84f0ddd7c56f443",
+            "start_byte": 764753
+          }
+        },
+        "normalized_amount": "9714000000",
+        "period_days": 364,
+        "period_end": "2018-01-28",
+        "period_start": "2017-01-30",
+        "precision_decimals": -6,
+        "raw_amount": "9,714",
+        "scale": 1000000,
+        "scope": "consolidated",
+        "verification": "provisional"
+      },
+      "extraction_matched": true,
+      "observed": {
+        "applicable_notes": [
+          {
+            "id": "note-1-fiscal-year",
+            "locator": {
+              "end_exclusive": {
+                "character": 1213778,
+                "line": 15
+              },
+              "start": {
+                "character": 1213188,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Fiscal Year"
+          },
+          {
+            "id": "note-1-consolidation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1214916,
+                "line": 15
+              },
+              "start": {
+                "character": 1214298,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Principles of Consolidation"
+          },
+          {
+            "id": "note-1-comparative-presentation",
+            "locator": {
+              "end_exclusive": {
+                "character": 1214298,
+                "line": 15
+              },
+              "start": {
+                "character": 1214016,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Comparative presentation"
+          },
+          {
+            "id": "note-1-revenue",
+            "locator": {
+              "end_exclusive": {
+                "character": 1217600,
+                "line": 15
+              },
+              "start": {
+                "character": 1216176,
+                "line": 15
+              }
+            },
+            "number": 1,
+            "title": "Revenue Recognition"
+          }
+        ],
+        "basis": "as_reported_in_filing",
+        "company": "NVIDIA Corporation",
+        "comparative": false,
+        "currency": "USD",
+        "evidence_version": "original-revenue-evidence-v1",
+        "fact_id": "fact:5111f3041f5a735f7eaa58acaca1bc2fac0e7c397ca9f2cda926391dae176c57",
+        "filing_date": "2018-02-28",
+        "inline_xbrl": null,
+        "locators": {
+          "annual_header": {
+            "cell": 2,
+            "character": 761856,
+            "column": 2,
+            "line": 15,
+            "row": 3,
+            "table": 90
+          },
+          "currency_symbol": {
+            "cell": 2,
+            "character": 764120,
+            "column": 2,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "metric_label": {
+            "cell": 1,
+            "character": 763842,
+            "column": 1,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "statement_heading": {
+            "character": 760503,
+            "line": 15
+          },
+          "statement_issuer": {
+            "character": 760279,
+            "line": 15
+          },
+          "table": {
+            "character": 761117,
+            "line": 15,
+            "table": 90
+          },
+          "unit_header": {
+            "character": 760725,
+            "line": 15,
+            "table": 90
+          },
+          "value": {
+            "cell": 3,
+            "character": 764371,
+            "column": 3,
+            "line": 15,
+            "row": 5,
+            "table": 90
+          },
+          "year_header": {
+            "cell": 2,
+            "character": 762389,
+            "column": 2,
+            "line": 15,
+            "row": 4,
+            "table": 90
+          }
+        },
+        "metric": "reported_consolidated_revenue",
+        "metric_label": "Revenue",
+        "normalized_amount": "9714000000",
+        "parent_table_id": "sha256:d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544#table-90",
+        "parser_version": "dated-columns-revenue-v1",
+        "raw_amount": "9,714",
+        "reporting_period": {
+          "end": "2018-01-28",
+          "fiscal_year": 2018,
+          "kind": "annual",
+          "start": "2017-01-30"
+        },
+        "scale": 1000000,
+        "scope": "consolidated",
+        "source_id": "sha256:d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+        "status": "provisional",
+        "unresolved_requirements": [
+          "source_identity_verification",
+          "inline_xbrl_verification"
+        ]
+      },
+      "original_sha256": "d45d7ffaab5b5de90e905e72e4c050ad42a019d9ca925150590dd3a2ecc61544",
+      "reusable_verification_matched": false,
+      "source_id": "0001045810-18-000010"
+    }
+  ],
+  "opened_observation_gate_passed": true,
+  "passed": true,
+  "peak_device_vram_mib": 0,
+  "peak_working_set_mib": {
+    "planner": 578.83,
+    "runner": 64.4
+  },
+  "replay_sha256": "f58b675126a649c3f9c1bbdee2ae405c09b62cb811324744860145d5d68808e1",
+  "reusable_verification_coverage": [
+    18,
+    21
+  ],
+  "reviewed_citations_sha256": "8d4965560944c56878c8af238ff91b632d567c400a3567ac6a3571ee01baa378",
+  "scorer_bundle_sha256": "2140f69d74b6546ef4bfdc0942b6e6bbd138db8d2e638150f5f54878f2c3372e",
+  "scoring_files": {
+    "artifacts/phase04/sec_holdout_score.py": "4cb7b67fab83eaa70231676d4722103899b5b539e718d34ea861a0b763f4b950",
+    "artifacts/phase05/acceptance_score.py": "22ad3a37a9e7c679c53d6fe80e93e553ab731b66b270b8b8ff46e9aaa16859ac",
+    "artifacts/phase05/holdout-score.json": "3b315f446cb5d9df8a549d86755a626581f950e4661364eef54b3c59a5ca0a58",
+    "artifacts/phase05/holdout_score.py": "d3178583530042d4e5e4a7571927142fa02742ad4c31454cca3991d32d858d68",
+    "artifacts/phase05/score.py": "7fc35b9207254d0295de9dd9d9aa3a00f82e9152c6faccdc39399a7eeef4bfa6",
+    "artifacts/phase06/development_score.py": "ad9740cb2c09fb643c1d9915ca62fb7961b944fe199f8d394f55ac0ad022364c",
+    "artifacts/phase06/exact_replay.py": "323141041de644ba0fb46a4f7cdb8955c8cb7c5bea06a62712d6e649f3fa73fb",
+    "artifacts/phase06/fresh_score.py": "0bfe84a3740d8a816980d8eee4bbd1df9b77711d473c2a6dce0a5669663be0c3",
+    "artifacts/phase06/fresh_score_v2.py": "d89f645e06cfd57c2ebfbe9db9e1416cf8feebbea559b64c3ac0696336a759f1",
+    "artifacts/phase06/observations.py": "1dc930bd293ebe4a7cd057499b9a4c24e1f4e10c3275638bcfc3b954ec36aad4",
+    "artifacts/phase06/revenue_score.py": "48d73076ec9baf27814f6bd7aff4ab46b260e961df799864890d45dcd282c9f4",
+    "src/frag/__init__.py": "0eab3d094882d193bf2cce627975d7811d20384a7a9d88ca4bbc4806a0fd3187",
+    "src/frag/citations.py": "0e2f31f1ec61a05ed69987e9841df90673366ec692ab4feeb8104ddb3404822c",
+    "src/frag/dated_revenue.py": "223ff9377f261da8b18bf849ae94f38a1140fe23b0d1229b9f2552f028c4b1a0",
+    "src/frag/growth.py": "6b48cb5be717acdb5a8fed24181d333ee1bad30c5ae25f920e04aef2b74be500",
+    "src/frag/income_html.py": "45f0a82fc74e12a02623b3bc5860d2968bd5d6045eab12e1b46317ff7d920b3e",
+    "src/frag/microsoft-revenue-reference.json": "06e4f52f8b65dd750119684c3ed7702dec5e1896cbb54150017346600f3b6093",
+    "src/frag/revenue.py": "66f35ed80b5de4605bb10de2c363509d1de66beb39cf692ca42d38b0feaa1ca1",
+    "src/frag/revenue_notes.py": "140d5fb9f361eb7e2a7345fc90b579788ba752d35758a59c1ff733f2fe356c3e",
+    "src/frag/store.py": "c5db36a3ab732fe96dff21f4650a8c54b1a9d98262ce83a94af25114ecccd479",
+    "src/frag/verification.py": "1832b59783bd2c9abb86bc39679fa6fb672b80763379a531fed35cd5ef0db5f5"
+  },
+  "scoring_revision": "phase06-evidence-v2-exact-replay-opened-review",
+  "warm": {
+    "cases": [
+      {
+        "answer_accurate": true,
+        "case_id": "P6-01",
+        "citations_supported": true,
+        "elapsed_ms": 1906.556,
+        "eligible_fact_ids": [
+          "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true
+        },
+        "observations_verified": {
+          "2023": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2023?",
+        "source_id": "0000027419-24-000032",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-3-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-02",
+        "citations_supported": true,
+        "elapsed_ms": 7848.058,
+        "eligible_fact_ids": [
+          "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508",
+          "fact:b4af33787b9535a39b98ceb9b6fbc30afacacc1162a888a01bccf59784d92347"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2022": true,
+          "2023": true
+        },
+        "observations_verified": {
+          "2022": true,
+          "2023": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023 as reported?",
+        "source_id": "0000027419-24-000032",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-3-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-03",
+        "citations_supported": true,
+        "elapsed_ms": 1663.508,
+        "eligible_fact_ids": [
+          "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 3,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-consolidation",
+          "note-1-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-04",
+        "citations_supported": true,
+        "elapsed_ms": 7842.668,
+        "eligible_fact_ids": [
+          "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f",
+          "fact:41cde244269a7e2ff846cbd8107b451811a3942e6d0da13ecec981b3e04eeaf4"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001065280-25-000044",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-05",
+        "citations_supported": true,
+        "elapsed_ms": 1712.356,
+        "eligible_fact_ids": [
+          "fact:9502d4a73c0dfe387f96d0c2663e7b4079dabedb45bcc8e44a40901ccadd739b"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 3,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000037996-25-000013",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-presentation",
+          "note-4-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-06",
+        "citations_supported": true,
+        "elapsed_ms": 7603.943,
+        "eligible_fact_ids": [
+          "fact:9502d4a73c0dfe387f96d0c2663e7b4079dabedb45bcc8e44a40901ccadd739b",
+          "fact:6a63d14ee167ee45d297db1cebd2968ed77b63179180fd218cbc926222d0690b"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000037996-25-000013",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-presentation",
+          "note-4-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-07",
+        "citations_supported": true,
+        "elapsed_ms": 2097.904,
+        "eligible_fact_ids": [
+          "fact:1f418c4be33b10ae56d77a18bb47e4cd224ff7582350384e05a28f3018f6aa25"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2025": true
+        },
+        "observations_verified": {
+          "2025": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2025?",
+        "source_id": "0001045810-25-000023",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-1-comparative-presentation",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-1-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-08",
+        "citations_supported": true,
+        "elapsed_ms": 7687.908,
+        "eligible_fact_ids": [
+          "fact:1f418c4be33b10ae56d77a18bb47e4cd224ff7582350384e05a28f3018f6aa25",
+          "fact:c6d8d96a3d6e20fcdb55f2f708f115700a01480e065ae00fcc8748442d2aefdf"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true,
+          "2025": true
+        },
+        "observations_verified": {
+          "2024": true,
+          "2025": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 6,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2024 to FY2025 as reported?",
+        "source_id": "0001045810-25-000023",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-comparative-presentation",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-1-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-09",
+        "citations_supported": true,
+        "elapsed_ms": 1736.102,
+        "eligible_fact_ids": [
+          "fact:9509447c2c7db4a34e53fd21f4a28e77a45b2f95fad9278b5bbf944ca045e167"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 3,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0000063908-25-000012",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-consolidation-and-presentation",
+          "note-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-10",
+        "citations_supported": true,
+        "elapsed_ms": 7862.979,
+        "eligible_fact_ids": [
+          "fact:9509447c2c7db4a34e53fd21f4a28e77a45b2f95fad9278b5bbf944ca045e167",
+          "fact:4a585af76f5f25c0b7d55330f8cfda7e8f6afb7a7e59a0bd14b2bda169cf93ec"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0000063908-25-000012",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-consolidation-and-presentation",
+          "note-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-11",
+        "citations_supported": true,
+        "elapsed_ms": 2041.03,
+        "eligible_fact_ids": [
+          "fact:a39cf6161225ff5fb25d03b61aa8b850245833dd1ca87a740e8e498dcfb923e0"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue in FY2024?",
+        "source_id": "0001744489-24-000276",
+        "status": "answered",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "note-2-comparative-presentation",
+          "note-2-consolidation",
+          "note-2-fiscal-year",
+          "note-2-revenue",
+          "revenue"
+        ],
+        "supported_companions": [],
+        "validation_status": "answered"
+      },
+      {
+        "answer_accurate": true,
+        "case_id": "P6-12",
+        "citations_supported": true,
+        "elapsed_ms": 7755.762,
+        "eligible_fact_ids": [
+          "fact:a39cf6161225ff5fb25d03b61aa8b850245833dd1ca87a740e8e498dcfb923e0",
+          "fact:0e56451adb80728902f9726fb05be87195eb1543529c2168fbf674d1d516df32"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "answerable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": false,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": true,
+        "numeric_answer_emitted": true,
+        "observations_extracted": {
+          "2023": true,
+          "2024": true
+        },
+        "observations_verified": {
+          "2023": true,
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 6,
+        "proposal_returned": true,
+        "question": "What was reported consolidated revenue growth from FY2023 to FY2024 as reported?",
+        "source_id": "0001744489-24-000276",
+        "status": "calculated",
+        "stop": {
+          "reasons": [],
+          "stage": "complete"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-2-comparative-presentation",
+          "note-2-consolidation",
+          "note-2-fiscal-year",
+          "note-2-revenue",
+          "prior"
+        ],
+        "supported_companions": [],
+        "validation_status": "calculated"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-13",
+        "citations_supported": true,
+        "elapsed_ms": 40.542,
+        "eligible_fact_ids": [
+          "fact:97156ea825ccb580df9db378e26058b5081f84ac5fb7eb262177122f91556c1f"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "absent_year",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": true,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2024": true
+        },
+        "observations_verified": {
+          "2024": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 4,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2021 to FY2024?",
+        "source_id": "0001065280-25-000044",
+        "status": "unavailable",
+        "stop": {
+          "reasons": [
+            "absent"
+          ],
+          "stage": "statement_period_inventory"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-revenue",
+          "statement-periods"
+        ],
+        "supported_companions": [
+          "current"
+        ],
+        "validation_status": "unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-14",
+        "citations_supported": false,
+        "elapsed_ms": 13.142,
+        "eligible_fact_ids": [],
+        "end_to_end_complete": true,
+        "expected_outcome": "present_unverifiable",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": true,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [
+          "unsupported_observation",
+          "unsupported_observation",
+          "unsupported_observation"
+        ],
+        "missing_citations": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2018": true
+        },
+        "observations_verified": {
+          "2018": false
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [
+          "source_identity_verification",
+          "inline_xbrl_verification",
+          "extraction",
+          "comparison_compatibility"
+        ],
+        "opened_citations": 0,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue in FY2018?",
+        "source_id": "0001045810-18-000010",
+        "status": "evidence_unavailable",
+        "stop": {
+          "reasons": [
+            "unverified"
+          ],
+          "stage": "verification"
+        },
+        "supported_citation_ids": [],
+        "supported_companions": [],
+        "validation_status": "evidence_unavailable"
+      },
+      {
+        "answer_accurate": false,
+        "case_id": "P6-15",
+        "citations_supported": true,
+        "elapsed_ms": 42.378,
+        "eligible_fact_ids": [
+          "fact:5de8ba15328898f4bba547a2d12572a18a9784cee07659565919a5173aecd508",
+          "fact:b4af33787b9535a39b98ceb9b6fbc30afacacc1162a888a01bccf59784d92347"
+        ],
+        "end_to_end_complete": true,
+        "expected_outcome": "incompatible_periods",
+        "findings": [],
+        "first_failure_stage": "complete",
+        "grounded_abstention": true,
+        "incomplete": false,
+        "incomplete_findings": [],
+        "intake_diagnostics": [],
+        "missing_citations": [],
+        "model_request_sent": false,
+        "numeric_answer_emitted": false,
+        "observations_extracted": {
+          "2022": true,
+          "2023": true
+        },
+        "observations_verified": {
+          "2022": true,
+          "2023": true
+        },
+        "offline_replay_matched": true,
+        "open_requirements": [],
+        "opened_citations": 5,
+        "proposal_returned": false,
+        "question": "What was reported consolidated revenue growth from FY2022 to FY2023? Compare equal-length fiscal periods only.",
+        "source_id": "0000027419-24-000032",
+        "status": "unavailable",
+        "stop": {
+          "reasons": [
+            "incompatible"
+          ],
+          "stage": "comparison_compatibility"
+        },
+        "supported_citation_ids": [
+          "current",
+          "note-1-consolidation",
+          "note-1-fiscal-year",
+          "note-3-revenue",
+          "prior"
+        ],
+        "supported_companions": [
+          "current",
+          "prior"
+        ],
+        "validation_status": "unavailable"
+      }
+    ],
+    "metrics": {
+      "accuracy": [
+        12,
+        12
+      ],
+      "citation_support_emitted": [
+        12,
+        12
+      ],
+      "coverage": [
+        12,
+        15
+      ],
+      "end_to_end": [
+        15,
+        15
+      ],
+      "grounded_abstentions": 3,
+      "incomplete_cases": 0,
+      "latency_ms": {
+        "max": 7862.979,
+        "median": 2041.03,
+        "min": 13.142
+      },
+      "offline_replay": [
+        15,
+        15
+      ],
+      "planner_calls": 12,
+      "supported_answers": 12,
+      "supported_citations": 61,
+      "supported_companions": 3,
+      "timed_cases": 15
+    },
+    "passed": true
+  }
+}

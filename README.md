@@ -411,3 +411,10 @@ Replay runs with sockets blocked and writes `runner/replay/report.json`.
 A mismatch fails the replay command and leaves the per-case payloads and
 diagnostics in the report. Score writes `scoring/score.json` and exits with
 code 2 if the acceptance gate fails. [Exact replay protocol and controls](artifacts/phase06/EXACT_REPLAY.md)
+
+## Phase 6 opened-cohort development gate
+
+The #53 PowerShell commands reproduce the retained #44-question run with
+the pinned candidate and reviewed citation ranges. They also rerun the
+earlier development, collection, and browser checks.
+[Opened-cohort results and reproduction commands](artifacts/phase06/CONTINUATION_GATE.md#reproduce-on-windows)

@@ -8,6 +8,8 @@
 
 [Issue #52 exact offline replay and acceptance controls](EXACT_REPLAY.md)
 
+[Issue #53 opened-cohort development gate and regression runs](CONTINUATION_GATE.md)
+
 Issue #36 ran 30 fixed questions against 14 preserved SEC originals. In
 each cold and warm pass, the opened cohort completed 1 of 15 cases and the
 earlier development cohort completed 13 of 15. All 60 results and citation

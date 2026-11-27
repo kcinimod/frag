@@ -28,6 +28,7 @@ from frag.income_html import is_statement_heading
 from frag.store import SourceError
 
 SCORING_REVISION = "phase06-evidence-v2-exact-replay"
+OPENED_CITATION_REVIEW_SHA256 = "8d4965560944c56878c8af238ff91b632d567c400a3567ac6a3571ee01baa378"
 INLINE_LOCATORS = (("inline_fact", "inline_fact"), ("inline_context", "context"), ("currency_measure", "unit"))
 PRODUCTION_DEPENDENCIES = (
     "__init__.py", "citations.py", "dated_revenue.py", "growth.py", "income_html.py", "revenue.py",
@@ -574,6 +575,7 @@ def classify(
 
 def score(
     freeze_path: Path, runner_path: Path, expected_path: Path, live_path: Path, replay_path: Path,
+    *, reviewed_citations_path: Path | None = None,
 ) -> dict[str, Any]:
     frozen = json.loads(freeze_path.read_bytes())
     receipt = frozen["receipt"]
@@ -599,6 +601,25 @@ def score(
         manifest_bytes = runner.read("manifest.json")
         manifest = json.loads(manifest_bytes)
         originals = {filing["source_id"]: runner.read(filing["path"]) for filing in manifest["sources"]}
+    review_binding = {}
+    if reviewed_citations_path is not None:
+        if reviewed_citations_path.resolve().is_relative_to(runner_path.resolve().parent):
+            raise ValueError("The opened citation review must remain outside the runner input directory.")
+        review_bytes = reviewed_citations_path.read_bytes()
+        review_hash = sha256(review_bytes).hexdigest()
+        if review_hash != OPENED_CITATION_REVIEW_SHA256:
+            raise ValueError("Citation review differs from the pinned opened #44 review.")
+        supplement = json.loads(review_bytes)
+        if (manifest["cohort"] != "sec-phase06-holdout-43-v1"
+                or supplement["scorer_bundle_sha256"] != receipt["scorer_bundle"]["sha256"]):
+            raise ValueError("Opened citation review must bind to the original #44 references.")
+        for source_id, spans in supplement["sources"].items():
+            notes = {note["label"]: note for note in expected["sources"][source_id]["applicable_notes"]}
+            for label, span in spans.items():
+                # The observation audit verifies the supplemental span against the original
+                # and checks that it encloses the sealed disclosure.
+                notes[label]["citation_locator"] = span
+        review_binding["reviewed_citations_sha256"] = review_hash
     binding = {"freeze_sha256": sha256(freeze_path.read_bytes()).hexdigest(),
                "manifest_sha256": sha256(manifest_bytes).hexdigest(),
                "runner_sha256": receipt["runner_bundle"]["sha256"]}
@@ -629,7 +650,9 @@ def score(
             or Counter(row["outcome"] for row in expected["cases"].values()) != receipt["case_counts_by_outcome"]):
         raise ValueError("Case or observation counts differ from the sealed receipt.")
     report: dict[str, Any] = {
-        "scoring_revision": SCORING_REVISION, "scoring_files": scoring_files,
+        "scoring_revision": f"{SCORING_REVISION}-opened-review" if review_binding else SCORING_REVISION,
+        "scoring_files": scoring_files,
+        **review_binding,
         "binding": binding, "live_sha256": live_hash, "replay_sha256": sha256(replay_bytes).hexdigest(),
         "scorer_bundle_sha256": receipt["scorer_bundle"]["sha256"], **memory_peaks(live),
         "observations": observations,
@@ -637,6 +660,18 @@ def score(
         "reusable_verification_coverage": [sum(row["reusable_verification_matched"] for row in observations),
                                            len(observations)],
     }
+    minimum_answers = thresholds["supported_answers"]
+    observation_gate_passed = True
+    if review_binding:
+        minimum_answers = receipt["case_counts_by_outcome"]["answerable"]
+        provisional = [row for row in observations if row["expected"]["verification"] == "provisional"]
+        observation_gate_passed = (
+            report["extraction_coverage"] == [21, 21]
+            and report["reusable_verification_coverage"] == [18, 21]
+            and len(provisional) == 3
+            and all(row["observed"] and row["observed"]["status"] == "provisional" for row in provisional)
+        )
+        report["opened_observation_gate_passed"] = observation_gate_passed
     historical = json.loads((ROOT / "artifacts/phase05/holdout-score.json").read_bytes())
     report["historical_phase05"] = {
         **{key: historical[key] for key in ("accepted", "peak_working_set_mib", "peak_device_vram_mib")},
@@ -675,12 +710,12 @@ def score(
         metrics["supported_companions"] = sum(len(row["supported_companions"]) for row in cases)
         metrics["incomplete_cases"] = sum(row["incomplete"] for row in cases)
         report[mode] = {"metrics": metrics, "cases": cases, "passed": (
-            metrics["supported_answers"] >= thresholds["supported_answers"]
+            metrics["supported_answers"] >= minimum_answers
             and metrics["grounded_abstentions"] == thresholds["grounded_abstentions"]
             and metrics["offline_replay"] == [thresholds["exact_replay"], receipt["case_count"]]
             and not any(row["findings"] for row in cases)
         )}
-    report["passed"] = all(report[mode]["passed"] for mode in MODES)
+    report["passed"] = observation_gate_passed and all(report[mode]["passed"] for mode in MODES)
     return report
 
 
@@ -688,8 +723,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("freeze", "inputs", "expected", "live", "replay", "output"):
         parser.add_argument(name, type=Path)
+    parser.add_argument("--reviewed-citations", type=Path, help="Review supplement for the opened #44 development gate")
     args = parser.parse_args()
-    report = score(args.freeze, args.inputs, args.expected, args.live, args.replay)
+    report = score(args.freeze, args.inputs, args.expected, args.live, args.replay,
+                   reviewed_citations_path=args.reviewed_citations)
     with args.output.open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(report, stream, indent=2, sort_keys=True)
         stream.write("\n")

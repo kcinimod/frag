@@ -241,3 +241,13 @@ Phase 2 calculator and its offline results.
   failure and clarification, including changed payloads that block the
   score. The pinned #44 workflow reproduced its 30 historical matches.
   [Exact offline replay](../artifacts/phase06/EXACT_REPLAY.md)
+
+- Issue #53 passes the opened #44 development gate. All 21 reviewed
+  observations match extraction. Eighteen pass reusable verification and
+  three historical NVIDIA observations remain provisional. Each pass
+  completes 12 supported numeric answers and three grounded abstentions,
+  with all 15 results and citation sets reproduced offline. Earlier
+  development, collection, and browser checks pass. Apple FY2024 still
+  needs applicable disclosure verification. The next evaluation uses a
+  fresh issuer-disjoint cohort.
+  [Continuation gate and reproduction](../artifacts/phase06/CONTINUATION_GATE.md)
