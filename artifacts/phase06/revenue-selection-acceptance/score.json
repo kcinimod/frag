@@ -1,0 +1,881 @@
+{
+  "cases": {
+    "0000051143-25-000015": {
+      "evidence_gap": "The primary document incorporates Item 8 from the separately filed Annual Report to Stockholders.",
+      "issuer": "INTERNATIONAL BUSINESS MACHINES CORP",
+      "issuer_family": "0000051143",
+      "review_outcome": "absent_target",
+      "reviewed_target": null,
+      "strategies": {
+        "model_alone": {
+          "absent_target_abstained": false,
+          "candidate_available": null,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "model_choice",
+          "pre_validation_selection_error": true,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-26/row-11",
+            "table_id": "table-26"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "absent_target_abstained": true,
+          "candidate_available": null,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "abstained",
+          "shortlist": []
+        },
+        "rules_shortlisted_model": {
+          "absent_target_abstained": true,
+          "candidate_available": null,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "abstained",
+          "shortlist": []
+        }
+      }
+    },
+    "0000950170-24-083577": {
+      "evidence_gap": null,
+      "issuer": "FEDEX CORP",
+      "issuer_family": "0001048911",
+      "review_outcome": "target_present",
+      "reviewed_target": {
+        "row_id": "table-37/row-4",
+        "table_id": "table-37"
+      },
+      "strategies": {
+        "model_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "model_choice",
+          "pre_validation_selection_error": true,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-19/row-21",
+            "table_id": "table-19"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-37/row-4",
+            "table_id": "table-37"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-37/row-4",
+              "table_id": "table-37"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": 26,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-37/row-4",
+            "table_id": "table-37"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-37/row-4",
+              "table_id": "table-37"
+            }
+          ]
+        }
+      }
+    },
+    "0000950170-25-025210": {
+      "evidence_gap": null,
+      "issuer": "BERKSHIRE HATHAWAY INC",
+      "issuer_family": "0001067983",
+      "review_outcome": "target_present",
+      "reviewed_target": {
+        "row_id": "table-37/row-16",
+        "table_id": "table-37"
+      },
+      "strategies": {
+        "model_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "model_choice",
+          "pre_validation_selection_error": true,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-121/row-24",
+            "table_id": "table-121"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-37/row-16",
+            "table_id": "table-37"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-37/row-16",
+              "table_id": "table-37"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": 46,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-37/row-16",
+            "table_id": "table-37"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-37/row-16",
+              "table_id": "table-37"
+            }
+          ]
+        }
+      }
+    },
+    "0001403161-24-000058": {
+      "evidence_gap": null,
+      "issuer": "VISA INC.",
+      "issuer_family": "0001403161",
+      "review_outcome": "target_present",
+      "reviewed_target": {
+        "row_id": "table-27/row-11",
+        "table_id": "table-27"
+      },
+      "strategies": {
+        "model_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "model_choice",
+          "pre_validation_selection_error": true,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-27/row-22",
+            "table_id": "table-27"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-27/row-11",
+            "table_id": "table-27"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-27/row-11",
+              "table_id": "table-27"
+            }
+          ]
+        },
+        "rules_shortlisted_model": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "expected_fiscal_years": [
+              2022,
+              2023,
+              2024
+            ],
+            "missed_fiscal_years": [],
+            "observation_count": 3,
+            "outcome": "verification_gap"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": 53,
+          "reviewed_target_nominated": true,
+          "reviewed_target_shortlisted": true,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-27/row-11",
+            "table_id": "table-27"
+          },
+          "selection_outcome": "reviewed_row",
+          "shortlist": [
+            {
+              "row_id": "table-27/row-11",
+              "table_id": "table-27"
+            }
+          ]
+        }
+      }
+    },
+    "0001558370-24-004603": {
+      "evidence_gap": null,
+      "issuer": "KROGER CO",
+      "issuer_family": "0000056873",
+      "review_outcome": "target_present",
+      "reviewed_target": {
+        "row_id": "table-113/row-5",
+        "table_id": "table-113"
+      },
+      "strategies": {
+        "model_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": true,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2021,
+              2022,
+              2023
+            ],
+            "missed_fiscal_years": [
+              2021,
+              2022,
+              2023
+            ],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "model_choice",
+          "pre_validation_selection_error": true,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": true,
+          "selected": {
+            "row_id": "table-114/row-12",
+            "table_id": "table-114"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "absent_target_abstained": null,
+          "candidate_available": false,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2021,
+              2022,
+              2023
+            ],
+            "missed_fiscal_years": [
+              2021,
+              2022,
+              2023
+            ],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "candidate_representation",
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": false,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "shortlist_excluded",
+          "shortlist": []
+        },
+        "rules_shortlisted_model": {
+          "absent_target_abstained": null,
+          "candidate_available": false,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [
+              2021,
+              2022,
+              2023
+            ],
+            "missed_fiscal_years": [
+              2021,
+              2022,
+              2023
+            ],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "candidate_representation",
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": 35,
+          "reviewed_target_nominated": false,
+          "reviewed_target_shortlisted": false,
+          "reviewed_target_submitted": false,
+          "selected": null,
+          "selection_outcome": "shortlist_excluded",
+          "shortlist": []
+        }
+      }
+    },
+    "synthetic-01": {
+      "evidence_gap": "The consolidated statement omits its revenue row. The reported total is for a division.",
+      "issuer": "Northwind Components",
+      "issuer_family": null,
+      "review_outcome": "absent_target",
+      "reviewed_target": null,
+      "strategies": {
+        "model_alone": {
+          "absent_target_abstained": false,
+          "candidate_available": null,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "unsupported_scope"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": "model_choice",
+          "pre_validation_selection_error": true,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": {
+            "row_id": "table-2/row-2",
+            "table_id": "table-2"
+          },
+          "selection_outcome": "wrong_row",
+          "shortlist": null
+        },
+        "rules_alone": {
+          "absent_target_abstained": true,
+          "candidate_available": null,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "abstained",
+          "shortlist": []
+        },
+        "rules_shortlisted_model": {
+          "absent_target_abstained": true,
+          "candidate_available": null,
+          "extraction": {
+            "exact_fiscal_years": [],
+            "expected_fiscal_years": [],
+            "missed_fiscal_years": [],
+            "observation_count": 0,
+            "outcome": "not_run"
+          },
+          "incorrect_accepted": 0,
+          "miss_cause": null,
+          "pre_validation_selection_error": false,
+          "reviewed_table_rows_omitted": null,
+          "reviewed_target_nominated": null,
+          "reviewed_target_shortlisted": null,
+          "reviewed_target_submitted": null,
+          "selected": null,
+          "selection_outcome": "abstained",
+          "shortlist": []
+        }
+      }
+    }
+  },
+  "freeze_sha256": "03db492cfd16698aace48dcfe6ceefb1bef648bec6975ff4da410d13d68355a8",
+  "qualifying_strategies": [],
+  "replayed_cases": 6,
+  "run_sha256": "24beb872d219858ac9decc018ed542f61e79fef4368083f3dcf7d0d22873d50d",
+  "scorer_sha256": "ce749779231680bcbef4fd326a014267d5b2b763176433f8d1ed83b130d3f88a",
+  "strategies": {
+    "model_alone": {
+      "absent": 2,
+      "abstained": 0,
+      "adoption": {
+        "checks": {
+          "all_absent_targets_abstained": false,
+          "issuer_family_improvement": false,
+          "no_incorrect_accepted": true,
+          "overall_improvement": false
+        },
+        "improved_issuer_families": [],
+        "qualifies": false
+      },
+      "candidate_available": 4,
+      "exact": 0,
+      "gpu_memory": {
+        "GPU-511585ce-b899-6df3-e53e-b3d1bdf3395c": {
+          "first_mib": 0,
+          "sampled_peak_mib": 1518,
+          "samples": 1125
+        }
+      },
+      "gpu_sample_sha256": "2db0f4508b784d09b2f46ccb8fc362ded2af45f5e2d52670084dd72d38fc1d90",
+      "incorrect_accepted": 0,
+      "inventory_ms": 2651.054,
+      "issuer_families": {
+        "0000051143": {
+          "absent": 1,
+          "abstained": 0,
+          "candidate_available": 0,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "INTERNATIONAL BUSINESS MACHINES CORP",
+          "pre_validation_selection_errors": 1,
+          "reviewed": 0,
+          "target_present": 0
+        },
+        "0000056873": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "KROGER CO",
+          "pre_validation_selection_errors": 1,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001048911": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "FEDEX CORP",
+          "pre_validation_selection_errors": 1,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001067983": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "BERKSHIRE HATHAWAY INC",
+          "pre_validation_selection_errors": 1,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001403161": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "VISA INC.",
+          "pre_validation_selection_errors": 1,
+          "reviewed": 3,
+          "target_present": 1
+        }
+      },
+      "model_calls": 117,
+      "model_peak_working_set_bytes": 2097324032,
+      "pre_validation_selection_errors": 6,
+      "python_peak_working_set_bytes": 179032064,
+      "reviewed": 12,
+      "selection_and_validation_ms": 60085.152,
+      "startup_ms": 4753.114,
+      "target_present": 4,
+      "worker_wall_ms": 70431.177
+    },
+    "rules_alone": {
+      "absent": 2,
+      "abstained": 2,
+      "candidate_available": 3,
+      "exact": 9,
+      "gpu_memory": {
+        "GPU-511585ce-b899-6df3-e53e-b3d1bdf3395c": {
+          "first_mib": 0,
+          "sampled_peak_mib": 0,
+          "samples": 67
+        }
+      },
+      "gpu_sample_sha256": "ad45a152d12e8a2dc348f083c92c3c17d66bd5c37000743c4020a2ae68b3e36a",
+      "incorrect_accepted": 0,
+      "inventory_ms": 1990.617,
+      "issuer_families": {
+        "0000051143": {
+          "absent": 1,
+          "abstained": 1,
+          "candidate_available": 0,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "INTERNATIONAL BUSINESS MACHINES CORP",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 0,
+          "target_present": 0
+        },
+        "0000056873": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 0,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "KROGER CO",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001048911": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 3,
+          "incorrect_accepted": 0,
+          "issuer": "FEDEX CORP",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001067983": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 3,
+          "incorrect_accepted": 0,
+          "issuer": "BERKSHIRE HATHAWAY INC",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001403161": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 3,
+          "incorrect_accepted": 0,
+          "issuer": "VISA INC.",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        }
+      },
+      "model_calls": 0,
+      "pre_validation_selection_errors": 0,
+      "python_peak_working_set_bytes": 177217536,
+      "reviewed": 12,
+      "selection_and_validation_ms": 48.536,
+      "target_present": 4,
+      "worker_wall_ms": 3844.669
+    },
+    "rules_shortlisted_model": {
+      "absent": 2,
+      "abstained": 2,
+      "adoption": {
+        "checks": {
+          "all_absent_targets_abstained": true,
+          "issuer_family_improvement": false,
+          "no_incorrect_accepted": true,
+          "overall_improvement": false
+        },
+        "improved_issuer_families": [],
+        "qualifies": false
+      },
+      "candidate_available": 3,
+      "exact": 9,
+      "gpu_memory": {
+        "GPU-511585ce-b899-6df3-e53e-b3d1bdf3395c": {
+          "first_mib": 0,
+          "sampled_peak_mib": 1511,
+          "samples": 293
+        }
+      },
+      "gpu_sample_sha256": "4c27102f4eee815e4a49f773ddcf28d09ab2975d1f1858b088908c41193488b7",
+      "incorrect_accepted": 0,
+      "inventory_ms": 2578.2,
+      "issuer_families": {
+        "0000051143": {
+          "absent": 1,
+          "abstained": 1,
+          "candidate_available": 0,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "INTERNATIONAL BUSINESS MACHINES CORP",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 0,
+          "target_present": 0
+        },
+        "0000056873": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 0,
+          "exact": 0,
+          "incorrect_accepted": 0,
+          "issuer": "KROGER CO",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001048911": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 3,
+          "incorrect_accepted": 0,
+          "issuer": "FEDEX CORP",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001067983": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 3,
+          "incorrect_accepted": 0,
+          "issuer": "BERKSHIRE HATHAWAY INC",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        },
+        "0001403161": {
+          "absent": 0,
+          "abstained": 0,
+          "candidate_available": 1,
+          "exact": 3,
+          "incorrect_accepted": 0,
+          "issuer": "VISA INC.",
+          "pre_validation_selection_errors": 0,
+          "reviewed": 3,
+          "target_present": 1
+        }
+      },
+      "model_calls": 3,
+      "model_peak_working_set_bytes": 1571438592,
+      "pre_validation_selection_errors": 0,
+      "python_peak_working_set_bytes": 177840128,
+      "reviewed": 12,
+      "selection_and_validation_ms": 7834.493,
+      "startup_ms": 5020.374,
+      "target_present": 4,
+      "worker_wall_ms": 18258.387
+    }
+  }
+}

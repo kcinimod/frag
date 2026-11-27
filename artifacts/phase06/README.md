@@ -20,6 +20,8 @@
 
 [Issue #58 paired revenue selection results and offline replay](REVENUE_SELECTION_COMPARISON.md)
 
+[Issue #60 issuer-disjoint extraction decision and Windows replay](REVENUE_SELECTION_ACCEPTANCE.md)
+
 ## Reproduce the rules-alone extraction baseline on Windows
 
 Run from the repository root with the project Python environment and the

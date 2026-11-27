@@ -1,5 +1,10 @@
 # Project status
 
+Issue #60 completed the issuer-disjoint extraction comparison. Rules alone
+and the shortlisted model matched 9 of 12 reviewed observations. The
+model-only strategy matched zero. Neither model met the adoption gate.
+[Held-out results and replay](../artifacts/phase06/REVENUE_SELECTION_ACCEPTANCE.md)
+
 Issue #58 compared all three revenue selectors on the seven opened #54
 filings and two synthetic controls. Rules alone and the shortlisted model
 each selected all seven reviewed rows and matched 12 of 21 observations.

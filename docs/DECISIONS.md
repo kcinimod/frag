@@ -1,5 +1,12 @@
 # Decision log
 
+## Issue #60 issuer-disjoint extraction comparison
+
+Retain rules alone. On the frozen issuer-disjoint set, the shortlisted model
+tied the rules baseline and the model-only strategy failed to select any
+reviewed row. The shared validator rejected all six broad-model selections.
+[Frozen experiment and adoption gate](../artifacts/phase06/REVENUE_SELECTION_ACCEPTANCE.md)
+
 ## Issue #58 paired revenue selection
 
 Give the two model strategies the same prompt, row representation, batching
