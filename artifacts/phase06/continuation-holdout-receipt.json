@@ -1,0 +1,58 @@
+{
+  "answerable_counts_by_kind": {
+    "growth": 6,
+    "lookup": 6
+  },
+  "audit_sha256": {
+    "company-facts.json": "fdfdeb33dcdf1f176f17028e3037e81f98b2b574c17829058d8cbd0698309a1b",
+    "edgar-transfer-audit.json": "c18cd6a5678af2e96b34877ceef16c1343cefa82768c58e1a7f3787352337518",
+    "full-company-facts.zip": "13b5b80516a04d32b7fa9ff3c47b42d2a8ccc6b9f90632cc524f4b405936eee5",
+    "originals-audit/amendment.htm": "82364461cf7455477ae0f74f6b3ee33435cc03a92e45fbc8e844d311c6dceba8",
+    "overlap-audit.json": "488d8bbc0731eb07690fb2ce978f3153b753a8b9e6fbb66acf48f63a408654b8",
+    "registrant-indexes.zip": "1c84b3aa3077839d24297c4d87c2f04b110c028511ade3e2b7156e2b798f2bfb",
+    "reviewer-audit.json": "357e2bb85e7ad37cac3558ca5250f7aee4b2d07af44b5b64b37029a2aec86116",
+    "verify.py": "11c6394eb62d4a12e17f46bd38e6f017a53ee39ac34d11ba169de2ae6183d7f8"
+  },
+  "case_count": 15,
+  "case_counts_by_outcome": {
+    "absent_year": 1,
+    "answerable": 12,
+    "incompatible_periods": 1,
+    "present_unverifiable": 1
+  },
+  "cohort": "sec-phase06-holdout-54-v1",
+  "custody": {
+    "acceptance_freeze": "pending",
+    "development_gate": "passed",
+    "location_relative_to_checkout": "../FRAG-SEC-Holdout-54",
+    "runner_release": "withheld pending acceptance freeze",
+    "scorer_access": "scorer only",
+    "sealed_at_utc": "2026-11-27T02:49:27+00:00"
+  },
+  "development_gate_record_path": "artifacts/phase06/continuation-opened-score.json",
+  "development_gate_record_sha256": "f0ec54d860e3f8beb127c5b66ef71ae31d95a1d4df5c9166c186e2a0ef59ad15",
+  "development_layout_inventory_path": "artifacts/phase06/DEVELOPMENT_LAYOUTS.md",
+  "development_layout_inventory_sha256": "13ab8c49b17136a41cc4c3da5377a1163f59fc01f1b6928a900f781830539f7e",
+  "independent_review": {
+    "overlapping_issuer_families": 0,
+    "overlapping_originals": 0,
+    "sha256": "357e2bb85e7ad37cac3558ca5250f7aee4b2d07af44b5b64b37029a2aec86116",
+    "status": "passed"
+  },
+  "issuer_count": 6,
+  "lineage_accession_count": 197,
+  "new_statement_layout_count": 2,
+  "observation_count": 21,
+  "original_count": 7,
+  "preparation_base": "bd5bbeff77d380cbaa59237abfb85389eaf47c13",
+  "runner_bundle": {
+    "path": "runner/inputs.zip",
+    "sha256": "60a47c03051b11e4600afa40fdb335c043a4cb3f8462bdcb0268bd18d8d1c4f6"
+  },
+  "scorer_bundle": {
+    "path": "scorer/expected.zip",
+    "sha256": "c548cc4b73a619267145901c722eda1ed0a61d5aaadc90611efd8025ac17789f"
+  },
+  "statement_layout_count": 6,
+  "version": 1
+}

@@ -452,3 +452,10 @@ original filing bytes. Each added span must enclose the sealed disclosure
 it supports. Use this separate review and the stricter development gate
 only for the opened #44 cohort.
 [Opened-cohort gate and citation review](../artifacts/phase06/CONTINUATION_GATE.md)
+
+### Bind continuation custody to the passed development gate (#54)
+
+Keep the new seal and issuer and layout audit distinct from the historical
+#44 receipt. Keep case-specific evidence in scorer custody. Recheck the
+issuer lineages and layout inventory at the acceptance freeze before
+releasing runner inputs. [Continuation holdout custody](../artifacts/phase06/CONTINUATION_HOLDOUT.md)

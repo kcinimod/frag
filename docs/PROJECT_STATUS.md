@@ -251,3 +251,8 @@ Phase 2 calculator and its offline results.
   needs applicable disclosure verification. The next evaluation uses a
   fresh issuer-disjoint cohort.
   [Continuation gate and reproduction](../artifacts/phase06/CONTINUATION_GATE.md)
+
+- Issue #54 independently audits and seals the fresh 15-case cohort across
+  six issuer families and seven preserved domestic 10-Ks. Its runner inputs
+  remain in custody pending the acceptance freeze. The scoring references
+  are held separately. [Continuation holdout custody](../artifacts/phase06/CONTINUATION_HOLDOUT.md)
