@@ -37,5 +37,6 @@ Get-FileHash -LiteralPath $out
 The socket-blocked replay JSON SHA-256 is
 `05f838d0507dcedefb781b2ac185d15cd0604bb5e1f01a98635ca6ed52bea272`.
 The [frozen #60 result](REVENUE_SELECTION_ACCEPTANCE.md) remains the
-historical holdout score. A freshly reserved, issuer-disjoint cohort is
-needed for the next generalization measurement.
+historical holdout score. The subsequent fresh four-issuer check matched
+0 of 12 observations for both extraction revisions.
+[Fresh results and replay](REVENUE_EXTRACTION_FRESH.md)

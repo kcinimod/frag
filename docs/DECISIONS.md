@@ -8,8 +8,9 @@ Use the displayed fiscal-year columns to associate external lists of year-end
 dates with amount cells. Corroborate the dates and starts with tagged annual
 contexts or the filing's fiscal calendar disclosure. Preserve an explicit
 gap when the available evidence cannot establish a start.
-Review generalization on a fresh issuer-disjoint cohort before production
-integration.
+Keep the revisions in the offline extraction workflow. The frozen candidate
+and baseline both matched 0 of 12 observations in the fresh four-issuer check.
+[Fresh results](../artifacts/phase06/REVENUE_EXTRACTION_FRESH.md)
 [Development replay](../artifacts/phase06/REVENUE_EXTRACTION_FOLLOWUPS.md)
 
 ## Issue #60 issuer-disjoint extraction comparison

@@ -1,0 +1,289 @@
+[
+  {
+    "source": {
+      "cik": "0000029534",
+      "issuer": "DOLLAR GENERAL CORP",
+      "accession": "0001558370-25-003413",
+      "form": "10-K",
+      "filing_date": "2025-03-21",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/29534/000155837025003413/dg-20250131x10k.htm",
+      "sha256": {
+        "original.htm": "6f3d3ab61f7359bcfc370572a6c1ee4241b5cf232a64906adfff2b9a68605ac1",
+        "submissions.json": "a81f6dc1e378a6a976caad8332e8122cec8066a130b5b9b3e15029006c3992fb",
+        "companyfacts.json": "16157a14c6c91f04a8b3e89ccedfc91ee0d5ea6978f8c6ed1d25d8cfe73541cf"
+      }
+    },
+    "dom_table": 45,
+    "dom_row": 5,
+    "label": "Net sales",
+    "observations": [
+      {
+        "fiscal_year": 2024,
+        "start": "2024-02-03",
+        "end": "2025-01-31",
+        "normalized_amount": "40612308000",
+        "raw_amount": "40,612,308",
+        "scale": 1000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "inline_id": "Tc_I-weDdUvWkiw-Qc3YgX7HQ_4_3",
+        "inline_start": 1060996,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerExcludingAssessedTax"
+        ],
+        "dom_physical_cell": 4
+      },
+      {
+        "fiscal_year": 2023,
+        "start": "2023-02-04",
+        "end": "2024-02-02",
+        "normalized_amount": "38691609000",
+        "raw_amount": "38,691,609",
+        "scale": 1000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "inline_id": "Tc_zfe-OvTQLUe3Qrgji7XGyA_4_6",
+        "inline_start": 1061993,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerExcludingAssessedTax"
+        ],
+        "dom_physical_cell": 7
+      },
+      {
+        "fiscal_year": 2022,
+        "start": "2022-01-29",
+        "end": "2023-02-03",
+        "normalized_amount": "37844863000",
+        "raw_amount": "37,844,863",
+        "scale": 1000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "inline_id": "Tc_zNTCeHM3QE-H5KGv-eMcgA_4_9",
+        "inline_start": 1062989,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerExcludingAssessedTax"
+        ],
+        "dom_physical_cell": 10
+      }
+    ]
+  },
+  {
+    "source": {
+      "cik": "0000200406",
+      "issuer": "JOHNSON & JOHNSON",
+      "accession": "0000200406-25-000038",
+      "form": "10-K",
+      "filing_date": "2025-02-13",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/200406/000020040625000038/jnj-20241229.htm",
+      "sha256": {
+        "original.htm": "45ef5ea14829ad0f05739c30000aaa77a1dc0d118dbc3aabe66181acf398ae37",
+        "submissions.json": "16dece1463edd2c75b4c75c06d0e2037cdfd38e0727aac7c4c1daed037cedf18",
+        "companyfacts.json": "9ce98e50414e9a6704eaf485e1868c2298c6ae36acc85a82c0a3737485303be7"
+      }
+    },
+    "dom_table": 78,
+    "dom_row": 3,
+    "label": "Sales to customers",
+    "observations": [
+      {
+        "fiscal_year": 2024,
+        "start": "2024-01-01",
+        "end": "2024-12-29",
+        "normalized_amount": "88821000000",
+        "raw_amount": "88,821",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "inline_id": "f-145",
+        "inline_start": 1325893,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerExcludingAssessedTax"
+        ],
+        "dom_physical_cell": 2
+      },
+      {
+        "fiscal_year": 2023,
+        "start": "2023-01-02",
+        "end": "2023-12-31",
+        "normalized_amount": "85159000000",
+        "raw_amount": "85,159",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "inline_id": "f-146",
+        "inline_start": 1326320,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerExcludingAssessedTax"
+        ],
+        "dom_physical_cell": 3
+      },
+      {
+        "fiscal_year": 2022,
+        "start": "2022-01-03",
+        "end": "2023-01-01",
+        "normalized_amount": "79990000000",
+        "raw_amount": "79,990",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "inline_id": "f-147",
+        "inline_start": 1326748,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerExcludingAssessedTax"
+        ],
+        "dom_physical_cell": 4
+      }
+    ]
+  },
+  {
+    "source": {
+      "cik": "0000764478",
+      "issuer": "BEST BUY CO INC",
+      "accession": "0000764478-25-000007",
+      "form": "10-K",
+      "filing_date": "2025-03-19",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/764478/000076447825000007/bby-20250201x10k.htm",
+      "sha256": {
+        "original.htm": "0ecba94ccca6b263576dce5407c38ad0dc3372d98355db082c625418e9979a58",
+        "submissions.json": "f21b6cb53928226cf1661dbdbe7993294794a999eafaf377638023c8e61bb8a7",
+        "companyfacts.json": "c9cd833d8edc99921ff5d5fb26d6b5b7ef2a2109ebbba7107fb1a4127c3c7149"
+      }
+    },
+    "dom_table": 28,
+    "dom_row": 3,
+    "label": "Revenue",
+    "observations": [
+      {
+        "fiscal_year": 2025,
+        "start": "2024-02-04",
+        "end": "2025-02-01",
+        "normalized_amount": "41528000000",
+        "raw_amount": "41,528",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerIncludingAssessedTax",
+        "inline_id": "ct-nonFraction-f96b0479-b696-411f-ba26-cb3aebf7fe0f",
+        "inline_start": 2394613,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerIncludingAssessedTax",
+          "Revenues"
+        ],
+        "dom_physical_cell": 3
+      },
+      {
+        "fiscal_year": 2024,
+        "start": "2023-01-29",
+        "end": "2024-02-03",
+        "normalized_amount": "43452000000",
+        "raw_amount": "43,452",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerIncludingAssessedTax",
+        "inline_id": "ct-nonFraction-b9cba25c-dc46-42b8-a61c-5389f37c3b31",
+        "inline_start": 2397509,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerIncludingAssessedTax",
+          "Revenues"
+        ],
+        "dom_physical_cell": 7
+      },
+      {
+        "fiscal_year": 2023,
+        "start": "2022-01-30",
+        "end": "2023-01-28",
+        "normalized_amount": "46298000000",
+        "raw_amount": "46,298",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:RevenueFromContractWithCustomerIncludingAssessedTax",
+        "inline_id": "ct-nonFraction-19186c6e-2d0a-4854-939d-ba9d187b7341",
+        "inline_start": 2400406,
+        "company_facts_concepts": [
+          "RevenueFromContractWithCustomerIncludingAssessedTax",
+          "Revenues"
+        ],
+        "dom_physical_cell": 11
+      }
+    ]
+  },
+  {
+    "source": {
+      "cik": "0000794367",
+      "issuer": "Macy's, Inc.",
+      "accession": "0001628280-25-014315",
+      "form": "10-K",
+      "filing_date": "2025-03-21",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/794367/000162828025014315/m-20250201.htm",
+      "sha256": {
+        "original.htm": "45505f3c19372369d8a8a03e05e9c1f4075bfd675f8b69b0c0ef93fc67b2a343",
+        "submissions.json": "6c3cb6ad9fa2137c0434d6ec692488c7c04ce0be9de18232971b31cb64671158",
+        "companyfacts.json": "88668494d8180afc17328426e3d4aa770b19658806d846fa792d5629963696c6"
+      }
+    },
+    "dom_table": 39,
+    "dom_row": 5,
+    "label": "Total revenue",
+    "observations": [
+      {
+        "fiscal_year": 2024,
+        "start": "2024-02-04",
+        "end": "2025-02-01",
+        "normalized_amount": "23006000000",
+        "raw_amount": "23,006",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:Revenues",
+        "inline_id": "f-53",
+        "inline_start": 762555,
+        "company_facts_concepts": [
+          "Revenues"
+        ],
+        "dom_physical_cell": 2
+      },
+      {
+        "fiscal_year": 2023,
+        "start": "2023-01-29",
+        "end": "2024-02-03",
+        "normalized_amount": "23866000000",
+        "raw_amount": "23,866",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:Revenues",
+        "inline_id": "f-54",
+        "inline_start": 763161,
+        "company_facts_concepts": [
+          "Revenues"
+        ],
+        "dom_physical_cell": 5
+      },
+      {
+        "fiscal_year": 2022,
+        "start": "2022-01-30",
+        "end": "2023-01-28",
+        "normalized_amount": "25449000000",
+        "raw_amount": "25,449",
+        "scale": 1000000,
+        "currency": "USD",
+        "scope": "consolidated",
+        "context_concept": "us-gaap:Revenues",
+        "inline_id": "f-55",
+        "inline_start": 763767,
+        "company_facts_concepts": [
+          "Revenues"
+        ],
+        "dom_physical_cell": 8
+      }
+    ]
+  }
+]

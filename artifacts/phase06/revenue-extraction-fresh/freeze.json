@@ -1,0 +1,59 @@
+{
+  "baseline": "7f94ac352e0b824db436aff950aefe2abfcccc17",
+  "candidate": "c2787f8663a2d0b1bcafedb46c1d2bbda1cfad92",
+  "method": "Score the latest three displayed annual consolidated revenue observations in each frozen original. Exact means an original value-cell locator and displayed fiscal column, amount, currency, scale, consolidated scope, and period matching references corroborated against SEC Company Facts by accession. Record provisional starts separately. Review original cells in a browser before running either extraction revision.",
+  "cases": [
+    {
+      "cik": "0000029534",
+      "issuer": "DOLLAR GENERAL CORP",
+      "accession": "0001558370-25-003413",
+      "form": "10-K",
+      "filing_date": "2025-03-21",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/29534/000155837025003413/dg-20250131x10k.htm",
+      "sha256": {
+        "original.htm": "6f3d3ab61f7359bcfc370572a6c1ee4241b5cf232a64906adfff2b9a68605ac1",
+        "submissions.json": "a81f6dc1e378a6a976caad8332e8122cec8066a130b5b9b3e15029006c3992fb",
+        "companyfacts.json": "16157a14c6c91f04a8b3e89ccedfc91ee0d5ea6978f8c6ed1d25d8cfe73541cf"
+      }
+    },
+    {
+      "cik": "0000200406",
+      "issuer": "JOHNSON & JOHNSON",
+      "accession": "0000200406-25-000038",
+      "form": "10-K",
+      "filing_date": "2025-02-13",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/200406/000020040625000038/jnj-20241229.htm",
+      "sha256": {
+        "original.htm": "45ef5ea14829ad0f05739c30000aaa77a1dc0d118dbc3aabe66181acf398ae37",
+        "submissions.json": "16dece1463edd2c75b4c75c06d0e2037cdfd38e0727aac7c4c1daed037cedf18",
+        "companyfacts.json": "9ce98e50414e9a6704eaf485e1868c2298c6ae36acc85a82c0a3737485303be7"
+      }
+    },
+    {
+      "cik": "0000764478",
+      "issuer": "BEST BUY CO INC",
+      "accession": "0000764478-25-000007",
+      "form": "10-K",
+      "filing_date": "2025-03-19",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/764478/000076447825000007/bby-20250201x10k.htm",
+      "sha256": {
+        "original.htm": "0ecba94ccca6b263576dce5407c38ad0dc3372d98355db082c625418e9979a58",
+        "submissions.json": "f21b6cb53928226cf1661dbdbe7993294794a999eafaf377638023c8e61bb8a7",
+        "companyfacts.json": "c9cd833d8edc99921ff5d5fb26d6b5b7ef2a2109ebbba7107fb1a4127c3c7149"
+      }
+    },
+    {
+      "cik": "0000794367",
+      "issuer": "Macy's, Inc.",
+      "accession": "0001628280-25-014315",
+      "form": "10-K",
+      "filing_date": "2025-03-21",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/794367/000162828025014315/m-20250201.htm",
+      "sha256": {
+        "original.htm": "45505f3c19372369d8a8a03e05e9c1f4075bfd675f8b69b0c0ef93fc67b2a343",
+        "submissions.json": "6c3cb6ad9fa2137c0434d6ec692488c7c04ce0be9de18232971b31cb64671158",
+        "companyfacts.json": "88668494d8180afc17328426e3d4aa770b19658806d846fa792d5629963696c6"
+      }
+    }
+  ]
+}

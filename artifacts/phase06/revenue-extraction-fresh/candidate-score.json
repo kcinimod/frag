@@ -1,0 +1,92 @@
+{
+  "cases": [
+    {
+      "exact_years": [],
+      "issuer": "DOLLAR GENERAL CORP",
+      "result": {
+        "candidates": [
+          {
+            "row_id": "table-45/row-5",
+            "table_id": "table-45"
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "unsupported_layout",
+            "message": "The applicable fiscal-calendar disclosure could not be established."
+          }
+        ],
+        "evidence_version": "original-revenue-evidence-v1",
+        "observations": [],
+        "parser_version": "shared-year-revenue-v1",
+        "selected": {
+          "row_id": "table-45/row-5",
+          "table_id": "table-45"
+        },
+        "stop": "extraction_gap",
+        "unresolved_requirements": [
+          "extraction",
+          "comparison_compatibility"
+        ]
+      }
+    },
+    {
+      "exact_years": [],
+      "issuer": "JOHNSON & JOHNSON",
+      "result": {
+        "candidates": [],
+        "diagnostics": [
+          {
+            "code": "no_candidate",
+            "message": "Rules did not find a unique consolidated revenue row."
+          }
+        ],
+        "observations": [],
+        "selected": null,
+        "stop": "no_candidate",
+        "unresolved_requirements": [
+          "no_candidate"
+        ]
+      }
+    },
+    {
+      "exact_years": [],
+      "issuer": "BEST BUY CO INC",
+      "result": {
+        "candidates": [],
+        "diagnostics": [
+          {
+            "code": "no_candidate",
+            "message": "Rules did not find a unique consolidated revenue row."
+          }
+        ],
+        "observations": [],
+        "selected": null,
+        "stop": "no_candidate",
+        "unresolved_requirements": [
+          "no_candidate"
+        ]
+      }
+    },
+    {
+      "exact_years": [],
+      "issuer": "Macy's, Inc.",
+      "result": {
+        "candidates": [],
+        "diagnostics": [
+          {
+            "code": "no_candidate",
+            "message": "Rules did not find a unique consolidated revenue row."
+          }
+        ],
+        "observations": [],
+        "selected": null,
+        "stop": "no_candidate",
+        "unresolved_requirements": [
+          "no_candidate"
+        ]
+      }
+    }
+  ],
+  "commit": "c2787f8663a2d0b1bcafedb46c1d2bbda1cfad92"
+}
