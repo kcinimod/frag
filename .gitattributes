@@ -25,3 +25,4 @@ artifacts/phase06/revenue-selection-model/*.json -text diff
 artifacts/phase06/revenue-selection-acceptance/*.json -text diff
 artifacts/phase06/revenue-selection-acceptance/*.csv -text diff whitespace=cr-at-eol
 artifacts/phase06/revenue-selection-acceptance/SHA256SUMS -text diff
+artifacts/phase06/revenue-extraction-fresh/*.json -text diff
