@@ -18,6 +18,7 @@ from frag.revenue import MONTHS, REVENUE_CONCEPT, SCALES, _normalize, _value_cel
 from frag.revenue_notes import (
     StatementPolicies, accounting_policy_notes, acquisition_revenue_notes, comparison_disclosures,
     cross_section_policy_notes, dated_policy_notes, fiscal_year_policy_notes, january_calendar_policy_notes,
+    nearest_weekday_calendar,
     numbered_policy_notes, referenced_revenue_policy, reporting_period_policy, statement_policy_notes,
     unnumbered_revenue_policy,
 )
@@ -74,6 +75,7 @@ class DatedStatement:
     disclosed_year_end_weekday: int | None = None
     calendar_starts: dict[date, date] = field(default_factory=dict)
     external_annual_header: EvidenceText | None = None
+    displayed_week_cells: dict[date, GridCell] = field(default_factory=dict)
     accepts_aggregate_revenues_tag: bool = False
 
     @property
@@ -365,6 +367,13 @@ def _annual_facts(
         week_count = weeks.get(year)
         try:
             fact, value = _visible_fact(statement, periods[end], end, base)
+            week_cell = statement.displayed_week_cells.get(end)
+            if week_cell is not None and not value.cell.inline_facts and week_count is not None:
+                start = end - timedelta(weeks=week_count) + timedelta(days=1)
+                if prior_end is not None and start != prior_end + timedelta(days=1):
+                    raise UnsupportedLayout("The displayed week count conflicts with the preceding fiscal year-end.")
+                fact["reporting_period"]["start"] = start.isoformat()
+                fact["locators"]["week_count"] = week_cell.locator(statement.table)
             _verify_inline(document, statement, value, end, prior_end, cik, fact, week_count)
         except UnsupportedLayout as exc:
             diagnostics.append({"code": "unsupported_observation", "fiscal_year": year, "message": str(exc)})
@@ -501,7 +510,8 @@ def inspect_original_revenue(
         calendar_starts: dict[date, date] = {}
         calendar_year_labels = False
         external_header = None
-        displayed_weeks: dict[int, int] = {}
+        displayed_week_cells: dict[date, GridCell] = {}
+        calendar_note = None
         if table.separate_title:
             parser_version = TITLED_TABLE_PARSER_VERSION
             annual, periods = _titled_table_columns(headers)
@@ -525,7 +535,7 @@ def inspect_original_revenue(
         elif combined_headers:
             annual, periods = _combined_year_columns(headers, label, combined_headers)
         elif selected_label is not None and (external_header := _external_annual_header(table)) is not None:
-            annual, periods, fiscal_labels, displayed_weeks = _external_year_columns(headers, label, external_header)
+            annual, periods, fiscal_labels, displayed_week_cells = _external_year_columns(headers, label, external_header)
             requirements.append("fiscal_calendar_verification")
         elif not has_shared_header and table.preamble:
             calendar_year_labels = True
@@ -551,6 +561,12 @@ def inspect_original_revenue(
                 calendar_starts = _january_calendar_starts(periods, policy.weeks, policy.year_end_weekday, diagnostics)
             policy.weeks = {end.year: policy.weeks[end.year] for end in calendar_starts}
             company = company or policy.issuer or ""
+        elif (selected_label is not None and parser_version == DATED_COLUMNS_PARSER_VERSION and not document.contexts
+                and (calendar := nearest_weekday_calendar(document, lines, after=table.position))):
+            rule, note = calendar
+            calendar_starts = _nearest_calendar_starts(periods, rule)
+            if calendar_starts:
+                calendar_note = note
         statement = DatedStatement(table, rows, label, annual, scale, unit_locator,
                                    shared_year=parser_version == SHARED_YEAR_PARSER_VERSION
                                    and not (fiscal_labels or calendar_year_labels),
@@ -559,6 +575,7 @@ def inspect_original_revenue(
                                    fiscal_labels=fiscal_labels,
                                    disclosed_year_end_weekday=policy.year_end_weekday if fiscal_labels else None,
                                    calendar_starts=calendar_starts, external_annual_header=external_header,
+                                   displayed_week_cells=displayed_week_cells,
                                    accepts_aggregate_revenues_tag=selected_label is not None and (
                                        external_header is not None or (
                                            parser_version == DATED_COLUMNS_PARSER_VERSION
@@ -589,7 +606,7 @@ def inspect_original_revenue(
             if (shared_row or combined_headers or calendar_year_labels or fiscal_labels
                     or parser_version == DATED_COLUMNS_PARSER_VERSION) and not coverage:
                 raise UnsupportedLayout("The visible fiscal year headers do not establish an unambiguous period inventory.")
-        weeks = displayed_weeks
+        weeks: dict[int, int] = {}
         qualified_years: set[int] = set()
         acquisition_notes: list[dict[str, Any]] = []
         caveats: list[str] | None = []
@@ -653,10 +670,20 @@ def inspect_original_revenue(
                 )
             else:
                 notes, caveats, qualified_years = extended_notes
+        for end, cell in displayed_week_cells.items():
+            match = DISPLAYED_WEEKS.fullmatch(cell.cell.text)
+            assert match is not None
+            year = fiscal_labels[end]
+            displayed = int(match[1])
+            if year in weeks and weeks[year] != displayed:
+                raise UnsupportedLayout("The displayed week count conflicts with the filing's calendar disclosure.")
+            weeks[year] = displayed
         if len(notes) < 2:
             requirements.append("applicable_notes")
             diagnostics.append({"code": "unsupported_notes",
                                 "message": "The applicable filing disclosures could not be established."})
+        if calendar_note is not None:
+            notes = [*notes, calendar_note]
         base = {
             "source_id": source["source_id"], "company": company or None,
             "filing_date": source["filing_date"], "parser_version": parser_version,
@@ -916,7 +943,7 @@ def _external_annual_header(table: Table) -> EvidenceText | None:
 
 def _external_year_columns(
     headers: list[list[GridCell]], label: GridCell, annual_header: EvidenceText,
-) -> tuple[GridCell, dict[date, GridCell], dict[date, int], dict[int, int]]:
+) -> tuple[GridCell, dict[date, GridCell], dict[date, int], dict[date, GridCell]]:
     ends = [_displayed_date(match[0]) for match in DATE_HEADER.finditer(annual_header.text)]
     data_rows = [[cell for cell in row if cell.cell.text and cell.columns.start >= label.columns.stop]
                  for row in headers]
@@ -926,8 +953,8 @@ def _external_year_columns(
         raise UnsupportedLayout("The external annual dates do not align with the fiscal year columns.")
     years = [int(cell.cell.text) for cell in columns]
     offsets = {end.year - year for end, year in zip(ends, years, strict=True)}
-    if (len(offsets) != 1 or not offsets <= {0, 1}
-            or not all(newer - older == 1 for newer, older in zip(years, years[1:]))):
+    if (not offsets <= {0, 1} or not all(newer - older == 1 for newer, older in zip(years, years[1:]))
+            or not all((newer - older).days in {364, 365, 366, 371} for newer, older in zip(ends, ends[1:]))):
         raise UnsupportedLayout("The external annual dates conflict with the displayed fiscal years.")
     periods = dict(zip(ends, columns, strict=True))
     week_rows = [row for row in data_rows if any(DISPLAYED_WEEKS.fullmatch(cell.cell.text) for cell in row)]
@@ -936,12 +963,30 @@ def _external_year_columns(
         week_row = _one(week_rows, "Expected one row of week counts for the external annual dates.")
         if len(week_row) != len(columns):
             raise UnsupportedLayout("The displayed week counts do not align with the fiscal year columns.")
-        for week_cell, column, year in zip(week_row, columns, years, strict=True):
-            week = DISPLAYED_WEEKS.fullmatch(week_cell.cell.text)
-            if week is None or not set(week_cell.columns) <= set(column.columns):
+        for week_cell, column, end in zip(week_row, columns, ends, strict=True):
+            if not DISPLAYED_WEEKS.fullmatch(week_cell.cell.text) or not set(week_cell.columns) <= set(column.columns):
                 raise UnsupportedLayout("The displayed week counts do not align with the fiscal year columns.")
-            weeks[year] = int(week[1])
+            weeks[end] = week_cell
     return columns[0], periods, dict(zip(ends, years, strict=True)), weeks
+
+
+def _nearest_calendar_starts(periods: dict[date, GridCell], rule: re.Match[str]) -> dict[date, date]:
+    weekdays = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+    weekday = weekdays.index(rule[1].casefold())
+    month = DATE_MONTHS.get(rule[2].casefold())
+    if month is None:
+        return {}
+
+    def year_end(year: int) -> date:
+        anchor = date(year, month, int(rule[3]))
+        return anchor + timedelta(days=(weekday - anchor.weekday() + 3) % 7 - 3)
+
+    try:
+        if not all(end == year_end(end.year) for end in periods):
+            return {}
+        return {end: year_end(end.year - 1) + timedelta(days=1) for end in periods}
+    except ValueError:
+        return {}
 
 
 def _titled_table_columns(rows: list[list[GridCell]]) -> tuple[GridCell, dict[date, GridCell]]:

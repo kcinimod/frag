@@ -66,6 +66,11 @@ DATED_FISCAL_PAIR = re.compile(
     r"respectively, and consisted of (52|53) weeks\.", re.I,
 )
 FISCAL_YEAR_END_RULE = re.compile(r"\bOur fiscal year ends on the (Saturday|Sunday) nearest January 31\.", re.I)
+NEAREST_WEEKDAY_RULE = re.compile(
+    r"\bfiscal year is a 52- or 53-week year that ends on the "
+    r"(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday) "
+    r"(?:closest to|nearest) ([A-Za-z]+) (\d{1,2})\.", re.I,
+)
 
 
 @dataclass
@@ -93,6 +98,22 @@ def statement_policy_notes(
     if layout == "continuing_operations":
         return _continuing_operations_policy(lines, blocks)
     return _transportation_policy(lines, blocks)
+
+
+def nearest_weekday_calendar(
+    document: StatementHTML, lines: list[str], *, after: tuple[int, int],
+) -> tuple[re.Match[str], dict[str, Any]] | None:
+    blocks = [block for block in document.blocks if block.position > after]
+    section = _policy_section(
+        blocks, r"^note\s+1\s*\.\s*(?:basis of presentation and |summary of )significant accounting policies$",
+    )
+    index = _unique_heading(section, re.compile("fiscal year", re.I))
+    if index is None:
+        return None
+    disclosure = section[index + 1]
+    rule = NEAREST_WEEKDAY_RULE.search(disclosure.text)
+    note = _note(lines, "fiscal-year", section[index], disclosure.end, number=1)
+    return (rule, note) if rule and note else None
 
 
 def _policy_section(blocks: list[TextBlock], heading: str) -> list[TextBlock]:

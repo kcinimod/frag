@@ -17,6 +17,7 @@ from frag.revenue import REVENUE_CONCEPT, _normalize
 REVENUE_LABELS = SHARED_REVENUE_LABELS | {"net revenue", "net revenues", "net sales"}
 AMOUNT = re.compile(r"[0-9][0-9,]*(?:\.[0-9]+)?")
 OPERATING_REVENUE_TOTAL = re.compile(r"total operating revenues?")
+COMPONENT_LABEL = re.compile(r"\b(?:subtotals?|segments?|divisions?)\b", re.I)
 STATEMENT_CONTEXT = re.compile(
     r"^(?:\((?:in|dollars in|amounts in)\s|(?:for the )?(?:fiscal )?years? ended\b)"
     r"|\b(?:inc\.?|corp\.?|corporation|company)(?: and subsidiaries)?$", re.I,
@@ -115,10 +116,6 @@ def extract_selection(
     except UnsupportedLayout as exc:
         return selection_stop("unsupported_layout", str(exc), selection)
     label = next(cell for cell in rows[row - 1].cells if cell.cell.text)
-    # A dimensioned tag identifies a component even if its visible label looks like a total.
-    if any(context.dimensioned for cell in rows[row - 1].cells for fact in cell.cell.inline_facts
-           for context in inventory.document.contexts.get(fact.attrs.get("contextref") or "", [])):
-        return selection_stop("unsupported_scope", "The selected row has dimensioned Inline XBRL contexts.", selection)
     statement = replace(table, heading=heading)
     result = inspect_original_revenue(
         inventory.document, [statement], inventory.lines,
@@ -187,7 +184,8 @@ def _supports_consolidated_total(document: StatementHTML, table: Table, selected
     revenue_rows = []
     for row_number, row in enumerate(table.rows, 1):
         texts = [cell.text for cell in row if cell.text]
-        if not texts or not any(_normalize(text, 1) is not None for text in texts[1:]):
+        if (not texts or not any(_normalize(text, 1) is not None for text in texts[1:])
+                or _has_dimensioned_context(document, row)):
             continue
         label = texts[0].casefold()
         if (TOTAL_REVENUE_NOTE.fullmatch(label) or OPERATING_REVENUE_TOTAL.fullmatch(label)
@@ -202,7 +200,8 @@ def _revenue_rows(document: StatementHTML, table: Table) -> dict[int, bool]:
     candidates = {}
     for row_number, row in enumerate(table.rows, 1):
         texts = [cell.text for cell in row if cell.text]
-        if not texts or sum(AMOUNT.fullmatch(text) is not None for text in texts[1:]) < 2:
+        if (not texts or sum(AMOUNT.fullmatch(text) is not None for text in texts[1:]) < 2
+                or _has_dimensioned_context(document, row)):
             continue
         label = texts[0].casefold()
         if label in REVENUE_LABELS or TOTAL_REVENUE_NOTE.fullmatch(label):
@@ -212,11 +211,16 @@ def _revenue_rows(document: StatementHTML, table: Table) -> dict[int, bool]:
     return candidates
 
 
+def _has_dimensioned_context(document: StatementHTML, row: list[Cell]) -> bool:
+    return any(context.dimensioned for cell in row for fact in cell.inline_facts
+               for context in document.contexts.get(fact.attrs.get("contextref") or "", []))
+
+
 def _tagged_annual_revenue(document: StatementHTML, row: list[Cell]) -> bool:
     """Recognize unfamiliar labels through consistent company-wide annual revenue tags."""
     visible = [cell for cell in row if cell.text]
     amounts = [cell for cell in visible[1:] if _normalize(cell.text, 1) is not None]
-    if len(amounts) < 2:
+    if len(amounts) < 2 or COMPONENT_LABEL.search(visible[0].text):
         return False
     registrants = document.cover_facts.get("dei:entitycentralindexkey", [])
     if len(registrants) != 1 or not re.fullmatch(r"[0-9]{10}", registrants[0].text):

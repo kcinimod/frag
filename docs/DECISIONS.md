@@ -6,7 +6,8 @@ Keep familiar revenue labels and use consistent company-wide annual inline
 XBRL revenue facts to qualify unfamiliar labels in the consolidated statement.
 Use the displayed fiscal-year columns to associate external lists of year-end
 dates with amount cells. Corroborate the dates and starts with tagged annual
-contexts and preserve an explicit gap when that evidence does not resolve.
+contexts or the filing's fiscal calendar disclosure. Preserve an explicit
+gap when the available evidence cannot establish a start.
 Review generalization on a fresh issuer-disjoint cohort before production
 integration.
 [Development replay](../artifacts/phase06/REVENUE_EXTRACTION_FOLLOWUPS.md)

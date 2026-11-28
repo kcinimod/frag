@@ -431,3 +431,18 @@ archives and original evidence without starting a selector.
 The command reports the reviewed observation and control counts. Complete
 the final inventory recheck and freeze before releasing the runner archive.
 [Custody and final recheck commands](artifacts/phase06/REVENUE_SELECTION_HOLDOUT.md)
+
+## Phase 6 extraction follow-up replay
+
+From the repository root, replay rules-only extraction on the opened #54
+and #59 bundles with sockets blocked.
+
+```powershell
+New-Item -ItemType Directory -Path build -Force | Out-Null
+$out = Join-Path 'build' ('extraction-followups-' + [guid]::NewGuid() + '.json')
+.venv/Scripts/python.exe artifacts/phase06/revenue_extraction_followups.py ../FRAG-SEC-Holdout-54 ../FRAG-SEC-Holdout-59 $out
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Get-FileHash -LiteralPath $out
+```
+
+[Development scores and expected replay hash](artifacts/phase06/REVENUE_EXTRACTION_FOLLOWUPS.md)

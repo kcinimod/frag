@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+import re
 
 import pytest
 
@@ -81,13 +82,14 @@ def test_rules_abstain_between_consolidated_statement_candidates() -> None:
     assert result["stop"] == "ambiguous_candidates"
 
 
-@pytest.mark.parametrize(("segment", "competing", "expected"), [
-    (False, False, "table-1/row-2"),
-    (True, False, None),
-    (False, True, None),
+@pytest.mark.parametrize(("label", "segment", "competing", "expected"), [
+    ("Sales", False, False, "table-1/row-2"),
+    ("Total revenue", True, False, None),
+    ("Retail sales subtotal", False, False, None),
+    ("Sales", False, True, None),
 ])
 def test_unfamiliar_label_requires_unique_consolidated_revenue_evidence(
-    segment: bool, competing: bool, expected: str | None,
+    label: str, segment: bool, competing: bool, expected: str | None,
 ) -> None:
     dimension = '<xbrldi:explicitMember dimension="test:Segment">test:Retail</xbrldi:explicitMember>'
     contexts = "".join(
@@ -111,7 +113,7 @@ def test_unfamiliar_label_requires_unique_consolidated_revenue_evidence(
     <h2>Consolidated Statements of Income</h2>
     <table>
     <tr><td>Years ended December 31</td><td>2024</td><td>2023</td></tr>
-    <tr><td>Sales</td>{values}</tr>
+    <tr><td>{label}</td>{values}</tr>
     {other}
     </table>
     """
@@ -164,9 +166,11 @@ def test_explicit_selection_can_extract_a_supported_label_outside_shortlisting()
     assert [fact["normalized_amount"] for fact in result["observations"]] == ["17000000", "22000000"]
 
 
-@pytest.mark.parametrize("conflicting", [False, True])
-def test_external_annual_dates_align_to_fiscal_labels_and_inline_contexts(conflicting: bool) -> None:
-    current_end = "2024-02-02" if conflicting else "2024-02-03"
+@pytest.mark.parametrize("heading", ["Consolidated Statements of Income", "Statements of Consolidated Income"])
+@pytest.mark.parametrize("mode", ["corroborated", "date conflict", "week conflict", "untagged"])
+def test_external_annual_dates_align_to_fiscal_labels_and_inline_contexts(heading: str, mode: str) -> None:
+    current_end = "2024-02-02" if mode == "date conflict" else "2024-02-03"
+    current_weeks = 52 if mode == "week conflict" else 53
     original = f"""
     <ix:nonNumeric name="dei:EntityCentralIndexKey">0000000001</ix:nonNumeric>
     <xbrli:context id="current"><xbrli:entity>
@@ -178,12 +182,12 @@ def test_external_annual_dates_align_to_fiscal_labels_and_inline_contexts(confli
     <xbrli:period><xbrli:startDate>2022-01-30</xbrli:startDate><xbrli:endDate>2023-01-28</xbrli:endDate></xbrli:period>
     </xbrli:context>
     <xbrli:unit id="usd"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>
-    <h2>Consolidated Statements of Income</h2>
+    <h2>{heading}</h2>
     <p>Years Ended February 3, 2024 and January 28, 2023</p>
     <p>(In millions)</p>
     <table>
     <tr><td></td><td colspan="2">2023</td><td colspan="2">2022</td></tr>
-    <tr><td></td><td colspan="2">(53 weeks)</td><td colspan="2">(52 weeks)</td></tr>
+    <tr><td></td><td colspan="2">({current_weeks} weeks)</td><td colspan="2">(52 weeks)</td></tr>
     <tr><td>Net revenue</td><td>$</td>
     <td><ix:nonFraction name="us-gaap:Revenues" contextRef="current" unitRef="usd"
     scale="6" format="ixt:num-dot-decimal">19</ix:nonFraction></td><td>$</td>
@@ -191,6 +195,8 @@ def test_external_annual_dates_align_to_fiscal_labels_and_inline_contexts(confli
     scale="6" format="ixt:num-dot-decimal">15</ix:nonFraction></td></tr>
     </table>
     """
+    if mode == "untagged":
+        original = re.sub(r"<ix:nonFraction[^>]+>(\d+)</ix:nonFraction>", r"\1", original)
     result = extract_selection(filing_inventory(original.encode()), SYNTHETIC_SOURCE,
                                Selection("table-1", "table-1/row-3"))
     prior, current = result["observations"]
@@ -198,15 +204,19 @@ def test_external_annual_dates_align_to_fiscal_labels_and_inline_contexts(confli
         "kind": "annual", "fiscal_year": 2022, "start": "2022-01-30", "end": "2023-01-28",
     }
     assert current["reporting_period"] == {
-        "kind": "annual", "fiscal_year": 2023, "start": None if conflicting else "2023-01-29", "end": "2024-02-03",
+        "kind": "annual", "fiscal_year": 2023,
+        "start": None if mode.endswith("conflict") else "2023-01-29", "end": "2024-02-03",
     }
     assert current["normalized_amount"] == "19000000"
     assert current["locators"]["year_header"]["cell"] == 2
     assert current["locators"]["value"]["cell"] == 3
     assert "Years Ended February" in original.splitlines()[current["locators"]["annual_header"]["line"] - 1]
-    if conflicting:
+    if mode == "untagged":
+        assert current["status"] == "provisional"
+        assert current["locators"]["week_count"]["cell"] == 2
+    if mode.endswith("conflict"):
         assert result["stop"] == "extraction_gap"
-        assert any("conflicts with the displayed fiscal year-end" in item["message"] for item in result["diagnostics"])
+        assert any("conflicts with" in item["message"] for item in result["diagnostics"])
 
 
 def test_bom_and_unicode_text_do_not_change_original_locator_conventions() -> None:
