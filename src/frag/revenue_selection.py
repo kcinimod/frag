@@ -2,6 +2,7 @@
 
 from dataclasses import asdict, dataclass, replace
 from collections.abc import Iterator
+from datetime import date
 from hashlib import sha256
 import re
 from typing import Any
@@ -11,7 +12,7 @@ from frag.income_html import (
     Cell, EvidenceText, GridRow, StatementHTML, Table, UnsupportedLayout,
     is_statement_heading, table_grid,
 )
-from frag.revenue import _normalize
+from frag.revenue import REVENUE_CONCEPT, _normalize
 
 REVENUE_LABELS = SHARED_REVENUE_LABELS | {"net revenue", "net revenues", "net sales"}
 AMOUNT = re.compile(r"[0-9][0-9,]*(?:\.[0-9]+)?")
@@ -70,7 +71,7 @@ class Selection:
 def _candidate_rows(inventory: FilingInventory) -> Iterator[tuple[Table, dict[int, bool]]]:
     for table in inventory.document.visible_tables:
         if _statement_heading(table):
-            yield table, _revenue_rows(table)
+            yield table, _revenue_rows(inventory.document, table)
 
 
 def shortlist_revenue(inventory: FilingInventory) -> list[Selection]:
@@ -106,7 +107,7 @@ def extract_selection(
     if row is None:
         return selection_stop("invalid_selection", "The selected row ID is absent from the table.", selection)
     heading = _statement_heading(table)
-    if heading is None or not _supports_consolidated_total(table, row):
+    if heading is None or not _supports_consolidated_total(inventory.document, table, row):
         return selection_stop("unsupported_scope", "The selection does not establish a consolidated revenue total.",
                         selection)
     try:
@@ -180,7 +181,7 @@ def _consolidated_heading(text: str) -> bool:
     }
 
 
-def _supports_consolidated_total(table: Table, selected_row: int) -> bool:
+def _supports_consolidated_total(document: StatementHTML, table: Table, selected_row: int) -> bool:
     """Check the chosen label and competing totals independently of candidate shortlisting."""
     totals = []
     revenue_rows = []
@@ -192,12 +193,12 @@ def _supports_consolidated_total(table: Table, selected_row: int) -> bool:
         if (TOTAL_REVENUE_NOTE.fullmatch(label) or OPERATING_REVENUE_TOTAL.fullmatch(label)
                 or (label in REVENUE_LABELS and label.startswith("total "))):
             totals.append(row_number)
-        elif label in REVENUE_LABELS:
+        elif label in REVENUE_LABELS or _tagged_annual_revenue(document, row):
             revenue_rows.append(row_number)
     return (totals or revenue_rows) == [selected_row]
 
 
-def _revenue_rows(table: Table) -> dict[int, bool]:
+def _revenue_rows(document: StatementHTML, table: Table) -> dict[int, bool]:
     candidates = {}
     for row_number, row in enumerate(table.rows, 1):
         texts = [cell.text for cell in row if cell.text]
@@ -206,7 +207,45 @@ def _revenue_rows(table: Table) -> dict[int, bool]:
         label = texts[0].casefold()
         if label in REVENUE_LABELS or TOTAL_REVENUE_NOTE.fullmatch(label):
             candidates[row_number] = label.startswith("total ")
+        elif _tagged_annual_revenue(document, row):
+            candidates[row_number] = False
     return candidates
+
+
+def _tagged_annual_revenue(document: StatementHTML, row: list[Cell]) -> bool:
+    """Recognize unfamiliar labels through consistent company-wide annual revenue tags."""
+    visible = [cell for cell in row if cell.text]
+    amounts = [cell for cell in visible[1:] if _normalize(cell.text, 1) is not None]
+    if len(amounts) < 2:
+        return False
+    registrants = document.cover_facts.get("dei:entitycentralindexkey", [])
+    if len(registrants) != 1 or not re.fullmatch(r"[0-9]{10}", registrants[0].text):
+        return False
+    ends = set()
+    for cell in amounts:
+        if len(cell.inline_facts) != 1:
+            return False
+        fact = cell.inline_facts[0].attrs
+        if (fact.get("name") or "").casefold() != REVENUE_CONCEPT.casefold():
+            return False
+        contexts = document.contexts.get(fact.get("contextref") or "", [])
+        measures = document.unit_measures.get(fact.get("unitref") or "", [])
+        if len(contexts) != 1 or len(measures) != 1 or measures[0].text.casefold() != "iso4217:usd":
+            return False
+        context = contexts[0]
+        fields = {name: value.text for name, value in context.fields.items()}
+        if (context.dimensioned or fields.get("xbrli:identifier") != registrants[0].text
+                or context.identifier_scheme not in {"http://www.sec.gov/CIK", "https://www.sec.gov/CIK"}):
+            return False
+        try:
+            start = date.fromisoformat(fields.get("xbrli:startdate", ""))
+            end = date.fromisoformat(fields.get("xbrli:enddate", ""))
+        except ValueError:
+            return False
+        if (end - start).days + 1 not in {364, 365, 366, 371}:
+            return False
+        ends.add(end)
+    return len(ends) == len(amounts)
 
 
 def _strongest_rows(candidates: dict[int, bool]) -> list[int]:

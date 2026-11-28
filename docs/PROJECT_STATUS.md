@@ -1,5 +1,10 @@
 # Project status
 
+Issues #62 and #63 extend standalone rules-only extraction. On the opened
+cohorts it matches 18 of 21 #54 observations and all 12 #59 observations.
+All exact observations remain provisional. Fresh issuer-disjoint evaluation
+is pending. [Development replay](../artifacts/phase06/REVENUE_EXTRACTION_FOLLOWUPS.md)
+
 Issue #60 completed the issuer-disjoint extraction comparison. Rules alone
 and the shortlisted model matched 9 of 12 reviewed observations. The
 model-only strategy matched zero. Neither model met the adoption gate.

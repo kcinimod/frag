@@ -52,6 +52,11 @@ DATED_ANNUAL_HEADERS = {"year ended", "years ended"}
 SHARED_REVENUE_LABELS = {"total net sales", "total revenue", "total revenues", "revenues", "revenue", "net operating revenues"}
 TOTAL_REVENUE_NOTE = re.compile(r"total revenues? \(note (\d+)\)", re.I)
 COMBINED_YEAR_HEADER = re.compile(rf"(?:for the )?years? ended ({DATE_HEADER.pattern})", re.I)
+EXTERNAL_YEAR_ENDS = re.compile(
+    rf"(?:for the )?(?:fiscal )?years ended {DATE_HEADER.pattern}"
+    rf"(?:, {DATE_HEADER.pattern})*,? and {DATE_HEADER.pattern}", re.I,
+)
+DISPLAYED_WEEKS = re.compile(r"\((52|53) weeks\)", re.I)
 
 
 @dataclass(frozen=True)
@@ -68,6 +73,8 @@ class DatedStatement:
     fiscal_labels: dict[date, int] = field(default_factory=dict)
     disclosed_year_end_weekday: int | None = None
     calendar_starts: dict[date, date] = field(default_factory=dict)
+    external_annual_header: EvidenceText | None = None
+    accepts_aggregate_revenues_tag: bool = False
 
     @property
     def uses_original_evidence(self) -> bool:
@@ -267,7 +274,9 @@ def _visible_fact(
     assert table.heading is not None
     locators = {
         "table": table.locator(), "statement_heading": table.heading.locator(),
-        "metric_label": label.locator(table), "annual_header": statement.annual.locator(table),
+        "metric_label": label.locator(table),
+        "annual_header": (statement.external_annual_header.locator() if statement.external_annual_header
+                          else statement.annual.locator(table)),
         "year_header": header.locator(table), "value": value.locator(table),
         "unit_header": statement.unit_header, "currency_symbol": markers[0].locator(table),
     }
@@ -306,7 +315,7 @@ def _verify_inline(
     tagged = _one(value.cell.inline_facts, "Expected one inline XBRL fact in the revenue cell.")
     inline = tagged.attrs
     concepts = {REVENUE_CONCEPT.casefold()}
-    if statement.shared_year or (
+    if statement.shared_year or statement.accepts_aggregate_revenues_tag or (
         end in statement.calendar_starts
         and statement.label.cell.text.casefold() in {"revenue", "revenues", "total revenue", "total revenues"}
     ):
@@ -317,7 +326,10 @@ def _verify_inline(
                                     statement=statement, weeks=weeks)
     if inline.get("scale") != str(len(str(statement.scale)) - 1):
         raise UnsupportedLayout("Inline XBRL scale conflicts with the visible statement scale.")
-    if (inline.get("format") != "ixt:num-dot-decimal" or inline.get("sign") is not None
+    formats = {"ixt:num-dot-decimal"}
+    if statement.external_annual_header is not None:
+        formats.add("ixt:numdotdecimal")
+    if (inline.get("format") not in formats or inline.get("sign") is not None
             or inline.get("xsi:nil") in {"true", "1"}
             or fact["normalized_amount"] != _normalize(tagged.text, statement.scale)):
         raise UnsupportedLayout("Inline XBRL amount or sign conflicts with the displayed revenue amount.")
@@ -347,7 +359,7 @@ def _annual_facts(
         prior_end = calendar_start - timedelta(days=1) if calendar_start else (ordered[index - 1] if index else None)
         fact = None
         year = statement.fiscal_labels.get(end, end.year)
-        if statement.fiscal_labels:
+        if statement.fiscal_labels and statement.external_annual_header is None:
             weekday = statement.disclosed_year_end_weekday
             prior_end = _fiscal_week_year_end(year - 1, weekday if weekday is not None else 6)
         week_count = weeks.get(year)
@@ -488,6 +500,8 @@ def inspect_original_revenue(
         has_shared_header = any(SHARED_YEAR_HEADER.fullmatch(cell.cell.text) for row in headers for cell in row)
         calendar_starts: dict[date, date] = {}
         calendar_year_labels = False
+        external_header = None
+        displayed_weeks: dict[int, int] = {}
         if table.separate_title:
             parser_version = TITLED_TABLE_PARSER_VERSION
             annual, periods = _titled_table_columns(headers)
@@ -510,6 +524,9 @@ def inspect_original_revenue(
             periods, fiscal_labels = _disclosed_fiscal_year_columns(headers, label, annual, policy)
         elif combined_headers:
             annual, periods = _combined_year_columns(headers, label, combined_headers)
+        elif selected_label is not None and (external_header := _external_annual_header(table)) is not None:
+            annual, periods, fiscal_labels, displayed_weeks = _external_year_columns(headers, label, external_header)
+            requirements.append("fiscal_calendar_verification")
         elif not has_shared_header and table.preamble:
             calendar_year_labels = True
             policy = reporting_period_policy(document, lines, after=table.position)
@@ -526,7 +543,7 @@ def inspect_original_revenue(
                 or _cover(document, "documenttype") != "10-K"
                 or cover_end != current):
             requirements.append("source_identity_verification")
-        scale, unit_locator = _original_statement_scale(table, headers, annual)
+        scale, unit_locator = _original_statement_scale(table, headers, annual, external_header=external_header)
         singular_annual_header = parser_version == DATED_COLUMNS_PARSER_VERSION and annual.cell.text.casefold() == "year ended"
         if singular_annual_header:
             policy = january_calendar_policy_notes(document, lines, after=table.position)
@@ -541,7 +558,13 @@ def inspect_original_revenue(
                                    original_dated_columns=parser_version == DATED_COLUMNS_PARSER_VERSION,
                                    fiscal_labels=fiscal_labels,
                                    disclosed_year_end_weekday=policy.year_end_weekday if fiscal_labels else None,
-                                   calendar_starts=calendar_starts)
+                                   calendar_starts=calendar_starts, external_annual_header=external_header,
+                                   accepts_aggregate_revenues_tag=selected_label is not None and (
+                                       external_header is not None or (
+                                           parser_version == DATED_COLUMNS_PARSER_VERSION
+                                           and label.cell.text.casefold() in {"total revenue", "total revenues"}
+                                       )
+                                   ))
         issuer = statement.issuer_heading
         conflicting_heading = issuer is not None and _company_words(issuer.text, statement=True) != _company_words(company)
         if disclosed_fiscal_years:
@@ -566,7 +589,7 @@ def inspect_original_revenue(
             if (shared_row or combined_headers or calendar_year_labels or fiscal_labels
                     or parser_version == DATED_COLUMNS_PARSER_VERSION) and not coverage:
                 raise UnsupportedLayout("The visible fiscal year headers do not establish an unambiguous period inventory.")
-        weeks: dict[int, int] = {}
+        weeks = displayed_weeks
         qualified_years: set[int] = set()
         acquisition_notes: list[dict[str, Any]] = []
         caveats: list[str] | None = []
@@ -852,7 +875,8 @@ def _original_comparison(
 
 
 def _original_statement_scale(
-    table: Table, headers: list[list[GridCell]], annual: GridCell,
+    table: Table, headers: list[list[GridCell]], annual: GridCell, *,
+    external_header: EvidenceText | None = None,
 ) -> tuple[int, dict[str, int]]:
     if fiscal_units := FISCAL_YEAR_UNITS.fullmatch(annual.cell.text):
         return SCALES[fiscal_units[1].casefold()], annual.locator(table)
@@ -868,6 +892,10 @@ def _original_statement_scale(
         ]
         if table.preamble:
             unit_entries.append((table.preamble, {"table": table.number, **table.preamble.locator()}))
+        if external_header is not None:
+            unit_entries.extend((block, {"table": table.number, **block.locator()})
+                                for block in table.nearby if block.position > external_header.position
+                                and block is not table.preamble and MONEY_PREAMBLE.match(block.text))
         if declaration and (scale := declaration[1] or declaration[3]):
             if unit_entries or (declaration[1] and declaration[3]):
                 raise UnsupportedLayout("Expected one visible consolidated statement scale.")
@@ -877,6 +905,43 @@ def _original_statement_scale(
     if units is None:
         raise UnsupportedLayout("The visible statement currency or scale declaration is unsupported.")
     return SCALES[units[1].casefold()], locator
+
+
+def _external_annual_header(table: Table) -> EvidenceText | None:
+    assert table.heading is not None
+    headers = [block for block in table.nearby if table.heading.position < block.position
+               and EXTERNAL_YEAR_ENDS.fullmatch(block.text)]
+    return _one(headers, "Expected one external annual date list.") if headers else None
+
+
+def _external_year_columns(
+    headers: list[list[GridCell]], label: GridCell, annual_header: EvidenceText,
+) -> tuple[GridCell, dict[date, GridCell], dict[date, int], dict[int, int]]:
+    ends = [_displayed_date(match[0]) for match in DATE_HEADER.finditer(annual_header.text)]
+    data_rows = [[cell for cell in row if cell.cell.text and cell.columns.start >= label.columns.stop]
+                 for row in headers]
+    columns = _one([row for row in data_rows if any(FISCAL_YEAR.fullmatch(cell.cell.text) for cell in row)],
+                   "Expected one row of fiscal years for the external annual dates.")
+    if len(columns) != len(ends) or not all(FISCAL_YEAR.fullmatch(cell.cell.text) for cell in columns):
+        raise UnsupportedLayout("The external annual dates do not align with the fiscal year columns.")
+    years = [int(cell.cell.text) for cell in columns]
+    offsets = {end.year - year for end, year in zip(ends, years, strict=True)}
+    if (len(offsets) != 1 or not offsets <= {0, 1}
+            or not all(newer - older == 1 for newer, older in zip(years, years[1:]))):
+        raise UnsupportedLayout("The external annual dates conflict with the displayed fiscal years.")
+    periods = dict(zip(ends, columns, strict=True))
+    week_rows = [row for row in data_rows if any(DISPLAYED_WEEKS.fullmatch(cell.cell.text) for cell in row)]
+    weeks = {}
+    if week_rows:
+        week_row = _one(week_rows, "Expected one row of week counts for the external annual dates.")
+        if len(week_row) != len(columns):
+            raise UnsupportedLayout("The displayed week counts do not align with the fiscal year columns.")
+        for week_cell, column, year in zip(week_row, columns, years, strict=True):
+            week = DISPLAYED_WEEKS.fullmatch(week_cell.cell.text)
+            if week is None or not set(week_cell.columns) <= set(column.columns):
+                raise UnsupportedLayout("The displayed week counts do not align with the fiscal year columns.")
+            weeks[year] = int(week[1])
+    return columns[0], periods, dict(zip(ends, years, strict=True)), weeks
 
 
 def _titled_table_columns(rows: list[list[GridCell]]) -> tuple[GridCell, dict[date, GridCell]]:

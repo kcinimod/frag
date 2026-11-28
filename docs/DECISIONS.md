@@ -1,5 +1,16 @@
 # Decision log
 
+## Issues #62 and #63 revenue extraction follow-up
+
+Keep familiar revenue labels and use consistent company-wide annual inline
+XBRL revenue facts to qualify unfamiliar labels in the consolidated statement.
+Use the displayed fiscal-year columns to associate external lists of year-end
+dates with amount cells. Corroborate the dates and starts with tagged annual
+contexts and preserve an explicit gap when that evidence does not resolve.
+Review generalization on a fresh issuer-disjoint cohort before production
+integration.
+[Development replay](../artifacts/phase06/REVENUE_EXTRACTION_FOLLOWUPS.md)
+
 ## Issue #60 issuer-disjoint extraction comparison
 
 Retain rules alone. On the frozen issuer-disjoint set, the shortlisted model

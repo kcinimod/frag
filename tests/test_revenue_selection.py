@@ -81,6 +81,46 @@ def test_rules_abstain_between_consolidated_statement_candidates() -> None:
     assert result["stop"] == "ambiguous_candidates"
 
 
+@pytest.mark.parametrize(("segment", "competing", "expected"), [
+    (False, False, "table-1/row-2"),
+    (True, False, None),
+    (False, True, None),
+])
+def test_unfamiliar_label_requires_unique_consolidated_revenue_evidence(
+    segment: bool, competing: bool, expected: str | None,
+) -> None:
+    dimension = '<xbrldi:explicitMember dimension="test:Segment">test:Retail</xbrldi:explicitMember>'
+    contexts = "".join(
+        f'<xbrli:context id="c{year}"><xbrli:entity>'
+        '<xbrli:identifier scheme="http://www.sec.gov/CIK">0000000001</xbrli:identifier>'
+        f'{dimension if segment else ""}</xbrli:entity><xbrli:period>'
+        f'<xbrli:startDate>{year}-01-01</xbrli:startDate><xbrli:endDate>{year}-12-31</xbrli:endDate>'
+        '</xbrli:period></xbrli:context>'
+        for year in (2024, 2023)
+    )
+    values = "".join(
+        f'<td><ix:nonFraction name="us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax" '
+        f'contextRef="c{year}" unitRef="usd">{amount}</ix:nonFraction></td>'
+        for year, amount in [(2024, 19), (2023, 15)]
+    )
+    other = f"<tr><td>Other receipts</td>{values}</tr>" if competing else ""
+    original = f"""
+    <ix:nonNumeric name="dei:EntityCentralIndexKey">0000000001</ix:nonNumeric>
+    {contexts}
+    <xbrli:unit id="usd"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>
+    <h2>Consolidated Statements of Income</h2>
+    <table>
+    <tr><td>Years ended December 31</td><td>2024</td><td>2023</td></tr>
+    <tr><td>Sales</td>{values}</tr>
+    {other}
+    </table>
+    """
+    result = run_rules(filing_inventory(original.encode()), SYNTHETIC_SOURCE)
+    assert result["selected"] == ({"table_id": "table-1", "row_id": expected} if expected else None)
+    if competing:
+        assert result["stop"] == "ambiguous_candidates"
+
+
 def test_shared_extractor_rejects_a_subtotal_in_the_selected_statement() -> None:
     inventory = filing_inventory(b"""
     <h2>Consolidated Statements of Income</h2>
@@ -122,6 +162,51 @@ def test_explicit_selection_can_extract_a_supported_label_outside_shortlisting()
     assert result["selected"] is None
     result = extract_selection(inventory, SYNTHETIC_SOURCE, Selection("table-1", "table-1/row-3"))
     assert [fact["normalized_amount"] for fact in result["observations"]] == ["17000000", "22000000"]
+
+
+@pytest.mark.parametrize("conflicting", [False, True])
+def test_external_annual_dates_align_to_fiscal_labels_and_inline_contexts(conflicting: bool) -> None:
+    current_end = "2024-02-02" if conflicting else "2024-02-03"
+    original = f"""
+    <ix:nonNumeric name="dei:EntityCentralIndexKey">0000000001</ix:nonNumeric>
+    <xbrli:context id="current"><xbrli:entity>
+    <xbrli:identifier scheme="http://www.sec.gov/CIK">0000000001</xbrli:identifier></xbrli:entity>
+    <xbrli:period><xbrli:startDate>2023-01-29</xbrli:startDate><xbrli:endDate>{current_end}</xbrli:endDate></xbrli:period>
+    </xbrli:context>
+    <xbrli:context id="prior"><xbrli:entity>
+    <xbrli:identifier scheme="http://www.sec.gov/CIK">0000000001</xbrli:identifier></xbrli:entity>
+    <xbrli:period><xbrli:startDate>2022-01-30</xbrli:startDate><xbrli:endDate>2023-01-28</xbrli:endDate></xbrli:period>
+    </xbrli:context>
+    <xbrli:unit id="usd"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>
+    <h2>Consolidated Statements of Income</h2>
+    <p>Years Ended February 3, 2024 and January 28, 2023</p>
+    <p>(In millions)</p>
+    <table>
+    <tr><td></td><td colspan="2">2023</td><td colspan="2">2022</td></tr>
+    <tr><td></td><td colspan="2">(53 weeks)</td><td colspan="2">(52 weeks)</td></tr>
+    <tr><td>Net revenue</td><td>$</td>
+    <td><ix:nonFraction name="us-gaap:Revenues" contextRef="current" unitRef="usd"
+    scale="6" format="ixt:num-dot-decimal">19</ix:nonFraction></td><td>$</td>
+    <td><ix:nonFraction name="us-gaap:Revenues" contextRef="prior" unitRef="usd"
+    scale="6" format="ixt:num-dot-decimal">15</ix:nonFraction></td></tr>
+    </table>
+    """
+    result = extract_selection(filing_inventory(original.encode()), SYNTHETIC_SOURCE,
+                               Selection("table-1", "table-1/row-3"))
+    prior, current = result["observations"]
+    assert prior["reporting_period"] == {
+        "kind": "annual", "fiscal_year": 2022, "start": "2022-01-30", "end": "2023-01-28",
+    }
+    assert current["reporting_period"] == {
+        "kind": "annual", "fiscal_year": 2023, "start": None if conflicting else "2023-01-29", "end": "2024-02-03",
+    }
+    assert current["normalized_amount"] == "19000000"
+    assert current["locators"]["year_header"]["cell"] == 2
+    assert current["locators"]["value"]["cell"] == 3
+    assert "Years Ended February" in original.splitlines()[current["locators"]["annual_header"]["line"] - 1]
+    if conflicting:
+        assert result["stop"] == "extraction_gap"
+        assert any("conflicts with the displayed fiscal year-end" in item["message"] for item in result["diagnostics"])
 
 
 def test_bom_and_unicode_text_do_not_change_original_locator_conventions() -> None:
